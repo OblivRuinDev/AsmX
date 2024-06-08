@@ -424,11 +424,12 @@ class ClassWriterTest extends AsmTest {
   void testToByteArray_computeFrames_highDimensionArrays() {
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     classWriter.visit(Opcodes.V1_7, Opcodes.ACC_PUBLIC, "A", null, "java/lang/Object", null);
+    String prefix = "[".repeat(255);
     MethodVisitor methodVisitor =
         classWriter.visitMethod(
             Opcodes.ACC_STATIC,
             "m",
-            "(I[[[[[[[[Ljava/lang/Integer;[[[[[[[[Ljava/lang/Long;)Ljava/lang/Object;",
+            "(I" + prefix + "Ljava/lang/Integer;" + prefix + "Ljava/lang/Long;)Ljava/lang/Object;",
             null,
             null);
     methodVisitor.visitCode();
@@ -440,9 +441,9 @@ class ClassWriterTest extends AsmTest {
     methodVisitor.visitJumpInsn(Opcodes.GOTO, endIfLabel);
     methodVisitor.visitLabel(thenLabel);
     methodVisitor.visitVarInsn(Opcodes.ALOAD, 2);
-    // At this point the stack can contain either an 8 dimensions Integer array or an 8 dimensions
-    // Long array. The merged type computed with the COMPUTE_FRAMES option should therefore be an
-    // 8 dimensions Number array.
+    // At this point the stack can contain either a 255-dimension Integer array or a 255-dimension
+    // Long array. The merged type computed with the COMPUTE_FRAMES option should therefore be a
+    // 255-dimension Number array.
     methodVisitor.visitLabel(endIfLabel);
     methodVisitor.visitInsn(Opcodes.ARETURN);
     methodVisitor.visitMaxs(0, 0);
@@ -452,7 +453,7 @@ class ClassWriterTest extends AsmTest {
     byte[] classFile = classWriter.toByteArray();
 
     // Check that the merged frame type is correctly computed.
-    assertTrue(new ClassFile(classFile).toString().contains("[[[[[[[[Ljava/lang/Number;"));
+    assertTrue(new ClassFile(classFile).toString().contains(prefix + "Ljava/lang/Number;"));
   }
 
   @Test
