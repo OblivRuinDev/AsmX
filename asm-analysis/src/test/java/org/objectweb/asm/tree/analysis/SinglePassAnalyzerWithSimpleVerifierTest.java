@@ -1,5 +1,6 @@
 package org.objectweb.asm.tree.analysis;
 
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,17 +10,17 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.test.AsmTest;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
-public class SinglePassAnalyzerWithSimpleVerifierTest extends AsmTest {
+class SinglePassAnalyzerWithSimpleVerifierTest extends AsmTest {
 
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
-  public void testAnalyze_simpleVerifier(
+  void testAnalyze_simpleVerifier(
       final AsmTest.PrecompiledClass classParameter, final AsmTest.Api apiParameter)
       throws AnalyzerException {
+    assumeFalse(hasJsrOrRetInstructions(classParameter));
     ClassNode classNode = computeFrames(classParameter);
     assumeFalse(classNode.methods.isEmpty());
     Analyzer<BasicValue> baseAnalyzer =
@@ -44,16 +45,15 @@ public class SinglePassAnalyzerWithSimpleVerifierTest extends AsmTest {
       }
       for (int i = 0; i < framesA.length; i++) {
         try {
-          AbstractInsnNode insn = methodNode.instructions.get(i);
           compareFrames(framesA[i], framesB[i], i);
         } catch (AssertionError e) {
-          for (int j = Math.max(0, i - 10); j < Math.min(framesA.length, i + 10); j++) {
-            System.out.println("Frame " + j + ":");
-            System.out.println("Instruction: " + methodNode.instructions.get(j));
-            System.out.println("A: " + framesA[j]);
-            System.out.println("B: " + framesB[j]);
-          }
-          throw new AssertionError(
+          //          for (int j = Math.max(0, i - 10); j < Math.min(framesA.length, i + 10); j++) {
+          //            System.out.println("Frame " + j + ":");
+          //            System.out.println("Instruction: " + methodNode.instructions.get(j));
+          //            System.out.println("A: " + framesA[j]);
+          //            System.out.println("B: " + framesB[j]);
+          //          }
+          fail(
               "Error in "
                   + classNode.name
                   + "."
@@ -109,8 +109,7 @@ public class SinglePassAnalyzerWithSimpleVerifierTest extends AsmTest {
     }
   }
 
-  private static ClassNode computeFrames(final PrecompiledClass classParameter) {
-    assumeFalse(hasJsrOrRetInstructions(classParameter));
+  private ClassNode computeFrames(final PrecompiledClass classParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
@@ -121,7 +120,7 @@ public class SinglePassAnalyzerWithSimpleVerifierTest extends AsmTest {
     return classNode;
   }
 
-  private static boolean hasJsrOrRetInstructions(final PrecompiledClass classParameter) {
+  private boolean hasJsrOrRetInstructions(final PrecompiledClass classParameter) {
     return classParameter == PrecompiledClass.JDK3_ALL_INSTRUCTIONS
         || classParameter == PrecompiledClass.JDK3_LARGE_METHOD;
   }

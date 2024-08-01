@@ -37,6 +37,7 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
   }
 
   /**
+   * Analyzes the given method.
    * {@inheritDoc}
    */
   @Override
