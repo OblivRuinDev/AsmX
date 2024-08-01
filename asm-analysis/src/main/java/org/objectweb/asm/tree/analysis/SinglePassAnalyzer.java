@@ -30,13 +30,16 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
    *
    * @param interpreter the interpreter to use to symbolically interpret the bytecode instructions.
    */
-  public SinglePassAnalyzer(Interpreter<BasicValue> interpreter) {
+  public SinglePassAnalyzer(final Interpreter<BasicValue> interpreter) {
     super(interpreter);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @SuppressWarnings("unchecked")
-  public Frame<BasicValue>[] analyze(String owner, MethodNode method) throws AnalyzerException {
+  public Frame<BasicValue>[] analyze(final String owner, final MethodNode method) throws AnalyzerException {
     if ((method.access & (ACC_ABSTRACT | ACC_NATIVE)) != 0) {
       frames = (Frame<BasicValue>[]) new Frame<?>[0];
       return frames;
@@ -73,6 +76,7 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
       frames[0] = newFrame(currentFrame);
       lastFrameNodeFrame = currentFrame;
     } catch (RuntimeException e) {
+      // DontCheck(IllegalCatch): can't be fixed, for backward compatibility.
       throw new AnalyzerException(insnList.get(0), "Error at instruction 0: " + e.getMessage(), e);
     }
 
@@ -121,7 +125,9 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
     return frames;
   }
 
-  /** copied from CheckFrameAnalyzer */
+  /**
+   * copied from CheckFrameAnalyzer.
+   */
   private Frame<BasicValue> expandFrame(
       final String owner, final Frame<BasicValue> previousFrame, final FrameNode frameNode)
       throws AnalyzerException {
@@ -176,6 +182,9 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
     return frame;
   }
 
+  /**
+   * copied from CheckFrameAnalyzer.
+   */
   private BasicValue newFrameValue(final String owner, final FrameNode frameNode, final Object type)
       throws AnalyzerException {
     if (type == Opcodes.TOP) {
@@ -207,6 +216,9 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
     throw new AnalyzerException(frameNode, "Illegal stack map frame value " + type);
   }
 
+  /**
+   * copied from CheckFrameAnalyzer.
+   */
   private static boolean isJvmInsnNode(final AbstractInsnNode insnNode) {
     return insnNode.getOpcode() >= 0;
   }
