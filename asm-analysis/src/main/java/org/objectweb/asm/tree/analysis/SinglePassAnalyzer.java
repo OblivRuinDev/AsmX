@@ -15,7 +15,9 @@ import org.objectweb.asm.tree.TypeInsnNode;
 
 /**
  * An {@link Analyzer} that trusts the {@link org.objectweb.asm.tree.FrameNode} values to be correct
- * in order to improve throughput. @Author Wagyourtail
+ * in order to improve throughput.
+ *
+ * @author William Gray
  */
 public class SinglePassAnalyzer extends Analyzer<BasicValue> {
 
@@ -34,12 +36,11 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
     super(interpreter);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   @SuppressWarnings("unchecked")
-  public Frame<BasicValue>[] analyze(final String owner, final MethodNode method) throws AnalyzerException {
+  public Frame<BasicValue>[] analyze(final String owner, final MethodNode method)
+      throws AnalyzerException {
     if ((method.access & (ACC_ABSTRACT | ACC_NATIVE)) != 0) {
       frames = (Frame<BasicValue>[]) new Frame<?>[0];
       return frames;
@@ -125,9 +126,7 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
     return frames;
   }
 
-  /**
-   * copied from CheckFrameAnalyzer.
-   */
+  /** copied from CheckFrameAnalyzer. */
   private Frame<BasicValue> expandFrame(
       final String owner, final Frame<BasicValue> previousFrame, final FrameNode frameNode)
       throws AnalyzerException {
@@ -182,9 +181,7 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
     return frame;
   }
 
-  /**
-   * copied from CheckFrameAnalyzer.
-   */
+  /** copied from CheckFrameAnalyzer. */
   private BasicValue newFrameValue(final String owner, final FrameNode frameNode, final Object type)
       throws AnalyzerException {
     if (type == Opcodes.TOP) {
@@ -216,9 +213,7 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
     throw new AnalyzerException(frameNode, "Illegal stack map frame value " + type);
   }
 
-  /**
-   * copied from CheckFrameAnalyzer.
-   */
+  /** copied from CheckFrameAnalyzer. */
   private static boolean isJvmInsnNode(final AbstractInsnNode insnNode) {
     return insnNode.getOpcode() >= 0;
   }
