@@ -80,6 +80,12 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
     for (int i = 0; i < insnListSize - 1; ++i) {
       AbstractInsnNode insn = insnList.get(i);
       int insnType = insn.getType();
+      int insnOpcode = insn.getOpcode();
+      if (insnOpcode == Opcodes.JSR) {
+        throw new AnalyzerException(insn, "JSR instructions are unsupported");
+      } else if (insnOpcode == Opcodes.RET) {
+        throw new AnalyzerException(insn, "RET instructions are unsupported");
+      }
       if (insnType == AbstractInsnNode.FRAME) {
         currentFrame = expandFrame(owner, lastFrameNodeFrame, (FrameNode) insn);
         frames[i + 1] = newFrame(currentFrame);
