@@ -36,7 +36,9 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
     super(interpreter);
   }
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @SuppressWarnings("unchecked")
   public Frame<BasicValue>[] analyze(final String owner, final MethodNode method)
