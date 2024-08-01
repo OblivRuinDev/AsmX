@@ -109,7 +109,9 @@ class SinglePassAnalyzerWithSimpleVerifierTest extends AsmTest {
     }
   }
 
+  @SuppressWarnings("PMD.UnusedPrivateMethod")
   private ClassNode computeFrames(final PrecompiledClass classParameter) {
+    // false positive pmd
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
@@ -120,7 +122,9 @@ class SinglePassAnalyzerWithSimpleVerifierTest extends AsmTest {
     return classNode;
   }
 
+  @SuppressWarnings("PMD.UnusedPrivateMethod")
   private boolean hasJsrOrRetInstructions(final PrecompiledClass classParameter) {
+    // false positive pmd
     return classParameter == PrecompiledClass.JDK3_ALL_INSTRUCTIONS
         || classParameter == PrecompiledClass.JDK3_LARGE_METHOD;
   }

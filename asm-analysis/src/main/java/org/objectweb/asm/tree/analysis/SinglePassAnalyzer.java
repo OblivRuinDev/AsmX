@@ -38,7 +38,16 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
 
   /**
    * Analyzes the given method.
-   * {@inheritDoc}
+   *
+   * @param owner the internal name of the class to which 'method' belongs (see {@link
+   *     Type#getInternalName()}).
+   * @param method the method to be analyzed. The maxStack and maxLocals fields must have correct
+   *     values.
+   * @return the symbolic state of the execution stack frame at each bytecode instruction of the
+   *     method. The size of the returned array is equal to the number of instructions (and labels)
+   *     of the method. A given frame is {@literal null} if and only if the corresponding
+   *     instruction cannot be reached (dead code).
+   * @throws AnalyzerException if a problem occurs during the analysis.
    */
   @Override
   @SuppressWarnings("unchecked")
