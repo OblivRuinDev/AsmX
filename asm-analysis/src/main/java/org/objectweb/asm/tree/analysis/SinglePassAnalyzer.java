@@ -16,10 +16,13 @@ import org.objectweb.asm.tree.TypeInsnNode;
 /**
  * An {@link Analyzer} that trusts the {@link org.objectweb.asm.tree.FrameNode} values to be correct
  * in order to improve throughput.
+ * <p>
+ * Due to trusting frame data, this analyzer may construct incorrect results for {@link SourceValue} due to recreating
+ * when a frame is encountered.
  *
  * @author William Gray
  */
-public class SinglePassAnalyzer extends Analyzer<BasicValue> {
+public class SinglePassAnalyzer<V extends Value> extends Analyzer<V> {
 
   /**
    * The number of locals in the last stack map frame processed by {@link #expandFrame}. Long and
@@ -32,7 +35,7 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
    *
    * @param interpreter the interpreter to use to symbolically interpret the bytecode instructions.
    */
-  public SinglePassAnalyzer(final Interpreter<BasicValue> interpreter) {
+  public SinglePassAnalyzer(final Interpreter<V> interpreter) {
     super(interpreter);
   }
 
@@ -51,10 +54,10 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
    */
   @Override
   @SuppressWarnings("unchecked")
-  public Frame<BasicValue>[] analyze(final String owner, final MethodNode method)
+  public Frame<V>[] analyze(final String owner, final MethodNode method)
       throws AnalyzerException {
     if ((method.access & (ACC_ABSTRACT | ACC_NATIVE)) != 0) {
-      frames = (Frame<BasicValue>[]) new Frame<?>[0];
+      frames = (Frame<V>[]) new Frame<?>[0];
       return frames;
     }
     insnList = method.instructions;
@@ -64,7 +67,7 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
       currentLocals -= 1;
     }
     handlers = (List<TryCatchBlockNode>[]) new List<?>[insnListSize];
-    frames = (Frame<BasicValue>[]) new Frame<?>[insnListSize];
+    frames = (Frame<V>[]) new Frame<?>[insnListSize];
 
     // For each exception handler, and each instruction within its range, record in 'handlers' the
     // fact that execution can flow from this instruction to the exception handler.
@@ -82,8 +85,8 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
       }
     }
 
-    Frame<BasicValue> currentFrame;
-    Frame<BasicValue> lastFrameNodeFrame;
+    Frame<V> currentFrame;
+    Frame<V> lastFrameNodeFrame;
     try {
       currentFrame = computeInitialFrame(owner, method);
       frames[0] = newFrame(currentFrame);
@@ -139,10 +142,10 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
   }
 
   /** copied from CheckFrameAnalyzer. */
-  private Frame<BasicValue> expandFrame(
-      final String owner, final Frame<BasicValue> previousFrame, final FrameNode frameNode)
+  private Frame<V> expandFrame(
+      final String owner, final Frame<V> previousFrame, final FrameNode frameNode)
       throws AnalyzerException {
-    Frame<BasicValue> frame = newFrame(previousFrame);
+    Frame<V> frame = newFrame(previousFrame);
     List<Object> locals = frameNode.local == null ? Collections.emptyList() : frameNode.local;
     int currentLocal = currentLocals;
     switch (frameNode.type) {
@@ -152,7 +155,7 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
         // fall through
       case Opcodes.F_APPEND:
         for (Object type : locals) {
-          BasicValue value = newFrameValue(owner, frameNode, type);
+          V value = newFrameValue(owner, frameNode, type);
           if (currentLocal + value.getSize() > frame.getLocals()) {
             throw new AnalyzerException(frameNode, "Cannot append more locals than maxLocals");
           }
@@ -194,7 +197,7 @@ public class SinglePassAnalyzer extends Analyzer<BasicValue> {
   }
 
   /** copied from CheckFrameAnalyzer. */
-  private BasicValue newFrameValue(final String owner, final FrameNode frameNode, final Object type)
+  private V newFrameValue(final String owner, final FrameNode frameNode, final Object type)
       throws AnalyzerException {
     if (type == Opcodes.TOP) {
       return interpreter.newValue(null);
