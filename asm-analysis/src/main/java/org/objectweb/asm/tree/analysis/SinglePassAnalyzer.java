@@ -17,8 +17,8 @@ import org.objectweb.asm.tree.TypeInsnNode;
  * An {@link Analyzer} that trusts the {@link org.objectweb.asm.tree.FrameNode} values to be correct
  * in order to improve throughput.
  *
- * <p>Due to trusting frame data, this analyzer may construct incorrect results for {@link SourceValue} due to recreating
- * when a frame is encountered.
+ * <p>Due to trusting frame data, this analyzer may construct incorrect results for {@link
+ * SourceValue} due to recreating when a frame is encountered.
  *
  * @author William Gray
  */
@@ -54,8 +54,7 @@ public class SinglePassAnalyzer<V extends Value> extends Analyzer<V> {
    */
   @Override
   @SuppressWarnings("unchecked")
-  public Frame<V>[] analyze(final String owner, final MethodNode method)
-      throws AnalyzerException {
+  public Frame<V>[] analyze(final String owner, final MethodNode method) throws AnalyzerException {
     if ((method.access & (ACC_ABSTRACT | ACC_NATIVE)) != 0) {
       frames = (Frame<V>[]) new Frame<?>[0];
       return frames;
@@ -107,7 +106,7 @@ public class SinglePassAnalyzer<V extends Value> extends Analyzer<V> {
         throw new AnalyzerException(insn, "RET instructions are unsupported");
       }
       if (insnType == AbstractInsnNode.FRAME) {
-        currentFrame = expandFrame(owner, lastFrameNodeFrame, (FrameNode) insn);
+        currentFrame = expandFrame(owner, lastFrameNodeFrame, (FrameNode) insn, i);
         frames[i + 1] = newFrame(currentFrame);
         lastFrameNodeFrame = frames[i + 1];
       } else if (insnType == AbstractInsnNode.LABEL || insnType == AbstractInsnNode.LINE) {
@@ -142,8 +141,8 @@ public class SinglePassAnalyzer<V extends Value> extends Analyzer<V> {
   }
 
   /** copied from CheckFrameAnalyzer. */
-  private Frame<V> expandFrame(
-      final String owner, final Frame<V> previousFrame, final FrameNode frameNode)
+  protected Frame<V> expandFrame(
+      final String owner, final Frame<V> previousFrame, final FrameNode frameNode, final int index)
       throws AnalyzerException {
     Frame<V> frame = newFrame(previousFrame);
     List<Object> locals = frameNode.local == null ? Collections.emptyList() : frameNode.local;
