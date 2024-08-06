@@ -17,7 +17,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
  * An {@link Analyzer} that trusts the {@link org.objectweb.asm.tree.FrameNode} values to be correct
  * in order to improve throughput.
  *
- * Due to trusting frame data, this analyzer may construct incorrect results for {@link SourceValue} due to recreating
+ * <p>Due to trusting frame data, this analyzer may construct incorrect results for {@link SourceValue} due to recreating
  * when a frame is encountered.
  *
  * @author William Gray
