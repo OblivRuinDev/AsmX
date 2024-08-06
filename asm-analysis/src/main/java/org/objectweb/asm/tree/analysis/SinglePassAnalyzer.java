@@ -16,7 +16,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
 /**
  * An {@link Analyzer} that trusts the {@link org.objectweb.asm.tree.FrameNode} values to be correct
  * in order to improve throughput.
- * <p>
+ *
  * Due to trusting frame data, this analyzer may construct incorrect results for {@link SourceValue} due to recreating
  * when a frame is encountered.
  *
@@ -197,7 +197,7 @@ public class SinglePassAnalyzer<V extends Value> extends Analyzer<V> {
   }
 
   /** copied from CheckFrameAnalyzer. */
-  private V newFrameValue(final String owner, final FrameNode frameNode, final Object type)
+  protected V newFrameValue(final String owner, final FrameNode frameNode, final Object type)
       throws AnalyzerException {
     if (type == Opcodes.TOP) {
       return interpreter.newValue(null);
