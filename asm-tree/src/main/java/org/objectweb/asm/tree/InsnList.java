@@ -324,7 +324,7 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    */
   public void insert(final AbstractInsnNode previousInsn, final AbstractInsnNode insnNode) {
     if (previousInsn.index == -1) {
-      throw new IllegalArgumentException("previousInsn does not belong to InsnList.");
+      throw new IllegalArgumentException("previousInsn does not belong to InsnList");
     }
     if (insnNode.index != -1) {
       throw new IllegalArgumentException("insnNode already belongs to another InsnList");
@@ -353,7 +353,7 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    */
   public void insert(final AbstractInsnNode previousInsn, final InsnList insnList) {
     if (previousInsn.index == -1) {
-      throw new IllegalArgumentException("previousInsn does not belong to InsnList.");
+      throw new IllegalArgumentException("previousInsn does not belong to InsnList");
     }
     if (insnList.size == 0) {
       return;
@@ -383,7 +383,7 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    */
   public void insertBefore(final AbstractInsnNode nextInsn, final AbstractInsnNode insnNode) {
     if (nextInsn.index == -1) {
-      throw new IllegalArgumentException("nextInsn does not belong to InsnList.");
+      throw new IllegalArgumentException("nextInsn does not belong to InsnList");
     }
     if (insnNode.index != -1) {
       throw new IllegalArgumentException("insnNode already belongs to another InsnList");
@@ -412,7 +412,7 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    */
   public void insertBefore(final AbstractInsnNode nextInsn, final InsnList insnList) {
     if (nextInsn.index == -1) {
-      throw new IllegalArgumentException("nextInsn does not belong to InsnList.");
+      throw new IllegalArgumentException("nextInsn does not belong to InsnList");
     }
     if (insnList.size == 0) {
       return;
@@ -440,7 +440,7 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    */
   public void remove(final AbstractInsnNode insnNode) {
     if (insnNode.index == -1) {
-      throw new IllegalArgumentException("insnNode does not belong to InsnList.");
+      throw new IllegalArgumentException("insnNode does not belong to InsnList");
     }
     --size;
     AbstractInsnNode nextInsn = insnNode.nextInsn;
