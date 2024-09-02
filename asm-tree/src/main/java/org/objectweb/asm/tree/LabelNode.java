@@ -70,7 +70,7 @@ public class LabelNode extends AbstractInsnNode {
 
   @Override
   public AbstractInsnNode clone(final Map<LabelNode, LabelNode> clonedLabels) {
-    return clonedLabels.get(this);
+    return new LabelNode(clonedLabels.get(this).getLabel());
   }
 
   public void resetLabel() {
