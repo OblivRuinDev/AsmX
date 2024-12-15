@@ -43,6 +43,15 @@ import org.objectweb.asm.signature.SignatureWriter;
  */
 public abstract class Remapper {
 
+  // The method signature of LambdaMetafactory.metafactory
+  private static final String LAMBDA_FACTORY_METAFACTORY =
+      "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;"
+          + "Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;";
+  // The method signature of LambdaMetafactory.altMetafactory
+  private static final String LAMBDA_FACTORY_ALTMETAFACTORY =
+      "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;[Ljava/lang/Object;"
+          + ")Ljava/lang/invoke/CallSite;";
+
   /**
    * Returns the given descriptor, remapped with {@link #map(String)}.
    *
@@ -316,9 +325,57 @@ public abstract class Remapper {
    * @param name the name of the method.
    * @param descriptor the descriptor of the method.
    * @return the new name of the method.
+   * @deprecated Use {@link #mapInvokeDynamicMethodName(String, String, Handle, Object...)} instead.
    */
+  @Deprecated
   public String mapInvokeDynamicMethodName(final String name, final String descriptor) {
     return name;
+  }
+
+  /**
+   * Maps an invokedynamic or a constant dynamic method name to its new name. The default
+   * implementation of this method returns the given name, unchanged, or returns remapped method
+   * name by {@link #mapMethodName(String, String, String)} if a lambda creation detected.
+   * Subclasses can override.
+   *
+   * @param name the name of the method.
+   * @param descriptor the descriptor of the method.
+   * @param bootstrapMethodHandle the bootstrap method handle of the method.
+   * @param bootstrapMethodArguments the arguments of the bootstrap method.
+   * @return the new name of the method.
+   */
+  public String mapInvokeDynamicMethodName(
+      final String name,
+      final String descriptor,
+      final Handle bootstrapMethodHandle,
+      final Object... bootstrapMethodArguments) {
+
+    if ("java/lang/invoke/LambdaMetafactory".equals(bootstrapMethodHandle.getOwner())
+        && bootstrapMethodHandle.getTag() == Opcodes.H_INVOKESTATIC) {
+      // this is a lambda creation command
+      boolean isLambdaCreation = false;
+      String lambdaClassName = null;
+      String lambdaOriginFunctionName = null;
+      String lambdaSamDescriptor = null;
+
+      // note: **if** is reserved for future JDK changes.
+      if (("metafactory".equals(bootstrapMethodHandle.getName())
+              && LAMBDA_FACTORY_METAFACTORY.equals(bootstrapMethodHandle.getDesc()))
+          || ("altMetafactory".equals(bootstrapMethodHandle.getName())
+              && LAMBDA_FACTORY_ALTMETAFACTORY.equals(bootstrapMethodHandle.getDesc()))) {
+        isLambdaCreation = true;
+        lambdaClassName =
+            Type.getReturnType(descriptor).getInternalName(); // the return type is the lambda type
+        lambdaOriginFunctionName = name; // SAM name
+        lambdaSamDescriptor = bootstrapMethodArguments[0].toString(); // SAM descriptor
+      }
+
+      if (isLambdaCreation) {
+        return mapMethodName(lambdaClassName, lambdaOriginFunctionName, lambdaSamDescriptor);
+      }
+    }
+
+    return mapInvokeDynamicMethodName(name, descriptor);
   }
 
   /**

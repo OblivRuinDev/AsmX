@@ -179,8 +179,10 @@ public class MethodRemapper extends MethodVisitor {
     for (int i = 0; i < bootstrapMethodArguments.length; ++i) {
       remappedBootstrapMethodArguments[i] = remapper.mapValue(bootstrapMethodArguments[i]);
     }
+
     super.visitInvokeDynamicInsn(
-        remapper.mapInvokeDynamicMethodName(name, descriptor),
+        remapper.mapInvokeDynamicMethodName(
+            name, descriptor, bootstrapMethodHandle, bootstrapMethodArguments),
         remapper.mapMethodDesc(descriptor),
         (Handle) remapper.mapValue(bootstrapMethodHandle),
         remappedBootstrapMethodArguments);

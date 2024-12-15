@@ -270,6 +270,56 @@ class ClassRemapperTest extends AsmTest {
     assertEquals("demo", invokeDynamic.bsm.getName());
   }
 
+  @Test
+  void testLambdaRemap() {
+    ClassNode classNode = new ClassNode();
+    ClassRemapper classRemapper =
+        new ClassRemapper(
+            /* latest api */ Opcodes.ASM9,
+            classNode,
+            new Remapper() {
+              @Override
+              public String mapMethodName(
+                  final String owner, final String name, final String descriptor) {
+                if ("java/lang/MyRunnable".equals(owner) && "run".equals(name)) {
+                  return "call";
+                }
+                return name;
+              }
+
+              @Override
+              public String map(final String internalName) {
+                if ("java/lang/MyRunnable".equals(internalName)) {
+                  return "me/MyRunnable";
+                }
+                return super.map(internalName);
+              }
+            });
+
+    classRemapper.visit(Opcodes.V11, Opcodes.ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    MethodVisitor methodVisitor =
+        classRemapper.visitMethod(Opcodes.ACC_PUBLIC, "hello", "()V", null, null);
+    methodVisitor.visitCode();
+    methodVisitor.visitInvokeDynamicInsn(
+        "run",
+        "()Ljava/lang/MyRunnable;",
+        new Handle(
+            Opcodes.H_INVOKESTATIC,
+            "java/lang/invoke/LambdaMetafactory",
+            "metafactory",
+            "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;"
+                + "Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;",
+            false),
+        Type.getType("()V"),
+        new Handle(Opcodes.H_INVOKESTATIC, "java/lang/Thread", "dumpStack", "()V", false),
+        Type.getType("()V"));
+
+    InvokeDynamicInsnNode invokeDynamic =
+        (InvokeDynamicInsnNode) classNode.methods.get(0).instructions.get(0);
+    assertEquals("()Lme/MyRunnable;", invokeDynamic.desc);
+    assertEquals("call", invokeDynamic.name);
+  }
+
   /** Tests that classes transformed with a ClassRemapper can be loaded and instantiated. */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
