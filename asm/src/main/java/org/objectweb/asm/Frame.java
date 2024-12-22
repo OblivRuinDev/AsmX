@@ -54,21 +54,21 @@ package org.objectweb.asm;
  *
  * <pre>
  *   =====================================
- *   |...DIM|KIND|.F|...............VALUE|
+ *   |.....DIM|KIND|.F|.............VALUE|
  *   =====================================
  * </pre>
  *
  * <ul>
- *   <li>the DIM field, stored in the 6 most significant bits, is a signed number of array
- *       dimensions (from -32 to 31, included). It can be retrieved with {@link #DIM_MASK} and a
- *       right shift of {@link #DIM_SHIFT}.
+ *   <li>the DIM field, stored in the 8 most significant bits, is a unsigned number of array
+ *       dimensions (from 0 to 255, included). It can be retrieved with {@link #DIM_MASK} and an
+ *       unsigned right shift of {@link #DIM_SHIFT}.
  *   <li>the KIND field, stored in 4 bits, indicates the kind of VALUE used. These 4 bits can be
  *       retrieved with {@link #KIND_MASK} and, without any shift, must be equal to {@link
  *       #CONSTANT_KIND}, {@link #REFERENCE_KIND}, {@link #UNINITIALIZED_KIND}, {@link
  *       #FORWARD_UNINITIALIZED_KIND},{@link #LOCAL_KIND} or {@link #STACK_KIND}.
  *   <li>the FLAGS field, stored in 2 bits, contains up to 2 boolean flags. Currently only one flag
  *       is defined, namely {@link #TOP_IF_LONG_OR_DOUBLE_FLAG}.
- *   <li>the VALUE field, stored in the remaining 20 bits, contains either
+ *   <li>the VALUE field, stored in the remaining 18 bits, contains either
  *       <ul>
  *         <li>one of the constants {@link #ITEM_TOP}, {@link #ITEM_ASM_BOOLEAN}, {@link
  *             #ITEM_ASM_BYTE}, {@link #ITEM_ASM_CHAR} or {@link #ITEM_ASM_SHORT}, {@link
@@ -134,7 +134,7 @@ class Frame {
 
   // The size and offset in bits of each field of an abstract type.
 
-  private static final int DIM_SIZE = 6;
+  private static final int DIM_SIZE = 8;
   private static final int KIND_SIZE = 4;
   private static final int FLAGS_SIZE = 2;
   private static final int VALUE_SIZE = 32 - DIM_SIZE - KIND_SIZE - FLAGS_SIZE;
@@ -1317,7 +1317,7 @@ class Frame {
         }
       } else if ((srcType & DIM_MASK) != 0 || (srcType & KIND_MASK) == REFERENCE_KIND) {
         // If srcType is any other reference or array type,
-        // merge(srcType, dstType) = min(srcDdim, dstDim) | java/lang/Object
+        // merge(srcType, dstType) = min(srcDim, dstDim) | java/lang/Object
         // where srcDim is the array dimension of srcType, minus 1 if srcType is an array type
         // with a non reference element type (and similarly for dstDim).
         int srcDim = srcType & DIM_MASK;
@@ -1329,7 +1329,9 @@ class Frame {
           dstDim = ELEMENT_OF + dstDim;
         }
         mergedType =
-            Math.min(srcDim, dstDim) | REFERENCE_KIND | symbolTable.addType("java/lang/Object");
+            (Math.min(srcDim >>> DIM_SHIFT, dstDim >>> DIM_SHIFT) << DIM_SHIFT)
+                | REFERENCE_KIND
+                | symbolTable.addType("java/lang/Object");
       } else {
         // If srcType is any other type, merge(srcType, dstType) = TOP.
         mergedType = TOP;
@@ -1419,7 +1421,7 @@ class Frame {
    */
   static void putAbstractType(
       final SymbolTable symbolTable, final int abstractType, final ByteVector output) {
-    int arrayDimensions = (abstractType & Frame.DIM_MASK) >> DIM_SHIFT;
+    int arrayDimensions = (abstractType & Frame.DIM_MASK) >>> DIM_SHIFT;
     if (arrayDimensions == 0) {
       int typeValue = abstractType & VALUE_MASK;
       switch (abstractType & KIND_MASK) {
