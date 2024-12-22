@@ -33,7 +33,6 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FrameNode;
-import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
@@ -97,12 +96,6 @@ import org.objectweb.asm.tree.analysis.Value;
  */
 class CheckFrameAnalyzer<V extends Value> extends Analyzer<V> {
 
-  /** The interpreter to use to symbolically interpret the bytecode instructions. */
-  private final Interpreter<V> interpreter;
-
-  /** The instructions of the currently analyzed method. */
-  private InsnList insnList;
-
   /**
    * The number of locals in the last stack map frame processed by {@link expandFrame}. Long and
    * double values are represented with two elements.
@@ -111,7 +104,6 @@ class CheckFrameAnalyzer<V extends Value> extends Analyzer<V> {
 
   CheckFrameAnalyzer(final Interpreter<V> interpreter) {
     super(interpreter);
-    this.interpreter = interpreter;
   }
 
   @Override

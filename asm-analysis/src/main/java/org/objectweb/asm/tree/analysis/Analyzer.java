@@ -54,19 +54,19 @@ import org.objectweb.asm.tree.VarInsnNode;
 public class Analyzer<V extends Value> implements Opcodes {
 
   /** The interpreter to use to symbolically interpret the bytecode instructions. */
-  private final Interpreter<V> interpreter;
+  protected final Interpreter<V> interpreter;
 
   /** The instructions of the currently analyzed method. */
-  private InsnList insnList;
+  protected InsnList insnList;
 
   /** The size of {@link #insnList}. */
-  private int insnListSize;
+  protected int insnListSize;
 
   /** The exception handlers of the currently analyzed method (one list per instruction index). */
-  private List<TryCatchBlockNode>[] handlers;
+  protected List<TryCatchBlockNode>[] handlers;
 
   /** The execution stack frames of the currently analyzed method (one per instruction index). */
-  private Frame<V>[] frames;
+  protected Frame<V>[] frames;
 
   /** The subroutines of the currently analyzed method (one per instruction index). */
   private Subroutine[] subroutines;
@@ -492,7 +492,7 @@ public class Analyzer<V extends Value> implements Opcodes {
    * @param method the method to be analyzed.
    * @return the initial execution stack frame of the 'method'.
    */
-  private Frame<V> computeInitialFrame(final String owner, final MethodNode method) {
+  protected Frame<V> computeInitialFrame(final String owner, final MethodNode method) {
     Frame<V> frame = newFrame(method.maxLocals, method.maxStack);
     int currentLocal = 0;
     boolean isInstanceMethod = (method.access & ACC_STATIC) == 0;
