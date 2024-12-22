@@ -191,6 +191,12 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * @param newInsnNode another instruction, <i>which must not belong to any {@link InsnList}</i>.
    */
   public void set(final AbstractInsnNode oldInsnNode, final AbstractInsnNode newInsnNode) {
+    if (oldInsnNode.index == -1) {
+      throw new IllegalArgumentException("oldInsnNode does not belong to InsnList");
+    }
+    if (newInsnNode.index != -1) {
+      throw new IllegalArgumentException("newInsnNode already belongs to another InsnList");
+    }
     AbstractInsnNode nextInsn = oldInsnNode.nextInsn;
     newInsnNode.nextInsn = nextInsn;
     if (nextInsn != null) {
@@ -223,6 +229,9 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * @param insnNode an instruction, <i>which must not belong to any {@link InsnList}</i>.
    */
   public void add(final AbstractInsnNode insnNode) {
+    if (insnNode.index != -1) {
+      throw new IllegalArgumentException("insnNode already belongs to another InsnList");
+    }
     ++size;
     if (lastInsn == null) {
       firstInsn = insnNode;
@@ -266,6 +275,9 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * @param insnNode an instruction, <i>which must not belong to any {@link InsnList}</i>.
    */
   public void insert(final AbstractInsnNode insnNode) {
+    if (insnNode.index != -1) {
+      throw new IllegalArgumentException("insnNode already belongs to another InsnList");
+    }
     ++size;
     if (firstInsn == null) {
       firstInsn = insnNode;
@@ -311,6 +323,12 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    *     InsnList}</i>.
    */
   public void insert(final AbstractInsnNode previousInsn, final AbstractInsnNode insnNode) {
+    if (previousInsn.index == -1) {
+      throw new IllegalArgumentException("previousInsn does not belong to InsnList");
+    }
+    if (insnNode.index != -1) {
+      throw new IllegalArgumentException("insnNode already belongs to another InsnList");
+    }
     ++size;
     AbstractInsnNode nextInsn = previousInsn.nextInsn;
     if (nextInsn == null) {
@@ -334,6 +352,9 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    *     list must be different from 'this'.
    */
   public void insert(final AbstractInsnNode previousInsn, final InsnList insnList) {
+    if (previousInsn.index == -1) {
+      throw new IllegalArgumentException("previousInsn does not belong to InsnList");
+    }
     if (insnList.size == 0) {
       return;
     }
@@ -361,6 +382,12 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    *     InsnList}</i>.
    */
   public void insertBefore(final AbstractInsnNode nextInsn, final AbstractInsnNode insnNode) {
+    if (nextInsn.index == -1) {
+      throw new IllegalArgumentException("nextInsn does not belong to InsnList");
+    }
+    if (insnNode.index != -1) {
+      throw new IllegalArgumentException("insnNode already belongs to another InsnList");
+    }
     ++size;
     AbstractInsnNode previousInsn = nextInsn.previousInsn;
     if (previousInsn == null) {
@@ -384,6 +411,9 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    *     list must be different from 'this'.
    */
   public void insertBefore(final AbstractInsnNode nextInsn, final InsnList insnList) {
+    if (nextInsn.index == -1) {
+      throw new IllegalArgumentException("nextInsn does not belong to InsnList");
+    }
     if (insnList.size == 0) {
       return;
     }
@@ -409,6 +439,9 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * @param insnNode the instruction <i>of this list</i> that must be removed.
    */
   public void remove(final AbstractInsnNode insnNode) {
+    if (insnNode.index == -1) {
+      throw new IllegalArgumentException("insnNode does not belong to InsnList");
+    }
     --size;
     AbstractInsnNode nextInsn = insnNode.nextInsn;
     AbstractInsnNode previousInsn = insnNode.previousInsn;
