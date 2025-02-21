@@ -29,8 +29,10 @@ package org.objectweb.asm.commons;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.objectweb.asm.ConstantDynamic;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
@@ -96,6 +98,13 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
   private Map<Label, List<Object>> forwardJumpStackFrames;
 
   /**
+   * Stores indices of local variables that reference the uninitialized this value for constructors.
+   * References can be loaded and stored on different indices, something that mainly happens during
+   * obfuscation.
+   */
+  private Set<Integer> unititializedThis;
+
+  /**
    * Constructs a new {@link AdviceAdapter}.
    *
    * @param api the ASM API version implemented by this visitor. Must be one of the {@code
@@ -123,6 +132,8 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
     if (isConstructor) {
       stackFrame = new ArrayList<>();
       forwardJumpStackFrames = new HashMap<>();
+      unititializedThis = new HashSet<>();
+      unititializedThis.add(0);
     } else {
       onMethodEnter();
     }
@@ -341,17 +352,25 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
           pushValue(OTHER);
           break;
         case ALOAD:
-          pushValue(varIndex == 0 ? UNINITIALIZED_THIS : OTHER);
+          pushValue(unititializedThis.contains(varIndex) ? UNINITIALIZED_THIS : OTHER);
           break;
         case ASTORE:
+          if (popValue() == UNINITIALIZED_THIS) {
+            unititializedThis.add(varIndex);
+          } else {
+            unititializedThis.remove(varIndex);
+          }
+          break;
         case ISTORE:
         case FSTORE:
           popValue();
+          unititializedThis.remove(varIndex);
           break;
         case LSTORE:
         case DSTORE:
           popValue();
           popValue();
+          unititializedThis.remove(varIndex);
           break;
         case RET:
           endConstructorBasicBlockWithoutSuccessor();
