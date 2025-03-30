@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,13 +30,15 @@
 package org.objectweb.asm.tree;
 
 import java.util.Map;
-import org.objectweb.asm.MethodVisitor;
+
+import org.objectweb.asm.IMethodVisitor;
 
 /**
  * A node that represents a field instruction. A field instruction is an instruction that loads or
  * stores the value of a field of an object.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class FieldInsnNode extends AbstractInsnNode {
 
@@ -84,7 +88,7 @@ public class FieldInsnNode extends AbstractInsnNode {
   }
 
   @Override
-  public void accept(final MethodVisitor methodVisitor) {
+  public void accept(final IMethodVisitor methodVisitor) {
     methodVisitor.visitFieldInsn(opcode, owner, name, desc);
     acceptAnnotations(methodVisitor);
   }

@@ -39,16 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.ConstantDynamic;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 import org.objectweb.asm.test.AsmTest;
 import org.objectweb.asm.test.ClassFile;
 import org.objectweb.asm.tree.ClassNode;
@@ -90,7 +81,7 @@ class ClassRemapperTest extends AsmTest {
               }
             });
     remapper.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC, "pkg/C", null, "java/lang/Object", null);
-    AnnotationVisitor annotationVisitor = remapper.visitAnnotation("Lpkg/A;", true);
+    IAnnotationVisitor annotationVisitor = remapper.visitAnnotation("Lpkg/A;", true);
     annotationVisitor.visit("attribute", "value");
 
     assertEquals("new.attribute", classNode.visibleAnnotations.get(0).values.get(0));
@@ -204,7 +195,7 @@ class ClassRemapperTest extends AsmTest {
     ClassNode classNode = new ClassNode();
     ClassRemapper classRemapper =
         new ClassRemapper(
-            /* latest api */ Opcodes.ASM9,
+            /* latest api */ Opcodes.V_DYNA,
             classNode,
             new Remapper() {
               @Override
@@ -223,7 +214,7 @@ class ClassRemapperTest extends AsmTest {
           /* inner class so it can access the protected constructor */
         };
     classRemapper.visit(Opcodes.V11, Opcodes.ACC_PUBLIC, "C", null, "java/lang/Object", null);
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         classRemapper.visitMethod(Opcodes.ACC_PUBLIC, "hello", "()V", null, null);
     methodVisitor.visitCode();
 
@@ -245,7 +236,7 @@ class ClassRemapperTest extends AsmTest {
     ClassNode classNode = new ClassNode();
     ClassRemapper classRemapper =
         new ClassRemapper(
-            /* latest api */ Opcodes.ASM9,
+            /* latest api */ Opcodes.V_DYNA,
             classNode,
             new Remapper() {
               @Override
@@ -258,7 +249,7 @@ class ClassRemapperTest extends AsmTest {
               }
             });
     classRemapper.visit(Opcodes.V11, Opcodes.ACC_PUBLIC, "C", null, "java/lang/Object", null);
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         classRemapper.visitMethod(Opcodes.ACC_PUBLIC, "hello", "()V", null, null);
     methodVisitor.visitCode();
 
@@ -394,7 +385,7 @@ class ClassRemapperTest extends AsmTest {
   }
 
   ClassRemapper newClassRemapper(
-      final int api, final ClassVisitor classVisitor, final Remapper remapper) {
+          final int api, final IClassVisitor classVisitor, final Remapper remapper) {
     return new ClassRemapper(api, classVisitor, remapper);
   }
 

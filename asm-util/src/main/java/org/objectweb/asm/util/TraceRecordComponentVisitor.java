@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,11 +29,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.util;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.RecordComponentVisitor;
-import org.objectweb.asm.TypePath;
+import org.objectweb.asm.*;
 
 /**
  * A {@link RecordComponentVisitor} that prints the record components it visits with a {@link
@@ -61,20 +59,20 @@ public final class TraceRecordComponentVisitor extends RecordComponentVisitor {
    * @param printer the printer to convert the visited record component into text.
    */
   public TraceRecordComponentVisitor(
-      final RecordComponentVisitor recordComponentVisitor, final Printer printer) {
-    super(/* latest api ='*/ Opcodes.ASM9, recordComponentVisitor);
+          final IRecordComponentVisitor recordComponentVisitor, final Printer printer) {
+    super(/* latest api ='*/ Opcodes.V_DYNA, recordComponentVisitor);
     this.printer = printer;
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     Printer annotationPrinter = printer.visitRecordComponentAnnotation(descriptor, visible);
     return new TraceAnnotationVisitor(
         super.visitAnnotation(descriptor, visible), annotationPrinter);
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     Printer annotationPrinter =
         printer.visitRecordComponentTypeAnnotation(typeRef, typePath, descriptor, visible);

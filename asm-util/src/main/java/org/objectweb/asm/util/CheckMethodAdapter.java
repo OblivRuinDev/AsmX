@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -35,17 +37,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.ConstantDynamic;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.TypePath;
-import org.objectweb.asm.TypeReference;
+
+import org.objectweb.asm.*;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
@@ -61,7 +54,7 @@ import org.objectweb.asm.tree.analysis.BasicVerifier;
  * org.objectweb.asm.tree.analysis.BasicVerifier}). For instance in a method whose signature is
  * {@code void m ()}, the invalid instruction IRETURN, or the invalid sequence IADD L2I will be
  * detected if the data flow checks are enabled. These checks are enabled by using the {@link
- * #CheckMethodAdapter(int,String,String,MethodVisitor,Map)} constructor. They are not performed if
+ * #CheckMethodAdapter(int,String,String, IMethodVisitor,Map)} constructor. They are not performed if
  * any other constructor is used.
  *
  * @author Eric Bruneton
@@ -344,21 +337,21 @@ public class CheckMethodAdapter extends MethodVisitor {
 
   /**
    * Constructs a new {@link CheckMethodAdapter} object. This method adapter will not perform any
-   * data flow check (see {@link #CheckMethodAdapter(int,String,String,MethodVisitor,Map)}).
+   * data flow check (see {@link #CheckMethodAdapter(int,String,String, IMethodVisitor,Map)}).
    * <i>Subclasses must not use this constructor</i>. Instead, they must use the {@link
-   * #CheckMethodAdapter(int, MethodVisitor, Map)} version.
+   * #CheckMethodAdapter(int, IMethodVisitor, Map)} version.
    *
    * @param methodvisitor the method visitor to which this adapter must delegate calls.
    */
-  public CheckMethodAdapter(final MethodVisitor methodvisitor) {
+  public CheckMethodAdapter(final IMethodVisitor methodvisitor) {
     this(methodvisitor, new HashMap<>());
   }
 
   /**
    * Constructs a new {@link CheckMethodAdapter} object. This method adapter will not perform any
-   * data flow check (see {@link #CheckMethodAdapter(int,String,String,MethodVisitor,Map)}).
+   * data flow check (see {@link #CheckMethodAdapter(int,String,String, IMethodVisitor,Map)}).
    * <i>Subclasses must not use this constructor</i>. Instead, they must use the {@link
-   * #CheckMethodAdapter(int, MethodVisitor, Map)} version.
+   * #CheckMethodAdapter(int, IMethodVisitor, Map)} version.
    *
    * @param methodVisitor the method visitor to which this adapter must delegate calls.
    * @param labelInsnIndices the index of the instruction designated by each visited label so far
@@ -366,8 +359,8 @@ public class CheckMethodAdapter extends MethodVisitor {
    * @throws IllegalStateException If a subclass calls this constructor.
    */
   public CheckMethodAdapter(
-      final MethodVisitor methodVisitor, final Map<Label, Integer> labelInsnIndices) {
-    this(/* latest api = */ Opcodes.ASM9, methodVisitor, labelInsnIndices);
+          final IMethodVisitor methodVisitor, final Map<Label, Integer> labelInsnIndices) {
+    this(/* latest api = */ Opcodes.V_DYNA, methodVisitor, labelInsnIndices);
     if (getClass() != CheckMethodAdapter.class) {
       throw new IllegalStateException();
     }
@@ -375,7 +368,7 @@ public class CheckMethodAdapter extends MethodVisitor {
 
   /**
    * Constructs a new {@link CheckMethodAdapter} object. This method adapter will not perform any
-   * data flow check (see {@link #CheckMethodAdapter(int,String,String,MethodVisitor,Map)}).
+   * data flow check (see {@link #CheckMethodAdapter(int,String,String, IMethodVisitor,Map)}).
    *
    * @param api the ASM API version implemented by this CheckMethodAdapter. Must be one of the
    *     {@code ASM}<i>x</i> values in {@link Opcodes}.
@@ -385,7 +378,7 @@ public class CheckMethodAdapter extends MethodVisitor {
    */
   protected CheckMethodAdapter(
       final int api,
-      final MethodVisitor methodVisitor,
+      final IMethodVisitor methodVisitor,
       final Map<Label, Integer> labelInsnIndices) {
     super(api, methodVisitor);
     this.labelInsnIndices = labelInsnIndices;
@@ -398,7 +391,7 @@ public class CheckMethodAdapter extends MethodVisitor {
    * flow checks. For instance in a method whose signature is {@code void m ()}, the invalid
    * instruction IRETURN, or the invalid sequence IADD L2I will be detected. <i>Subclasses must not
    * use this constructor</i>. Instead, they must use the {@link
-   * #CheckMethodAdapter(int,int,String,String,MethodVisitor,Map)} version.
+   * #CheckMethodAdapter(int,int,String,String, IMethodVisitor,Map)} version.
    *
    * @param access the method's access flags.
    * @param name the method's name.
@@ -411,10 +404,10 @@ public class CheckMethodAdapter extends MethodVisitor {
       final int access,
       final String name,
       final String descriptor,
-      final MethodVisitor methodVisitor,
+      final IMethodVisitor methodVisitor,
       final Map<Label, Integer> labelInsnIndices) {
     this(
-        /* latest api = */ Opcodes.ASM9, access, name, descriptor, methodVisitor, labelInsnIndices);
+        /* latest api = */ Opcodes.V_DYNA, access, name, descriptor, methodVisitor, labelInsnIndices);
     if (getClass() != CheckMethodAdapter.class) {
       throw new IllegalStateException();
     }
@@ -439,7 +432,7 @@ public class CheckMethodAdapter extends MethodVisitor {
       final int access,
       final String name,
       final String descriptor,
-      final MethodVisitor methodVisitor,
+      final IMethodVisitor methodVisitor,
       final Map<Label, Integer> labelInsnIndices) {
     this(
         api,
@@ -504,14 +497,14 @@ public class CheckMethodAdapter extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     checkVisitEndNotCalled();
     checkDescriptor(version, descriptor, false);
     return new CheckAnnotationAdapter(super.visitAnnotation(descriptor, visible));
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     checkVisitEndNotCalled();
     int sort = new TypeReference(typeRef).getSort();
@@ -530,7 +523,7 @@ public class CheckMethodAdapter extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitAnnotationDefault() {
+  public IAnnotationVisitor visitAnnotationDefault() {
     checkVisitEndNotCalled();
     return new CheckAnnotationAdapter(super.visitAnnotationDefault(), false);
   }
@@ -547,7 +540,7 @@ public class CheckMethodAdapter extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitParameterAnnotation(
+  public IAnnotationVisitor visitParameterAnnotation(
       final int parameter, final String descriptor, final boolean visible) {
     checkVisitEndNotCalled();
     if ((visible
@@ -731,29 +724,24 @@ public class CheckMethodAdapter extends MethodVisitor {
       final String owner,
       final String name,
       final String descriptor,
-      final boolean isInterface) {
-    if (api < Opcodes.ASM5 && (opcodeAndSource & Opcodes.SOURCE_DEPRECATED) == 0) {
-      // Redirect the call to the deprecated version of this method.
-      super.visitMethodInsn(opcodeAndSource, owner, name, descriptor, isInterface);
-      return;
-    }
-    int opcode = opcodeAndSource & ~Opcodes.SOURCE_MASK;
+      final boolean isInterface) {//todo: uncheck
+    checkInterfaceInvoke(ver, opcodeAndSource, isInterface);
 
     checkVisitCodeCalled();
     checkVisitMaxsNotCalled();
-    checkOpcodeMethod(opcode, Method.VISIT_METHOD_INSN);
-    if (opcode != Opcodes.INVOKESPECIAL || !"<init>".equals(name)) {
+    checkOpcodeMethod(opcodeAndSource, Method.VISIT_METHOD_INSN);
+    if (opcodeAndSource != Opcodes.INVOKESPECIAL || !"<init>".equals(name)) {
       checkMethodIdentifier(version, name, "name");
     }
     checkInternalName(version, owner, "owner");
     checkMethodDescriptor(version, descriptor);
-    if (opcode == Opcodes.INVOKEVIRTUAL && isInterface) {
+    if (opcodeAndSource == Opcodes.INVOKEVIRTUAL && isInterface) {
       throw new IllegalArgumentException("INVOKEVIRTUAL can't be used with interfaces");
     }
-    if (opcode == Opcodes.INVOKEINTERFACE && !isInterface) {
+    if (opcodeAndSource == Opcodes.INVOKEINTERFACE && !isInterface) {
       throw new IllegalArgumentException("INVOKEINTERFACE can't be used with classes");
     }
-    if (opcode == Opcodes.INVOKESPECIAL && isInterface && (version & 0xFFFF) < Opcodes.V1_8) {
+    if (opcodeAndSource == Opcodes.INVOKESPECIAL && isInterface && (version & 0xFFFF) < Opcodes.V1_8) {
       throw new IllegalArgumentException(
           "INVOKESPECIAL can't be used with interfaces prior to Java 8");
     }
@@ -886,7 +874,7 @@ public class CheckMethodAdapter extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitInsnAnnotation(
+  public IAnnotationVisitor visitInsnAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     checkVisitCodeCalled();
     checkVisitMaxsNotCalled();
@@ -930,7 +918,7 @@ public class CheckMethodAdapter extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitTryCatchAnnotation(
+  public IAnnotationVisitor visitTryCatchAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     checkVisitCodeCalled();
     checkVisitMaxsNotCalled();
@@ -972,7 +960,7 @@ public class CheckMethodAdapter extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitLocalVariableAnnotation(
+  public IAnnotationVisitor visitLocalVariableAnnotation(
       final int typeRef,
       final TypePath typePath,
       final Label[] start,
@@ -1471,7 +1459,7 @@ public class CheckMethodAdapter extends MethodVisitor {
         final int api,
         final int version,
         final ClassWriter owner,
-        final MethodVisitor methodWriter) {
+        final IMethodVisitor methodWriter) {
       super(api, methodWriter);
       this.version = version;
       this.owner = owner;

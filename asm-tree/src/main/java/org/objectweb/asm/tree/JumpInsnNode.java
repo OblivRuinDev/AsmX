@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,7 +30,8 @@
 package org.objectweb.asm.tree;
 
 import java.util.Map;
-import org.objectweb.asm.MethodVisitor;
+
+import org.objectweb.asm.IMethodVisitor;
 
 /**
  * A node that represents a jump instruction. A jump instruction is an instruction that may jump to
@@ -75,7 +78,7 @@ public class JumpInsnNode extends AbstractInsnNode {
   }
 
   @Override
-  public void accept(final MethodVisitor methodVisitor) {
+  public void accept(final IMethodVisitor methodVisitor) {
     methodVisitor.visitJumpInsn(opcode, label.getLabel());
     acceptAnnotations(methodVisitor);
   }

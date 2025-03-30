@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -48,7 +50,7 @@ import org.objectweb.asm.TypeReference;
  *
  * @author Eric Bruneton
  */
-public abstract class Printer {
+public abstract class Printer {//todo
 
   /** The names of the Java Virtual Machine opcodes. */
   public static final String[] OPCODES = {
@@ -941,26 +943,6 @@ public abstract class Printer {
    * @param descriptor the field's descriptor (see {@link Type}).
    */
   public abstract void visitFieldInsn(int opcode, String owner, String name, String descriptor);
-
-  /**
-   * Method instruction. See {@link org.objectweb.asm.MethodVisitor#visitMethodInsn}.
-   *
-   * @param opcode the opcode of the type instruction to be visited. This opcode is either
-   *     INVOKEVIRTUAL, INVOKESPECIAL, INVOKESTATIC or INVOKEINTERFACE.
-   * @param owner the internal name of the method's owner class (see {@link
-   *     Type#getInternalName()}).
-   * @param name the method's name.
-   * @param descriptor the method's descriptor (see {@link Type}).
-   * @deprecated use {@link #visitMethodInsn(int, String, String, String, boolean)} instead.
-   */
-  @Deprecated
-  public void visitMethodInsn(
-      final int opcode, final String owner, final String name, final String descriptor) {
-    // This method was abstract before ASM5, and was therefore always overridden (without any
-    // call to 'super'). Thus, at this point we necessarily have api >= ASM5, and we must then
-    // redirect the method call to the ASM5 visitMethodInsn() method.
-    visitMethodInsn(opcode, owner, name, descriptor, opcode == Opcodes.INVOKEINTERFACE);
-  }
 
   /**
    * Method instruction. See {@link org.objectweb.asm.MethodVisitor#visitMethodInsn}.

@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -109,13 +111,13 @@ public final class TraceSignatureVisitor extends SignatureVisitor {
    * @param accessFlags for class type signatures, the access flags of the class.
    */
   public TraceSignatureVisitor(final int accessFlags) {
-    super(/* latest api = */ Opcodes.ASM9);
+    super(/* latest api = */ Opcodes.V_DYNA);
     this.isInterface = (accessFlags & Opcodes.ACC_INTERFACE) != 0;
     this.declaration = new StringBuilder();
   }
 
   private TraceSignatureVisitor(final StringBuilder stringBuilder) {
-    super(/* latest api = */ Opcodes.ASM9);
+    super(/* latest api = */ Opcodes.V_DYNA);
     this.isInterface = false;
     this.declaration = stringBuilder;
   }

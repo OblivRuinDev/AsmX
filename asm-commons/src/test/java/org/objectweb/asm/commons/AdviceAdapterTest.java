@@ -41,15 +41,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.ConstantDynamic;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 import org.objectweb.asm.test.AsmTest;
 import org.objectweb.asm.test.ClassFile;
 import org.objectweb.asm.tree.FieldInsnNode;
@@ -637,7 +629,7 @@ class AdviceAdapterTest extends AsmTest {
       final PrecompiledClass classParameter, final Api apiParameter) throws Exception {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     ClassWriter classWriter = new ClassWriter(0);
-    ClassVisitor adviceClassAdapter =
+    IClassVisitor adviceClassAdapter =
         new EmptyAdviceClassAdapter(apiParameter.value(), classWriter);
 
     Executable accept = () -> classReader.accept(adviceClassAdapter, ClassReader.EXPAND_FRAMES);
@@ -649,7 +641,7 @@ class AdviceAdapterTest extends AsmTest {
     }
     assertDoesNotThrow(accept);
     ClassWriter expectedClassWriter = new ClassWriter(0);
-    ClassVisitor expectedClassVisitor =
+    IClassVisitor expectedClassVisitor =
         new LocalVariablesSorterTest.LocalVariablesSorterClassAdapter(
             apiParameter.value(), expectedClassWriter);
     classReader.accept(expectedClassVisitor, ClassReader.EXPAND_FRAMES);
@@ -673,7 +665,7 @@ class AdviceAdapterTest extends AsmTest {
             visitLabel(label);
             // Generate ICONST_1 with the delegate visitor. The advice adapter does not 'see' this
             // and therefore cannot update its stack state, if it were doing so.
-            mv.visitInsn(ICONST_1);
+            parent.visitInsn(ICONST_1);
             // Generate IFEQ with the advice adapter itself. If the stack was updated here, it would
             // pop from an empty stack because the previous ICONST_1 was not simulated.
             visitJumpInsn(IFEQ, label);
@@ -720,7 +712,7 @@ class AdviceAdapterTest extends AsmTest {
 
   private static class BasicAdviceAdapter extends AdviceAdapter {
 
-    BasicAdviceAdapter(final MethodVisitor methodVisitor) {
+    BasicAdviceAdapter(final IMethodVisitor methodVisitor) {
       super(
           /* latest */ Opcodes.ASM10_EXPERIMENTAL,
           methodVisitor,
@@ -821,23 +813,23 @@ class AdviceAdapterTest extends AsmTest {
 
   private static class EmptyAdviceClassAdapter extends ClassVisitor {
 
-    EmptyAdviceClassAdapter(final int api, final ClassVisitor classVisitor) {
+    EmptyAdviceClassAdapter(final int api, final IClassVisitor classVisitor) {
       super(api, classVisitor);
     }
 
     @Override
-    public MethodVisitor visitMethod(
+    public IMethodVisitor visitMethod(
         final int access,
         final String name,
         final String descriptor,
         final String signature,
         final String[] exceptions) {
-      MethodVisitor methodVisitor =
+      IMethodVisitor methodVisitor =
           super.visitMethod(access, name, descriptor, signature, exceptions);
       if (methodVisitor == null || (access & (Opcodes.ACC_ABSTRACT | Opcodes.ACC_NATIVE)) > 0) {
         return methodVisitor;
       }
-      return new AdviceAdapter(api, methodVisitor, access, name, descriptor) {};
+      return new AdviceAdapter(ver, methodVisitor, access, name, descriptor) {};
     }
   }
 }

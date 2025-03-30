@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,7 +29,9 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.signature;
 
+import org.objectweb.asm.Constants;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.VerObj;
 
 /**
  * A visitor to visit a generic signature. The methods of this interface must be called in one of
@@ -47,8 +51,9 @@ import org.objectweb.asm.Opcodes;
  *
  * @author Thomas Hallgren
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
-public abstract class SignatureVisitor {
+public abstract class SignatureVisitor extends VerObj {
 
   /** Wildcard for an "extends" type argument. */
   public static final char EXTENDS = '+';
@@ -60,28 +65,17 @@ public abstract class SignatureVisitor {
   public static final char INSTANCEOF = '=';
 
   /**
-   * The ASM API version implemented by this visitor. The value of this field must be one of the
-   * {@code ASM}<i>x</i> values in {@link Opcodes}.
-   */
-  protected final int api;
-
-  /**
    * Constructs a new {@link SignatureVisitor}.
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of the {@code
+   * @param ver the ASM API version implemented by this visitor. Must be one of the {@code
    *     ASM}<i>x</i> values in {@link Opcodes}.
    */
-  protected SignatureVisitor(final int api) {
-    if (api != Opcodes.ASM9
-        && api != Opcodes.ASM8
-        && api != Opcodes.ASM7
-        && api != Opcodes.ASM6
-        && api != Opcodes.ASM5
-        && api != Opcodes.ASM4
-        && api != Opcodes.ASM10_EXPERIMENTAL) {
-      throw new IllegalArgumentException("Unsupported api " + api);
-    }
-    this.api = api;
+  protected SignatureVisitor(final int ver) {
+    super(ver);
+  }
+
+  protected SignatureVisitor() {
+    super();
   }
 
   /**

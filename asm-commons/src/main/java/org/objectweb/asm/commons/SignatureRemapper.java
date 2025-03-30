@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -53,7 +55,7 @@ public class SignatureRemapper extends SignatureVisitor {
    * @param remapper the remapper to use to remap the types in the visited signature.
    */
   public SignatureRemapper(final SignatureVisitor signatureVisitor, final Remapper remapper) {
-    this(/* latest api = */ Opcodes.ASM9, signatureVisitor, remapper);
+    this(/* latest api = */ Opcodes.V_DYNA, signatureVisitor, remapper);
   }
 
   /**

@@ -41,12 +41,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 import org.objectweb.asm.test.AsmTest;
 import org.objectweb.asm.test.ClassFile;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
@@ -372,7 +367,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   void testVisitMethod_checkDataFlowByDefault() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
     checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         checkClassAdapter.visitMethod(ACC_PUBLIC, "m", "(I)I", null, null);
     methodVisitor.visitCode();
     methodVisitor.visitVarInsn(ILOAD, 1);
@@ -393,10 +388,10 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
 
   @Test
   void testVisitMethod_checkMaxStackAndLocalsIfClassWriterWithoutComputeMaxs() {
-    ClassWriter classWriter = new ClassWriter(0);
+    IClassVisitor classWriter = new ClassWriter(0);
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(classWriter);
     checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         checkClassAdapter.visitMethod(ACC_PUBLIC, "m", "(I)I", null, null);
     methodVisitor.visitCode();
     methodVisitor.visitVarInsn(ILOAD, 1);
@@ -416,7 +411,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   void testVisitMethod_noDataFlowCheckIfDisabled() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null, /* checkDataFlow= */ false);
     checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
-    MethodVisitor methodVisitor = checkClassAdapter.visitMethod(ACC_PUBLIC, "m", "()V", null, null);
+    IMethodVisitor methodVisitor = checkClassAdapter.visitMethod(ACC_PUBLIC, "m", "()V", null, null);
     methodVisitor.visitCode();
     methodVisitor.visitVarInsn(ILOAD, 1);
     methodVisitor.visitVarInsn(ASTORE, 0);
@@ -473,7 +468,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
-    ClassVisitor classVisitor = new CheckClassAdapter(apiParameter.value(), classWriter, true);
+    IClassVisitor classVisitor = new CheckClassAdapter(apiParameter.value(), classWriter, true);
 
     Executable accept = () -> classReader.accept(classVisitor, attributes(), 0);
 
@@ -496,9 +491,9 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
-    ClassVisitor noOpClassVisitor =
+    IClassVisitor noOpClassVisitor =
         new ClassVisitor(/* latest */ Opcodes.ASM10_EXPERIMENTAL, classWriter) {};
-    ClassVisitor classVisitor = new CheckClassAdapter(apiParameter.value(), noOpClassVisitor, true);
+    IClassVisitor classVisitor = new CheckClassAdapter(apiParameter.value(), noOpClassVisitor, true);
 
     Executable accept = () -> classReader.accept(classVisitor, attributes(), 0);
 
@@ -517,7 +512,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
       final PrecompiledClass classParameter, final Api apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
-    ClassVisitor classVisitor = new CheckClassAdapter(apiParameter.value(), null, true) {};
+    IClassVisitor classVisitor = new CheckClassAdapter(apiParameter.value(), null, true) {};
 
     Executable accept = () -> classReader.accept(classVisitor, attributes(), 0);
 
@@ -530,7 +525,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
       final PrecompiledClass classParameter, final Api apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
-    ClassVisitor classVisitor =
+    IClassVisitor classVisitor =
         new CheckClassAdapter(
             apiParameter.value(),
             new ClassVisitor(/* latest */ Opcodes.ASM10_EXPERIMENTAL, null) {},
@@ -633,7 +628,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   void testVerify_invalidClass() {
     ClassWriter classWriter = new ClassWriter(0);
     classWriter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
-    MethodVisitor methodVisitor = classWriter.visitMethod(ACC_PUBLIC, "m", "()V", null, null);
+    IMethodVisitor methodVisitor = classWriter.visitMethod(ACC_PUBLIC, "m", "()V", null, null);
     methodVisitor.visitCode();
     methodVisitor.visitVarInsn(ALOAD, 0);
     methodVisitor.visitVarInsn(ISTORE, 30);

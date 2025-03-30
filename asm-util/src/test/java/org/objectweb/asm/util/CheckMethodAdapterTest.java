@@ -36,13 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.TypeReference;
+import org.objectweb.asm.*;
 import org.objectweb.asm.test.AsmTest;
 
 /**
@@ -425,18 +419,6 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
 
     Exception exception = assertThrows(IllegalArgumentException.class, visitFieldInsn);
     assertEquals("Invalid descriptor: L-;", exception.getMessage());
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  void testDeprecatedVisitMethodInsn_invalidOpcode() {
-    checkMethodAdapter.visitCode();
-
-    Executable visitMethodInsn = () -> checkMethodAdapter.visitMethodInsn(42, "o", "m", "()V");
-
-    Exception exception = assertThrows(IllegalArgumentException.class, visitMethodInsn);
-    assertEquals(
-        "Invalid combination of opcode and method: 42, VISIT_METHOD_INSN", exception.getMessage());
   }
 
   @Test
@@ -1101,7 +1083,7 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
 
   @Test
   void testVisitEnd_invalidDataFlow() {
-    MethodVisitor dataFlowCheckMethodAdapter =
+    IMethodVisitor dataFlowCheckMethodAdapter =
         new CheckMethodAdapter(ACC_PUBLIC, "m", "(I)I", null, Map.of());
     dataFlowCheckMethodAdapter.visitCode();
     dataFlowCheckMethodAdapter.visitVarInsn(ILOAD, 1);
@@ -1123,13 +1105,13 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitEnd_noInvalidMaxStackIfClassWriterWithComputeMaxs() {
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         new CheckMethodAdapter.MethodWriterWrapper(
-            /* latest api = */ Opcodes.ASM9,
+            /* latest api = */ V_DYNA,
             /* version= */ Opcodes.V1_5,
             classWriter,
-            new MethodVisitor(/* latest api = */ Opcodes.ASM9) {});
-    MethodVisitor dataFlowCheckMethodAdapter =
+            new MethodVisitor(/* latest api = */ V_DYNA) {});
+    IMethodVisitor dataFlowCheckMethodAdapter =
         new CheckMethodAdapter(ACC_PUBLIC, "m", "(I)I", methodVisitor, Map.of());
     dataFlowCheckMethodAdapter.visitCode();
     dataFlowCheckMethodAdapter.visitVarInsn(ILOAD, 1);
@@ -1144,13 +1126,13 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitEnd_noInvalidMaxStackIfClassWriterWithComputeFrames() {
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         new CheckMethodAdapter.MethodWriterWrapper(
-            /* latest api = */ Opcodes.ASM9,
+            /* latest api = */ V_DYNA,
             /* version= */ Opcodes.V1_5,
             classWriter,
-            new MethodVisitor(/* latest api = */ Opcodes.ASM9) {});
-    MethodVisitor dataFlowCheckMethodAdapter =
+            new MethodVisitor(/* latest api = */ V_DYNA) {});
+    IMethodVisitor dataFlowCheckMethodAdapter =
         new CheckMethodAdapter(ACC_PUBLIC, "m", "(I)I", methodVisitor, Map.of());
     dataFlowCheckMethodAdapter.visitCode();
     dataFlowCheckMethodAdapter.visitVarInsn(ILOAD, 1);
@@ -1165,13 +1147,13 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitEnd_invalidMaxStackIfClassWriterWithoutComputeMaxsOrComputeFrames() {
     ClassWriter classWriter = new ClassWriter(0);
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         new CheckMethodAdapter.MethodWriterWrapper(
-            /* latest api = */ Opcodes.ASM9,
+            /* latest api = */ V_DYNA,
             /* version= */ Opcodes.V1_5,
             classWriter,
-            new MethodVisitor(/* latest api = */ Opcodes.ASM9) {});
-    MethodVisitor dataFlowCheckMethodAdapter =
+            new MethodVisitor(/* latest api = */ V_DYNA) {});
+    IMethodVisitor dataFlowCheckMethodAdapter =
         new CheckMethodAdapter(ACC_PUBLIC, "m", "(I)I", methodVisitor, Map.of());
     dataFlowCheckMethodAdapter.visitCode();
     dataFlowCheckMethodAdapter.visitVarInsn(ILOAD, 1);
@@ -1190,13 +1172,13 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitEnd_noMissingFrameIfClassWriterWithComputeFrames() {
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         new CheckMethodAdapter.MethodWriterWrapper(
-            /* latest api = */ Opcodes.ASM9,
+            /* latest api = */ V_DYNA,
             /* version= */ Opcodes.V1_7,
             classWriter,
-            new MethodVisitor(/* latest api = */ Opcodes.ASM9) {});
-    MethodVisitor dataFlowCheckMethodAdapter =
+            new MethodVisitor(/* latest api = */ V_DYNA) {});
+    IMethodVisitor dataFlowCheckMethodAdapter =
         new CheckMethodAdapter(ACC_PUBLIC, "m", "(I)I", methodVisitor, new HashMap<>());
     Label label = new Label();
     dataFlowCheckMethodAdapter.visitCode();
@@ -1215,13 +1197,13 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitEnd_missingFrameIfClassWriterWithoutComputeFrames() {
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         new CheckMethodAdapter.MethodWriterWrapper(
-            /* latest api = */ Opcodes.ASM9,
+            /* latest api = */ V_DYNA,
             /* version= */ Opcodes.V1_7,
             classWriter,
-            new MethodVisitor(/* latest api = */ Opcodes.ASM9) {});
-    MethodVisitor dataFlowCheckMethodAdapter =
+            new MethodVisitor(/* latest api = */ V_DYNA) {});
+    IMethodVisitor dataFlowCheckMethodAdapter =
         new CheckMethodAdapter(ACC_PUBLIC, "m", "(I)I", methodVisitor, new HashMap<>());
     Label label = new Label();
     dataFlowCheckMethodAdapter.visitCode();
@@ -1243,7 +1225,7 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
 
   @Test
   void testVisitEnd_invalidReturnType() {
-    MethodVisitor dataFlowCheckMethodAdapter =
+    IMethodVisitor dataFlowCheckMethodAdapter =
         new CheckMethodAdapter(ACC_PUBLIC, "m", "(I)V", null, Map.of());
     dataFlowCheckMethodAdapter.visitCode();
     dataFlowCheckMethodAdapter.visitVarInsn(ILOAD, 1);

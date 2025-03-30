@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -421,7 +423,7 @@ public class ClassReader {
    * @param parsingOptions the options to use to parse this class. One or more of {@link
    *     #SKIP_CODE}, {@link #SKIP_DEBUG}, {@link #SKIP_FRAMES} or {@link #EXPAND_FRAMES}.
    */
-  public void accept(final ClassVisitor classVisitor, final int parsingOptions) {
+  public void accept(final IClassVisitor classVisitor, final int parsingOptions) {
     accept(classVisitor, new Attribute[0], parsingOptions);
   }
 
@@ -440,7 +442,7 @@ public class ClassReader {
    *     #SKIP_CODE}, {@link #SKIP_DEBUG}, {@link #SKIP_FRAMES} or {@link #EXPAND_FRAMES}.
    */
   public void accept(
-      final ClassVisitor classVisitor,
+      final IClassVisitor classVisitor,
       final Attribute[] attributePrototypes,
       final int parsingOptions) {
     Context context = new Context();
@@ -568,7 +570,7 @@ public class ClassReader {
     // Visit the class declaration. The minor_version and major_version fields start 6 bytes before
     // the first constant pool entry, which itself starts at cpInfoOffsets[1] - 1 (by definition).
     classVisitor.visit(
-        readInt(cpInfoOffsets[1] - 7), accessFlags, thisClass, signature, superClass, interfaces);
+        readVer(), accessFlags, thisClass, signature, superClass, interfaces);
 
     // Visit the SourceFile and SourceDebugExtenstion attributes.
     if ((parsingOptions & SKIP_DEBUG) == 0
@@ -766,7 +768,7 @@ public class ClassReader {
    *     null}.
    */
   private void readModuleAttributes(
-      final ClassVisitor classVisitor,
+      final IClassVisitor classVisitor,
       final Context context,
       final int moduleOffset,
       final int modulePackagesOffset,
@@ -779,7 +781,7 @@ public class ClassReader {
     int moduleFlags = readUnsignedShort(currentOffset + 2);
     String moduleVersion = readUTF8(currentOffset + 4, buffer);
     currentOffset += 6;
-    ModuleVisitor moduleVisitor = classVisitor.visitModule(moduleName, moduleFlags, moduleVersion);
+    IModuleVisitor moduleVisitor = classVisitor.visitModule(moduleName, moduleFlags, moduleVersion);
     if (moduleVisitor == null) {
       return;
     }
@@ -889,7 +891,7 @@ public class ClassReader {
    * @return the offset of the first byte following the record component.
    */
   private int readRecordComponent(
-      final ClassVisitor classVisitor, final Context context, final int recordComponentOffset) {
+          final IClassVisitor classVisitor, final Context context, final int recordComponentOffset) {
     char[] charBuffer = context.charBuffer;
 
     int currentOffset = recordComponentOffset;
@@ -950,7 +952,7 @@ public class ClassReader {
       currentOffset += attributeLength;
     }
 
-    RecordComponentVisitor recordComponentVisitor =
+    IRecordComponentVisitor recordComponentVisitor =
         classVisitor.visitRecordComponent(name, descriptor, signature);
     if (recordComponentVisitor == null) {
       return currentOffset;
@@ -1063,7 +1065,7 @@ public class ClassReader {
    * @return the offset of the first byte following the field_info structure.
    */
   private int readField(
-      final ClassVisitor classVisitor, final Context context, final int fieldInfoOffset) {
+          final IClassVisitor classVisitor, final Context context, final int fieldInfoOffset) {
     char[] charBuffer = context.charBuffer;
 
     // Read the access_flags, name_index and descriptor_index fields.
@@ -1134,7 +1136,7 @@ public class ClassReader {
     }
 
     // Visit the field declaration.
-    FieldVisitor fieldVisitor =
+    IFieldVisitor fieldVisitor =
         classVisitor.visitField(accessFlags, name, descriptor, signature, constantValue);
     if (fieldVisitor == null) {
       return currentOffset;
@@ -1247,7 +1249,7 @@ public class ClassReader {
    * @return the offset of the first byte following the method_info structure.
    */
   private int readMethod(
-      final ClassVisitor classVisitor, final Context context, final int methodInfoOffset) {
+          final IClassVisitor classVisitor, final Context context, final int methodInfoOffset) {
     char[] charBuffer = context.charBuffer;
 
     // Read the access_flags, name_index and descriptor_index fields.
@@ -1350,7 +1352,7 @@ public class ClassReader {
     }
 
     // Visit the method declaration.
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         classVisitor.visitMethod(
             context.currentMethodAccessFlags,
             context.currentMethodName,
@@ -1394,7 +1396,7 @@ public class ClassReader {
 
     // Visit the AnnotationDefault attribute.
     if (annotationDefaultOffset != 0) {
-      AnnotationVisitor annotationVisitor = methodVisitor.visitAnnotationDefault();
+      IAnnotationVisitor annotationVisitor = methodVisitor.visitAnnotationDefault();
       readElementValue(annotationVisitor, annotationDefaultOffset, null, charBuffer);
       if (annotationVisitor != null) {
         annotationVisitor.visitEnd();
@@ -1530,7 +1532,7 @@ public class ClassReader {
    *     its attribute_name_index and attribute_length fields.
    */
   private void readCode(
-      final MethodVisitor methodVisitor, final Context context, final int codeOffset) {
+          final IMethodVisitor methodVisitor, final Context context, final int codeOffset) {
     int currentOffset = codeOffset;
 
     // Read the max_stack, max_locals and code_length fields.
@@ -2666,7 +2668,7 @@ public class ClassReader {
 
   /**
    * Handles the bytecode offset of the next instruction to be visited in {@link
-   * #accept(ClassVisitor,int)}. This method is called just before the instruction and before its
+   * #accept(IClassVisitor,int)}. This method is called just before the instruction and before its
    * associated label and stack map frame, if any. The default implementation of this method does
    * nothing. Subclasses can override this method to store the argument in a mutable field, for
    * instance, so that {@link MethodVisitor} instances can get the bytecode offset of each visited
@@ -2743,7 +2745,7 @@ public class ClassReader {
    *     'annotations' array field.
    */
   private int[] readTypeAnnotations(
-      final MethodVisitor methodVisitor,
+      final IMethodVisitor methodVisitor,
       final Context context,
       final int runtimeTypeAnnotationsOffset,
       final boolean visible) {
@@ -2949,7 +2951,7 @@ public class ClassReader {
    *     attribute, false it is a RuntimeInvisibleParameterAnnotations attribute.
    */
   private void readParameterAnnotations(
-      final MethodVisitor methodVisitor,
+      final IMethodVisitor methodVisitor,
       final Context context,
       final int runtimeParameterAnnotationsOffset,
       final boolean visible) {
@@ -2990,7 +2992,7 @@ public class ClassReader {
    * @return the end offset of the JVMS 'annotation' or 'array_value' structure.
    */
   private int readElementValues(
-      final AnnotationVisitor annotationVisitor,
+      final IAnnotationVisitor annotationVisitor,
       final int annotationOffset,
       final boolean named,
       final char[] charBuffer) {
@@ -3029,7 +3031,7 @@ public class ClassReader {
    * @return the end offset of the JVMS 'element_value' structure.
    */
   private int readElementValue(
-      final AnnotationVisitor annotationVisitor,
+      final IAnnotationVisitor annotationVisitor,
       final int elementValueOffset,
       final String elementName,
       final char[] charBuffer) {
@@ -3875,5 +3877,15 @@ public class ClassReader {
       default:
         throw new IllegalArgumentException();
     }
+  }
+
+  /**
+   * Visit the class declaration. The minor_version and major_version fields start 6 bytes before
+   * the first constant pool entry, which itself starts at cpInfoOffsets[1] - 1 (by definition).
+   *
+   * @return class version
+   */
+  public int readVer() {
+    return readInt(cpInfoOffsets[1] - 7);
   }
 }

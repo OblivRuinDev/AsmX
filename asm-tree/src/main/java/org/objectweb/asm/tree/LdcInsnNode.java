@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,11 +30,8 @@
 package org.objectweb.asm.tree;
 
 import java.util.Map;
-import org.objectweb.asm.ConstantDynamic;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+
+import org.objectweb.asm.*;
 
 /**
  * A node that represents an LDC instruction.
@@ -71,7 +70,7 @@ public class LdcInsnNode extends AbstractInsnNode {
   }
 
   @Override
-  public void accept(final MethodVisitor methodVisitor) {
+  public void accept(final IMethodVisitor methodVisitor) {
     methodVisitor.visitLdcInsn(cst);
     acceptAnnotations(methodVisitor);
   }

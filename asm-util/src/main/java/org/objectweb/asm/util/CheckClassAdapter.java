@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -35,20 +37,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.ModuleVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.RecordComponentVisitor;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.TypePath;
-import org.objectweb.asm.TypeReference;
+
+import org.objectweb.asm.*;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TryCatchBlockNode;
@@ -157,24 +147,24 @@ public class CheckClassAdapter extends ClassVisitor {
 
   /**
    * Constructs a new {@link CheckClassAdapter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #CheckClassAdapter(int, ClassVisitor, boolean)} version.
+   * Instead, they must use the {@link #CheckClassAdapter(int, IClassVisitor, boolean)} version.
    *
    * @param classVisitor the class visitor to which this adapter must delegate calls.
    */
-  public CheckClassAdapter(final ClassVisitor classVisitor) {
+  public CheckClassAdapter(final IClassVisitor classVisitor) {
     this(classVisitor, /* checkDataFlow= */ true);
   }
 
   /**
    * Constructs a new {@link CheckClassAdapter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #CheckClassAdapter(int, ClassVisitor, boolean)} version.
+   * Instead, they must use the {@link #CheckClassAdapter(int, IClassVisitor, boolean)} version.
    *
    * @param classVisitor the class visitor to which this adapter must delegate calls.
    * @param checkDataFlow whether to perform basic data flow checks.
    * @throws IllegalStateException If a subclass calls this constructor.
    */
-  public CheckClassAdapter(final ClassVisitor classVisitor, final boolean checkDataFlow) {
-    this(/* latest api = */ Opcodes.ASM9, classVisitor, checkDataFlow);
+  public CheckClassAdapter(final IClassVisitor classVisitor, final boolean checkDataFlow) {
+    this(/* latest api = */ Opcodes.V_DYNA, classVisitor, checkDataFlow);
     if (getClass() != CheckClassAdapter.class) {
       throw new IllegalStateException();
     }
@@ -190,7 +180,7 @@ public class CheckClassAdapter extends ClassVisitor {
    *     not perform any data flow check (see {@link CheckMethodAdapter}).
    */
   protected CheckClassAdapter(
-      final int api, final ClassVisitor classVisitor, final boolean checkDataFlow) {
+          final int api, final IClassVisitor classVisitor, final boolean checkDataFlow) {
     super(api, classVisitor);
     this.labelInsnIndices = new HashMap<>();
     this.checkDataFlow = checkDataFlow;
@@ -273,7 +263,7 @@ public class CheckClassAdapter extends ClassVisitor {
   }
 
   @Override
-  public ModuleVisitor visitModule(final String name, final int access, final String version) {
+  public IModuleVisitor visitModule(final String name, final int access, final String version) {
     checkState();
     if (visitModuleCalled) {
       throw new IllegalStateException("visitModule can be called only once.");
@@ -283,7 +273,7 @@ public class CheckClassAdapter extends ClassVisitor {
     checkAccess(access, Opcodes.ACC_OPEN | Opcodes.ACC_SYNTHETIC | Opcodes.ACC_MANDATED);
     CheckModuleAdapter checkModuleAdapter =
         new CheckModuleAdapter(
-            api, super.visitModule(name, access, version), (access & Opcodes.ACC_OPEN) != 0);
+                ver, super.visitModule(name, access, version), (access & Opcodes.ACC_OPEN) != 0);
     checkModuleAdapter.classVersion = this.version;
     return checkModuleAdapter;
   }
@@ -376,7 +366,7 @@ public class CheckClassAdapter extends ClassVisitor {
   }
 
   @Override
-  public RecordComponentVisitor visitRecordComponent(
+  public IRecordComponentVisitor visitRecordComponent(
       final String name, final String descriptor, final String signature) {
     checkState();
     CheckMethodAdapter.checkUnqualifiedName(version, name, "record component name");
@@ -385,11 +375,11 @@ public class CheckClassAdapter extends ClassVisitor {
       checkFieldSignature(signature);
     }
     return new CheckRecordComponentAdapter(
-        api, super.visitRecordComponent(name, descriptor, signature));
+            ver, super.visitRecordComponent(name, descriptor, signature));
   }
 
   @Override
-  public FieldVisitor visitField(
+  public IFieldVisitor visitField(
       final int access,
       final String name,
       final String descriptor,
@@ -417,11 +407,11 @@ public class CheckClassAdapter extends ClassVisitor {
     if (value != null) {
       CheckMethodAdapter.checkConstant(value);
     }
-    return new CheckFieldAdapter(api, super.visitField(access, name, descriptor, signature, value));
+    return new CheckFieldAdapter(ver, super.visitField(access, name, descriptor, signature, value));
   }
 
   @Override
-  public MethodVisitor visitMethod(
+  public IMethodVisitor visitMethod(
       final int access,
       final String name,
       final String descriptor,
@@ -459,32 +449,32 @@ public class CheckClassAdapter extends ClassVisitor {
       }
     }
     CheckMethodAdapter checkMethodAdapter;
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         super.visitMethod(access, name, descriptor, signature, exceptions);
     if (checkDataFlow) {
-      if (cv instanceof ClassWriter) {
+      if (parent instanceof IClassVisitor) {
         methodVisitor =
             new CheckMethodAdapter.MethodWriterWrapper(
-                api, version, (ClassWriter) cv, methodVisitor);
+                    ver, version, (ClassWriter) parent, methodVisitor);
       }
       checkMethodAdapter =
-          new CheckMethodAdapter(api, access, name, descriptor, methodVisitor, labelInsnIndices);
+          new CheckMethodAdapter(ver, access, name, descriptor, methodVisitor, labelInsnIndices);
     } else {
-      checkMethodAdapter = new CheckMethodAdapter(api, methodVisitor, labelInsnIndices);
+      checkMethodAdapter = new CheckMethodAdapter(ver, methodVisitor, labelInsnIndices);
     }
     checkMethodAdapter.version = version;
     return checkMethodAdapter;
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     checkState();
     CheckMethodAdapter.checkDescriptor(version, descriptor, false);
     return new CheckAnnotationAdapter(super.visitAnnotation(descriptor, visible));
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     checkState();
     int sort = new TypeReference(typeRef).getSort();
@@ -1048,7 +1038,7 @@ public class CheckClassAdapter extends ClassVisitor {
       final PrintWriter printWriter) {
     ClassNode classNode = new ClassNode();
     classReader.accept(
-        new CheckClassAdapter(/*latest*/ Opcodes.ASM9, classNode, false) {},
+        new CheckClassAdapter(/*latest*/ Opcodes.V_DYNA, classNode, false) {},
         ClassReader.SKIP_DEBUG);
 
     Type syperType = classNode.superName == null ? null : Type.getObjectType(classNode.superName);

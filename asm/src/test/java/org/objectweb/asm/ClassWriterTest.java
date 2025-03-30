@@ -343,7 +343,7 @@ class ClassWriterTest extends AsmTest {
     ClassWriter classWriter = newEmptyClassWriter();
     String methodName = "m";
     String descriptor = "()V";
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         classWriter.visitMethod(Opcodes.ACC_STATIC, methodName, descriptor, null, null);
     methodVisitor.visitCode();
     for (int i = 0; i < methodCodeSize - 1; ++i) {
@@ -401,7 +401,7 @@ class ClassWriterTest extends AsmTest {
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     classWriter.visit(Opcodes.V1_7, Opcodes.ACC_PUBLIC, "A", null, "java/lang/Object", null);
     // Generate a default constructor, so that we can instantiate the class.
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         classWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
     methodVisitor.visitCode();
     methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
@@ -435,7 +435,7 @@ class ClassWriterTest extends AsmTest {
   void testToByteArray_computeFrames_highDimensionArrays() {
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     classWriter.visit(Opcodes.V1_7, Opcodes.ACC_PUBLIC, "A", null, "java/lang/Object", null);
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         classWriter.visitMethod(
             Opcodes.ACC_STATIC,
             "m",
@@ -470,7 +470,7 @@ class ClassWriterTest extends AsmTest {
   void testToByteArray_manyFramesWithForwardLabelReferences() {
     ClassWriter classWriter = new ClassWriter(0);
     classWriter.visit(Opcodes.V1_7, Opcodes.ACC_PUBLIC, "A", null, "java/lang/Object", null);
-    MethodVisitor constructor =
+    IMethodVisitor constructor =
         classWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
     constructor.visitCode();
     constructor.visitVarInsn(Opcodes.ALOAD, 0);
@@ -478,7 +478,7 @@ class ClassWriterTest extends AsmTest {
     constructor.visitInsn(Opcodes.RETURN);
     constructor.visitMaxs(1, 1);
     constructor.visitEnd();
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         classWriter.visitMethod(Opcodes.ACC_STATIC, "m", "()V", null, null);
     methodVisitor.visitCode();
     Label label0 = new Label();
@@ -711,7 +711,7 @@ class ClassWriterTest extends AsmTest {
     assumeTrue(hasJsrOrRetInstructions(classParameter));
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
-    ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    IClassVisitor classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 
     Executable accept = () -> classReader.accept(classWriter, attributes(), 0);
 
@@ -764,7 +764,7 @@ class ClassWriterTest extends AsmTest {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-    ClassVisitor classVisitor = new DeadCodeInserter(apiParameter.value(), classWriter);
+    IClassVisitor classVisitor = new DeadCodeInserter(apiParameter.value(), classWriter);
     classReader.accept(classVisitor, attributes(), ClassReader.SKIP_FRAMES);
 
     byte[] newClassFile = classWriter.toByteArray();
@@ -845,7 +845,7 @@ class ClassWriterTest extends AsmTest {
 
     private String className;
 
-    DeadCodeInserter(final int api, final ClassVisitor classVisitor) {
+    DeadCodeInserter(final int api, final IClassVisitor classVisitor) {
       super(api, classVisitor);
     }
 
@@ -869,7 +869,7 @@ class ClassWriterTest extends AsmTest {
     }
 
     @Override
-    public MethodVisitor visitMethod(
+    public IMethodVisitor visitMethod(
         final int access,
         final String name,
         final String descriptor,
@@ -877,7 +877,7 @@ class ClassWriterTest extends AsmTest {
         final String[] exceptions) {
       int seed = (className + "." + name + descriptor).hashCode();
       return new MethodDeadCodeInserter(
-          api, seed, super.visitMethod(access, name, descriptor, signature, exceptions));
+              ver, seed, super.visitMethod(access, name, descriptor, signature, exceptions));
     }
   }
 
@@ -886,7 +886,7 @@ class ClassWriterTest extends AsmTest {
     private Random random;
     private boolean inserted;
 
-    MethodDeadCodeInserter(final int api, final int seed, final MethodVisitor methodVisitor) {
+    MethodDeadCodeInserter(final int api, final int seed, final IMethodVisitor methodVisitor) {
       super(api, methodVisitor);
       random = new Random(seed);
     }
@@ -1027,19 +1027,19 @@ class ClassWriterTest extends AsmTest {
 
     boolean transformed;
 
-    ForwardJumpNopInserter(final int api, final ClassVisitor classVisitor) {
+    ForwardJumpNopInserter(final int api, final IClassVisitor classVisitor) {
       super(api, classVisitor);
     }
 
     @Override
-    public MethodVisitor visitMethod(
+    public IMethodVisitor visitMethod(
         final int access,
         final String name,
         final String descriptor,
         final String signature,
         final String[] exceptions) {
       return new MethodVisitor(
-          api, super.visitMethod(access, name, descriptor, signature, exceptions)) {
+              ver, super.visitMethod(access, name, descriptor, signature, exceptions)) {
         private final HashSet<Label> labels = new HashSet<>();
 
         @Override
@@ -1068,7 +1068,7 @@ class ClassWriterTest extends AsmTest {
     private boolean needFrames;
     private boolean transformed;
 
-    WideForwardJumpInserter(final int api, final ClassVisitor classVisitor) {
+    WideForwardJumpInserter(final int api, final IClassVisitor classVisitor) {
       super(api, classVisitor);
     }
 
@@ -1085,14 +1085,14 @@ class ClassWriterTest extends AsmTest {
     }
 
     @Override
-    public MethodVisitor visitMethod(
+    public IMethodVisitor visitMethod(
         final int access,
         final String name,
         final String descriptor,
         final String signature,
         final String[] exceptions) {
       return new MethodVisitor(
-          api, super.visitMethod(access, name, descriptor, signature, exceptions)) {
+              ver, super.visitMethod(access, name, descriptor, signature, exceptions)) {
 
         @Override
         public void visitCode() {

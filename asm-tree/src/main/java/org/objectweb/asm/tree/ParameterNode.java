@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,7 +29,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.tree;
 
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.IMethodVisitor;
 
 /**
  * A node that represents a parameter of a method.
@@ -62,7 +64,7 @@ public class ParameterNode {
    *
    * @param methodVisitor a method visitor.
    */
-  public void accept(final MethodVisitor methodVisitor) {
+  public void accept(final IMethodVisitor methodVisitor) {
     methodVisitor.visitParameter(name, access);
   }
 }

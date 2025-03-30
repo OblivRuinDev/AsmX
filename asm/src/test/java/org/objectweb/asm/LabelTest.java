@@ -43,7 +43,7 @@ class LabelTest {
   /** Tests that {@link Label#getOffset()} returns a correct offset after the label is visited. */
   @Test
   void testGetOffset() {
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         new ClassWriter(0).visitMethod(Opcodes.ACC_PUBLIC, "m", "()V", null, null);
     methodVisitor.visitCode();
     methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);

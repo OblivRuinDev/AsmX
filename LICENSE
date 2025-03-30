@@ -1,0 +1,17 @@
+This project contains modified code from ASM (https://asm.ow2.io/).
+
+Original code copyright and license:
+  ASM: a very small and fast Java bytecode manipulation framework
+  Copyright (c) 2000-2011 INRIA, France Telecom
+  Licensed under BSD-3-Clause (full text in LICENSE.txt)
+
+Modifications and derivative work:
+  ASMX: a modifications of ASM(ASMX is just a modified branch of ASM and has nothing else to do with it)
+  Copyright (c) 2025 OblivRuinDev
+  Licensed under BSD-3-Clause (full text in LICENSE.txt)
+
+NOTICE:
+  This project is an independent modification of ASM and is not affiliated with,
+  endorsed by, or connected to the original ASM authors.
+
+For full license terms, see LICENSE.txt.

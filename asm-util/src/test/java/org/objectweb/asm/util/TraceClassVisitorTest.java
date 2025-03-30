@@ -36,14 +36,7 @@ import java.io.StringWriter;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.ModuleVisitor;
+import org.objectweb.asm.*;
 import org.objectweb.asm.test.AsmTest;
 import org.objectweb.asm.test.ClassFile;
 
@@ -63,7 +56,7 @@ class TraceClassVisitorTest extends AsmTest {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
-    ClassVisitor traceClassVisitor =
+    IClassVisitor traceClassVisitor =
         new TraceClassVisitor(classWriter, new PrintWriter(new StringWriter()));
 
     classReader.accept(traceClassVisitor, new Attribute[] {new Comment(), new CodeComment()}, 0);
@@ -101,19 +94,19 @@ class TraceClassVisitorTest extends AsmTest {
                 new ClassVisitor(apiParameter.value()) {
 
                   @Override
-                  public ModuleVisitor visitModule(
+                  public IModuleVisitor visitModule(
                       final String name, final int access, final String version) {
                     return new TraceModuleVisitor(new Textifier());
                   }
 
                   @Override
-                  public AnnotationVisitor visitAnnotation(
+                  public IAnnotationVisitor visitAnnotation(
                       final String descriptor, final boolean visible) {
                     return new TraceAnnotationVisitor(new Textifier());
                   }
 
                   @Override
-                  public FieldVisitor visitField(
+                  public IFieldVisitor visitField(
                       final int access,
                       final String name,
                       final String descriptor,
@@ -123,7 +116,7 @@ class TraceClassVisitorTest extends AsmTest {
                   }
 
                   @Override
-                  public MethodVisitor visitMethod(
+                  public IMethodVisitor visitMethod(
                       final int access,
                       final String name,
                       final String descriptor,

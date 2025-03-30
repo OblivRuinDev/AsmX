@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,19 +30,17 @@
 package org.objectweb.asm.tree;
 
 import java.util.List;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.RecordComponentVisitor;
-import org.objectweb.asm.TypePath;
+import java.util.function.Consumer;
+
+import org.objectweb.asm.*;
 
 /**
  * A node that represents a record component.
  *
  * @author Remi Forax
+ * @author OblivRuinDev
  */
-public class RecordComponentNode extends RecordComponentVisitor {
+public class RecordComponentNode implements IRecordComponentVisitor {
 
   /** The record component name. */
   public String name;
@@ -67,19 +67,16 @@ public class RecordComponentNode extends RecordComponentVisitor {
   public List<Attribute> attrs;
 
   /**
-   * Constructs a new {@link RecordComponentNode}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #RecordComponentNode(int, String, String, String)} version.
+   * Constructs a new {@link RecordComponentNode}.
    *
    * @param name the record component name.
    * @param descriptor the record component descriptor (see {@link org.objectweb.asm.Type}).
    * @param signature the record component signature.
-   * @throws IllegalStateException If a subclass calls this constructor.
    */
   public RecordComponentNode(final String name, final String descriptor, final String signature) {
-    this(/* latest api = */ Opcodes.ASM9, name, descriptor, signature);
-    if (getClass() != RecordComponentNode.class) {
-      throw new IllegalStateException();
-    }
+    this.name = name;
+    this.descriptor = descriptor;
+    this.signature = signature;
   }
 
   /**
@@ -91,12 +88,10 @@ public class RecordComponentNode extends RecordComponentVisitor {
    * @param descriptor the record component descriptor (see {@link org.objectweb.asm.Type}).
    * @param signature the record component signature.
    */
+  @Deprecated(forRemoval = true)
   public RecordComponentNode(
       final int api, final String name, final String descriptor, final String signature) {
-    super(api);
-    this.name = name;
-    this.descriptor = descriptor;
-    this.signature = signature;
+    this(name, descriptor, signature);
   }
 
   // -----------------------------------------------------------------------------------------------
@@ -104,7 +99,7 @@ public class RecordComponentNode extends RecordComponentVisitor {
   // -----------------------------------------------------------------------------------------------
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public AnnotationNode visitAnnotation(final String descriptor, final boolean visible) {
     AnnotationNode annotation = new AnnotationNode(descriptor);
     if (visible) {
       visibleAnnotations = Util.add(visibleAnnotations, annotation);
@@ -115,7 +110,7 @@ public class RecordComponentNode extends RecordComponentVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public AnnotationNode visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     TypeAnnotationNode typeAnnotation = new TypeAnnotationNode(typeRef, typePath, descriptor);
     if (visible) {
@@ -141,25 +136,12 @@ public class RecordComponentNode extends RecordComponentVisitor {
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Checks that this record component node is compatible with the given ASM API version. This
-   * method checks that this node, and all its children recursively, do not contain elements that
-   * were introduced in more recent versions of the ASM API than the given version.
-   *
-   * @param api an ASM API version. Must be one of {@link Opcodes#ASM8} or {@link Opcodes#ASM9}.
-   */
-  public void check(final int api) {
-    if (api < Opcodes.ASM8) {
-      throw new UnsupportedClassVersionException();
-    }
-  }
-
-  /**
    * Makes the given class visitor visit this record component.
    *
    * @param classVisitor a class visitor.
    */
-  public void accept(final ClassVisitor classVisitor) {
-    RecordComponentVisitor recordComponentVisitor =
+  public void accept(final IClassVisitor classVisitor) {
+    IRecordComponentVisitor recordComponentVisitor =
         classVisitor.visitRecordComponent(name, descriptor, signature);
     if (recordComponentVisitor == null) {
       return;

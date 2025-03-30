@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,6 +30,7 @@
 package org.objectweb.asm.util;
 
 import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.IAnnotationVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
@@ -47,12 +50,12 @@ public class CheckAnnotationAdapter extends AnnotationVisitor {
   /** Whether the {@link #visitEnd} method has been called. */
   private boolean visitEndCalled;
 
-  public CheckAnnotationAdapter(final AnnotationVisitor annotationVisitor) {
+  public CheckAnnotationAdapter(final IAnnotationVisitor annotationVisitor) {
     this(annotationVisitor, true);
   }
 
-  CheckAnnotationAdapter(final AnnotationVisitor annotationVisitor, final boolean useNamedValues) {
-    super(/* latest api = */ Opcodes.ASM9, annotationVisitor);
+  CheckAnnotationAdapter(final IAnnotationVisitor annotationVisitor, final boolean useNamedValues) {
+    super(/* latest api = */ Opcodes.V_DYNA, annotationVisitor);
     this.useNamedValue = useNamedValues;
   }
 
@@ -99,7 +102,7 @@ public class CheckAnnotationAdapter extends AnnotationVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String name, final String descriptor) {
+  public IAnnotationVisitor visitAnnotation(final String name, final String descriptor) {
     checkVisitEndNotCalled();
     checkName(name);
     // Annotations can only appear in V1_5 or more classes.
@@ -108,7 +111,7 @@ public class CheckAnnotationAdapter extends AnnotationVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitArray(final String name) {
+  public IAnnotationVisitor visitArray(final String name) {
     checkVisitEndNotCalled();
     checkName(name);
     return new CheckAnnotationAdapter(super.visitArray(name), false);

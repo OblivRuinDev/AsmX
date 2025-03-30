@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,12 +29,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.util;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.TypePath;
-import org.objectweb.asm.TypeReference;
+import org.objectweb.asm.*;
 
 /**
  * A {@link FieldVisitor} that checks that its methods are properly used.
@@ -46,13 +43,13 @@ public class CheckFieldAdapter extends FieldVisitor {
 
   /**
    * Constructs a new {@link CheckFieldAdapter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #CheckFieldAdapter(int, FieldVisitor)} version.
+   * Instead, they must use the {@link #CheckFieldAdapter(int, IFieldVisitor)} version.
    *
    * @param fieldVisitor the field visitor to which this adapter must delegate calls.
    * @throws IllegalStateException If a subclass calls this constructor.
    */
-  public CheckFieldAdapter(final FieldVisitor fieldVisitor) {
-    this(/* latest api = */ Opcodes.ASM9, fieldVisitor);
+  public CheckFieldAdapter(final IFieldVisitor fieldVisitor) {
+    this(/* latest api = */ Opcodes.V_DYNA, fieldVisitor);
     if (getClass() != CheckFieldAdapter.class) {
       throw new IllegalStateException();
     }
@@ -65,12 +62,12 @@ public class CheckFieldAdapter extends FieldVisitor {
    *     ASM}<i>x</i> values in {@link Opcodes}.
    * @param fieldVisitor the field visitor to which this adapter must delegate calls.
    */
-  protected CheckFieldAdapter(final int api, final FieldVisitor fieldVisitor) {
+  protected CheckFieldAdapter(final int api, final IFieldVisitor fieldVisitor) {
     super(api, fieldVisitor);
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     checkVisitEndNotCalled();
     // Annotations can only appear in V1_5 or more classes.
     CheckMethodAdapter.checkDescriptor(Opcodes.V1_5, descriptor, false);
@@ -78,7 +75,7 @@ public class CheckFieldAdapter extends FieldVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     checkVisitEndNotCalled();
     int sort = new TypeReference(typeRef).getSort();

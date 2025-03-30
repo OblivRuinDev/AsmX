@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -34,6 +36,7 @@ import org.objectweb.asm.TypePath;
  * A node that represents a type annotation.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class TypeAnnotationNode extends AnnotationNode {
 
@@ -48,8 +51,7 @@ public class TypeAnnotationNode extends AnnotationNode {
   public TypePath typePath;
 
   /**
-   * Constructs a new {@link AnnotationNode}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #TypeAnnotationNode(int, int, TypePath, String)} version.
+   * Constructs a new {@link AnnotationNode}.
    *
    * @param typeRef a reference to the annotated type. See {@link org.objectweb.asm.TypeReference}.
    * @param typePath the path to the annotated type argument, wildcard bound, array element type, or
@@ -59,10 +61,9 @@ public class TypeAnnotationNode extends AnnotationNode {
    * @throws IllegalStateException If a subclass calls this constructor.
    */
   public TypeAnnotationNode(final int typeRef, final TypePath typePath, final String descriptor) {
-    this(/* latest api = */ Opcodes.ASM9, typeRef, typePath, descriptor);
-    if (getClass() != TypeAnnotationNode.class) {
-      throw new IllegalStateException();
-    }
+    super(descriptor);
+    this.typeRef = typeRef;
+    this.typePath = typePath;
   }
 
   /**
@@ -76,10 +77,9 @@ public class TypeAnnotationNode extends AnnotationNode {
    *     'typeRef' as a whole.
    * @param descriptor the class descriptor of the annotation class.
    */
+  @Deprecated(forRemoval = true)
   public TypeAnnotationNode(
       final int api, final int typeRef, final TypePath typePath, final String descriptor) {
-    super(api, descriptor);
-    this.typeRef = typeRef;
-    this.typePath = typePath;
+    this(typeRef, typePath, descriptor);
   }
 }

@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -36,10 +38,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+
+import org.objectweb.asm.*;
 
 /**
  * A {@link ClassVisitor} that adds a serial version unique identifier to a class if missing. A
@@ -143,14 +143,14 @@ public class SerialVersionUIDAdder extends ClassVisitor {
 
   /**
    * Constructs a new {@link SerialVersionUIDAdder}. <i>Subclasses must not use this
-   * constructor</i>. Instead, they must use the {@link #SerialVersionUIDAdder(int, ClassVisitor)}
+   * constructor</i>. Instead, they must use the {@link #SerialVersionUIDAdder(int, IClassVisitor)}
    * version.
    *
    * @param classVisitor a {@link ClassVisitor} to which this visitor will delegate calls.
    * @throws IllegalStateException If a subclass calls this constructor.
    */
-  public SerialVersionUIDAdder(final ClassVisitor classVisitor) {
-    this(/* latest api = */ Opcodes.ASM9, classVisitor);
+  public SerialVersionUIDAdder(final IClassVisitor classVisitor) {
+    this(/* latest api = */ Opcodes.V_DYNA, classVisitor);
     if (getClass() != SerialVersionUIDAdder.class) {
       throw new IllegalStateException();
     }
@@ -163,7 +163,7 @@ public class SerialVersionUIDAdder extends ClassVisitor {
    *     ASM}<i>x</i> values in {@link Opcodes}.
    * @param classVisitor a {@link ClassVisitor} to which this visitor will delegate calls.
    */
-  protected SerialVersionUIDAdder(final int api, final ClassVisitor classVisitor) {
+  protected SerialVersionUIDAdder(final int api, final IClassVisitor classVisitor) {
     super(api, classVisitor);
   }
 
@@ -196,7 +196,7 @@ public class SerialVersionUIDAdder extends ClassVisitor {
   }
 
   @Override
-  public MethodVisitor visitMethod(
+  public IMethodVisitor visitMethod(
       final int access,
       final String name,
       final String descriptor,
@@ -236,7 +236,7 @@ public class SerialVersionUIDAdder extends ClassVisitor {
   }
 
   @Override
-  public FieldVisitor visitField(
+  public IFieldVisitor visitField(
       final int access,
       final String name,
       final String desc,
@@ -323,7 +323,7 @@ public class SerialVersionUIDAdder extends ClassVisitor {
    */
   // DontCheck(AbbreviationAsWordInName): can't be renamed (for backward binary compatibility).
   protected void addSVUID(final long svuid) {
-    FieldVisitor fieldVisitor =
+    IFieldVisitor fieldVisitor =
         super.visitField(
             Opcodes.ACC_FINAL + Opcodes.ACC_STATIC, "serialVersionUID", "J", null, svuid);
     if (fieldVisitor != null) {

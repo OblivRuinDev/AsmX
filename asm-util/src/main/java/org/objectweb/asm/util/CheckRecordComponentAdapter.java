@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,12 +29,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.util;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.RecordComponentVisitor;
-import org.objectweb.asm.TypePath;
-import org.objectweb.asm.TypeReference;
+import org.objectweb.asm.*;
 
 /**
  * A {@link RecordComponentVisitor} that checks that its methods are properly used.
@@ -48,14 +45,14 @@ public class CheckRecordComponentAdapter extends RecordComponentVisitor {
   /**
    * Constructs a new {@link CheckRecordComponentAdapter}. <i>Subclasses must not use this
    * constructor</i>. Instead, they must use the {@link #CheckRecordComponentAdapter(int,
-   * RecordComponentVisitor)} version.
+   * IRecordComponentVisitor)} version.
    *
    * @param recordComponentVisitor the record component visitor to which this adapter must delegate
    *     calls.
    * @throws IllegalStateException If a subclass calls this constructor.
    */
-  public CheckRecordComponentAdapter(final RecordComponentVisitor recordComponentVisitor) {
-    this(/* latest api =*/ Opcodes.ASM9, recordComponentVisitor);
+  public CheckRecordComponentAdapter(final IRecordComponentVisitor recordComponentVisitor) {
+    this(/* latest api =*/ Opcodes.V_DYNA, recordComponentVisitor);
     if (getClass() != CheckRecordComponentAdapter.class) {
       throw new IllegalStateException();
     }
@@ -70,12 +67,12 @@ public class CheckRecordComponentAdapter extends RecordComponentVisitor {
    *     calls.
    */
   protected CheckRecordComponentAdapter(
-      final int api, final RecordComponentVisitor recordComponentVisitor) {
+      final int api, final IRecordComponentVisitor recordComponentVisitor) {
     super(api, recordComponentVisitor);
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     checkVisitEndNotCalled();
     // Annotations can only appear in V1_5 or more classes.
     CheckMethodAdapter.checkDescriptor(Opcodes.V1_5, descriptor, false);
@@ -83,7 +80,7 @@ public class CheckRecordComponentAdapter extends RecordComponentVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     checkVisitEndNotCalled();
     int sort = new TypeReference(typeRef).getSort();

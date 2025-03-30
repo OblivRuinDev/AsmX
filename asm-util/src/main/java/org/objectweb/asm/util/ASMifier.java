@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -90,7 +92,7 @@ public class ASMifier extends Printer {
 
   static {
     HashMap<Integer, String> classVersions = new HashMap<>();
-    classVersions.put(Opcodes.V1_1, "V1_1");
+    //classVersions.put(Opcodes.V1_1, "V1_1");
     classVersions.put(Opcodes.V1_2, "V1_2");
     classVersions.put(Opcodes.V1_3, "V1_3");
     classVersions.put(Opcodes.V1_4, "V1_4");
@@ -134,7 +136,7 @@ public class ASMifier extends Printer {
    * @throws IllegalStateException If a subclass calls this constructor.
    */
   public ASMifier() {
-    this(/* latest api = */ Opcodes.ASM9, "classWriter", 0);
+    this(/* latest api = */ Opcodes.V_DYNA, "classWriter", 0);
     if (getClass() != ASMifier.class) {
       throw new IllegalStateException();
     }

@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -29,16 +31,19 @@ package org.objectweb.asm.tree;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ModuleVisitor;
+import java.util.function.Consumer;
+
+import org.objectweb.asm.IClassVisitor;
+import org.objectweb.asm.IModuleVisitor;
 import org.objectweb.asm.Opcodes;
 
 /**
  * A node that represents a module declaration.
  *
  * @author Remi Forax
+ * @author OblivRuinDev
  */
-public class ModuleNode extends ModuleVisitor {
+public class ModuleNode implements IModuleVisitor, Consumer<IClassVisitor> {//todo
 
   /** The fully qualified name (using dots) of this module. */
   public String name;
@@ -84,7 +89,7 @@ public class ModuleNode extends ModuleVisitor {
 
   /**
    * Constructs a {@link ModuleNode}. <i>Subclasses must not use this constructor</i>. Instead, they
-   * must use the {@link #ModuleNode(int,String,int,String,List,List,List,List,List)} version.
+   * must use the {@link #ModuleNode(String, int, String, List, List, List, List, List, List, String)}  ModuleNode} version.
    *
    * @param name the fully qualified name (using dots) of the module.
    * @param access the module access flags, among {@code ACC_OPEN}, {@code ACC_SYNTHETIC} and {@code
@@ -93,7 +98,6 @@ public class ModuleNode extends ModuleVisitor {
    * @throws IllegalStateException If a subclass calls this constructor.
    */
   public ModuleNode(final String name, final int access, final String version) {
-    super(/* latest api = */ Opcodes.ASM9);
     if (getClass() != ModuleNode.class) {
       throw new IllegalStateException();
     }
@@ -102,7 +106,6 @@ public class ModuleNode extends ModuleVisitor {
     this.version = version;
   }
 
-  // TODO(forax): why is there no 'mainClass' and 'packages' parameters in this constructor?
   /**
    * Constructs a {@link ModuleNode}.
    *
@@ -119,6 +122,7 @@ public class ModuleNode extends ModuleVisitor {
    *     org.objectweb.asm.Type#getInternalName()}). May be {@literal null}.
    * @param provides The services provided by this module. May be {@literal null}.
    */
+  @Deprecated(forRemoval = true)
   public ModuleNode(
       final int api,
       final String name,
@@ -129,15 +133,47 @@ public class ModuleNode extends ModuleVisitor {
       final List<ModuleOpenNode> opens,
       final List<String> uses,
       final List<ModuleProvideNode> provides) {
-    super(api);
+    this(name, access, version, exports, requires, opens, uses, provides, null, null);
+  }
+
+  /**
+   * Constructs a {@link ModuleNode}.
+   *
+   * @param name the fully qualified name (using dots) of the module.
+   * @param access the module access flags, among {@code ACC_OPEN}, {@code ACC_SYNTHETIC} and {@code
+   *     ACC_MANDATED}.
+   * @param version the module version, or {@literal null}.
+   * @param requires The dependencies of this module. May be {@literal null}.
+   * @param exports The packages exported by this module. May be {@literal null}.
+   * @param opens The packages opened by this module. May be {@literal null}.
+   * @param uses The internal names of the services used by this module (see {@link
+   *     org.objectweb.asm.Type#getInternalName()}). May be {@literal null}.
+   * @param provides The services provided by this module. May be {@literal null}.
+   * @param packages The internal name of the packages declared by this module (see {@link
+   *     org.objectweb.asm.Type#getInternalName()}). May be {@literal null}.
+   * @param mainClass The internal name of the main class of this module (see {@link
+   *     org.objectweb.asm.Type#getInternalName()}). May be {@literal null}.
+   */
+  public ModuleNode(String name,
+                    int access,
+                    String version,
+                    List<ModuleExportNode> exports,
+                    List<ModuleRequireNode> requires,
+                    List<ModuleOpenNode> opens,
+                    List<String> uses,
+                    List<ModuleProvideNode> provides,
+                    List<String> packages,
+                    String mainClass) {
     this.name = name;
     this.access = access;
     this.version = version;
-    this.requires = requires;
     this.exports = exports;
+    this.requires = requires;
     this.opens = opens;
     this.uses = uses;
     this.provides = provides;
+    this.packages = packages;
+    this.mainClass = mainClass;
   }
 
   @Override
@@ -203,8 +239,10 @@ public class ModuleNode extends ModuleVisitor {
    *
    * @param classVisitor a class visitor.
    */
-  public void accept(final ClassVisitor classVisitor) {
-    ModuleVisitor moduleVisitor = classVisitor.visitModule(name, access, version);
+  @Override
+  public void accept(final IClassVisitor classVisitor) {
+    final IModuleVisitor moduleVisitor = classVisitor.visitModule(name, access, version);
+    Consumer<Consumer<IModuleVisitor>> consumer = v -> v.accept(moduleVisitor);
     if (moduleVisitor == null) {
       return;
     }
@@ -212,34 +250,22 @@ public class ModuleNode extends ModuleVisitor {
       moduleVisitor.visitMainClass(mainClass);
     }
     if (packages != null) {
-      for (int i = 0, n = packages.size(); i < n; i++) {
-        moduleVisitor.visitPackage(packages.get(i));
-      }
+      packages.forEach(moduleVisitor::visitPackage);
     }
     if (requires != null) {
-      for (int i = 0, n = requires.size(); i < n; i++) {
-        requires.get(i).accept(moduleVisitor);
-      }
+      requires.forEach(consumer);
     }
     if (exports != null) {
-      for (int i = 0, n = exports.size(); i < n; i++) {
-        exports.get(i).accept(moduleVisitor);
-      }
+      exports.forEach(consumer);
     }
     if (opens != null) {
-      for (int i = 0, n = opens.size(); i < n; i++) {
-        opens.get(i).accept(moduleVisitor);
-      }
+      opens.forEach(consumer);
     }
     if (uses != null) {
-      for (int i = 0, n = uses.size(); i < n; i++) {
-        moduleVisitor.visitUse(uses.get(i));
-      }
+      uses.forEach(moduleVisitor::visitUse);
     }
     if (provides != null) {
-      for (int i = 0, n = provides.size(); i < n; i++) {
-        provides.get(i).accept(moduleVisitor);
-      }
+      provides.forEach(consumer);
     }
   }
 }

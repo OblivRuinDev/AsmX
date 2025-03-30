@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,7 +30,8 @@
 package org.objectweb.asm.tree;
 
 import java.util.List;
-import org.objectweb.asm.MethodVisitor;
+
+import org.objectweb.asm.IMethodVisitor;
 
 /**
  * A node that represents a try catch block.
@@ -104,7 +107,7 @@ public class TryCatchBlockNode {
    *
    * @param methodVisitor a method visitor.
    */
-  public void accept(final MethodVisitor methodVisitor) {
+  public void accept(final IMethodVisitor methodVisitor) {
     methodVisitor.visitTryCatchBlock(
         start.getLabel(), end.getLabel(), handler == null ? null : handler.getLabel(), type);
     if (visibleTypeAnnotations != null) {

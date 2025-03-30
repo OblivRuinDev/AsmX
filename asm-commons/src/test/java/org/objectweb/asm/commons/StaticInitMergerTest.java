@@ -30,10 +30,7 @@ package org.objectweb.asm.commons;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 import org.objectweb.asm.test.ClassFile;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -48,7 +45,7 @@ class StaticInitMergerTest {
   void testAllMethods_multipleStaticInitBlocks() throws Exception {
     ClassNode classNode = newClassWithStaticInitBlocks(5);
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-    ClassVisitor staticInitMerger = new StaticInitMerger("$clinit$", classWriter);
+    IClassVisitor staticInitMerger = new StaticInitMerger("$clinit$", classWriter);
 
     classNode.accept(staticInitMerger);
 
@@ -61,7 +58,7 @@ class StaticInitMergerTest {
     classNode.visit(Opcodes.V1_1, Opcodes.ACC_PUBLIC, "A", null, "java/lang/Object", null);
     classNode.visitField(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC, "counter", "I", null, null);
     for (int i = 0; i < numStaticInitBlocks; ++i) {
-      MethodVisitor methodVisitor =
+      IMethodVisitor methodVisitor =
           classNode.visitMethod(Opcodes.ACC_PUBLIC, "<clinit>", "()V", null, null);
       methodVisitor.visitFieldInsn(Opcodes.GETSTATIC, "A", "counter", "I");
       methodVisitor.visitInsn(Opcodes.ICONST_1);
@@ -70,7 +67,7 @@ class StaticInitMergerTest {
       methodVisitor.visitInsn(Opcodes.RETURN);
       methodVisitor.visitMaxs(0, 0);
     }
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         classNode.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
     methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
     methodVisitor.visitMethodInsn(

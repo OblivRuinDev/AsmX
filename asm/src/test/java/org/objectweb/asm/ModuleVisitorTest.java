@@ -59,7 +59,7 @@ class ModuleVisitorTest {
 
   @Test
   void testGetDelegate() {
-    ModuleVisitor delegate = new ModuleVisitor(Opcodes.ASM4) {};
+    IModuleVisitor delegate = new ModuleVisitor(Opcodes.ASM4) {};
     ModuleVisitor visitor = new ModuleVisitor(Opcodes.ASM4, delegate) {};
 
     assertSame(delegate, visitor.getDelegate());

@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,6 +30,7 @@
 
 package org.objectweb.asm.commons;
 
+import org.objectweb.asm.IModuleVisitor;
 import org.objectweb.asm.ModuleVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -43,13 +46,13 @@ public class ModuleRemapper extends ModuleVisitor {
 
   /**
    * Constructs a new {@link ModuleRemapper}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #ModuleRemapper(int,ModuleVisitor,Remapper)} version.
+   * Instead, they must use the {@link #ModuleRemapper(int, IModuleVisitor,Remapper)} version.
    *
    * @param moduleVisitor the module visitor this remapper must delegate to.
    * @param remapper the remapper to use to remap the types in the visited module.
    */
-  public ModuleRemapper(final ModuleVisitor moduleVisitor, final Remapper remapper) {
-    this(/* latest api = */ Opcodes.ASM9, moduleVisitor, remapper);
+  public ModuleRemapper(final IModuleVisitor moduleVisitor, final Remapper remapper) {
+    this(/* latest api = */ Opcodes.V_DYNA, moduleVisitor, remapper);
   }
 
   /**
@@ -61,7 +64,7 @@ public class ModuleRemapper extends ModuleVisitor {
    * @param remapper the remapper to use to remap the types in the visited module.
    */
   protected ModuleRemapper(
-      final int api, final ModuleVisitor moduleVisitor, final Remapper remapper) {
+          final int api, final IModuleVisitor moduleVisitor, final Remapper remapper) {
     super(api, moduleVisitor);
     this.remapper = remapper;
   }

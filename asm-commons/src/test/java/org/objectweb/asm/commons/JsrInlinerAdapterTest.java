@@ -37,12 +37,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 import org.objectweb.asm.test.AsmTest;
 import org.objectweb.asm.test.ClassFile;
 import org.objectweb.asm.tree.MethodNode;
@@ -1519,21 +1514,21 @@ class JsrInlinerAdapterTest extends AsmTest {
 
   static class JsrInlinerClassAdapter extends ClassVisitor {
 
-    JsrInlinerClassAdapter(final int api, final ClassVisitor classVisitor) {
+    JsrInlinerClassAdapter(final int api, final IClassVisitor classVisitor) {
       super(api, classVisitor);
     }
 
     @Override
-    public MethodVisitor visitMethod(
+    public IMethodVisitor visitMethod(
         final int access,
         final String name,
         final String descriptor,
         final String signature,
         final String[] exceptions) {
-      MethodVisitor methodVisitor =
+      IMethodVisitor methodVisitor =
           super.visitMethod(access, name, descriptor, signature, exceptions);
       return new JSRInlinerAdapter(
-          api, methodVisitor, access, name, descriptor, signature, exceptions) {};
+              ver, methodVisitor, access, name, descriptor, signature, exceptions) {};
     }
   }
 }

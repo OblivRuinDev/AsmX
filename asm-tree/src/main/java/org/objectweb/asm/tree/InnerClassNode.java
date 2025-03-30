@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,7 +29,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.tree;
 
-import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.IClassVisitor;
 
 /**
  * A node that represents an inner class. This inner class is not necessarily a member of the {@link
@@ -85,7 +87,7 @@ public class InnerClassNode {
    *
    * @param classVisitor a class visitor.
    */
-  public void accept(final ClassVisitor classVisitor) {
+  public void accept(final IClassVisitor classVisitor) {
     classVisitor.visitInnerClass(name, outerName, innerName, access);
   }
 }

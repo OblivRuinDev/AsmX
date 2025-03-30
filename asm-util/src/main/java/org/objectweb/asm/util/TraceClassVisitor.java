@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,15 +30,8 @@
 package org.objectweb.asm.util;
 
 import java.io.PrintWriter;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.ModuleVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.RecordComponentVisitor;
-import org.objectweb.asm.TypePath;
+
+import org.objectweb.asm.*;
 
 /**
  * A {@link ClassVisitor} that prints the classes it visits with a {@link Printer}. This class
@@ -106,7 +101,7 @@ public final class TraceClassVisitor extends ClassVisitor {
    * @param classVisitor the class visitor to which to delegate calls. May be {@literal null}.
    * @param printWriter the print writer to be used to print the class. May be {@literal null}.
    */
-  public TraceClassVisitor(final ClassVisitor classVisitor, final PrintWriter printWriter) {
+  public TraceClassVisitor(final IClassVisitor classVisitor, final PrintWriter printWriter) {
     this(classVisitor, new Textifier(), printWriter);
   }
 
@@ -118,8 +113,8 @@ public final class TraceClassVisitor extends ClassVisitor {
    * @param printWriter the print writer to be used to print the class. May be {@literal null}.
    */
   public TraceClassVisitor(
-      final ClassVisitor classVisitor, final Printer printer, final PrintWriter printWriter) {
-    super(/* latest api = */ Opcodes.ASM9, classVisitor);
+          final IClassVisitor classVisitor, final Printer printer, final PrintWriter printWriter) {
+    super(/* latest api = */ Opcodes.V_DYNA, classVisitor);
     this.printWriter = printWriter;
     this.p = printer;
   }
@@ -143,7 +138,7 @@ public final class TraceClassVisitor extends ClassVisitor {
   }
 
   @Override
-  public ModuleVisitor visitModule(final String name, final int flags, final String version) {
+  public IModuleVisitor visitModule(final String name, final int flags, final String version) {
     Printer modulePrinter = p.visitModule(name, flags, version);
     return new TraceModuleVisitor(super.visitModule(name, flags, version), modulePrinter);
   }
@@ -161,14 +156,14 @@ public final class TraceClassVisitor extends ClassVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     Printer annotationPrinter = p.visitClassAnnotation(descriptor, visible);
     return new TraceAnnotationVisitor(
         super.visitAnnotation(descriptor, visible), annotationPrinter);
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     Printer annotationPrinter = p.visitClassTypeAnnotation(typeRef, typePath, descriptor, visible);
     return new TraceAnnotationVisitor(
@@ -201,7 +196,7 @@ public final class TraceClassVisitor extends ClassVisitor {
   }
 
   @Override
-  public RecordComponentVisitor visitRecordComponent(
+  public IRecordComponentVisitor visitRecordComponent(
       final String name, final String descriptor, final String signature) {
     Printer recordComponentPrinter = p.visitRecordComponent(name, descriptor, signature);
     return new TraceRecordComponentVisitor(
@@ -209,7 +204,7 @@ public final class TraceClassVisitor extends ClassVisitor {
   }
 
   @Override
-  public FieldVisitor visitField(
+  public IFieldVisitor visitField(
       final int access,
       final String name,
       final String descriptor,
@@ -221,7 +216,7 @@ public final class TraceClassVisitor extends ClassVisitor {
   }
 
   @Override
-  public MethodVisitor visitMethod(
+  public IMethodVisitor visitMethod(
       final int access,
       final String name,
       final String descriptor,

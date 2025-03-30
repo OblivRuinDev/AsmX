@@ -35,6 +35,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.IAnnotationVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.test.AsmTest;
 
@@ -102,16 +103,16 @@ class AnnotationNodeTest extends AsmTest {
     annotationNode.visit("bytes", new byte[] {0, 1});
     annotationNode.visitAnnotation("annotation", "Lpkg/Annotation;");
     AnnotationNode dstAnnotationNode = new AnnotationNode("LJ;");
-    AnnotationVisitor skipNestedAnnotationsVisitor =
+    IAnnotationVisitor skipNestedAnnotationsVisitor =
         new AnnotationVisitor(/* latest */ Opcodes.ASM10_EXPERIMENTAL, dstAnnotationNode) {
 
           @Override
-          public AnnotationVisitor visitAnnotation(final String name, final String descriptor) {
+          public IAnnotationVisitor visitAnnotation(final String name, final String descriptor) {
             return null;
           }
 
           @Override
-          public AnnotationVisitor visitArray(final String name) {
+          public IAnnotationVisitor visitArray(final String name) {
             return null;
           }
         };

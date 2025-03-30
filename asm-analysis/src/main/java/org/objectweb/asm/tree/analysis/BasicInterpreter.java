@@ -61,7 +61,7 @@ public class BasicInterpreter extends Interpreter<BasicValue> implements Opcodes
    * version.
    */
   public BasicInterpreter() {
-    super(/* latest api = */ ASM9);
+    super(V_DYNA);
     if (getClass() != BasicInterpreter.class) {
       throw new IllegalStateException();
     }

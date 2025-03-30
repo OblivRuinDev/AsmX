@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -75,7 +77,7 @@ public class SignatureWriter extends SignatureVisitor {
   }
 
   private SignatureWriter(final StringBuilder stringBuilder) {
-    super(/* latest api =*/ Opcodes.ASM9);
+    super(/* latest api =*/ Opcodes.V_DYNA);
     this.stringBuilder = stringBuilder;
   }
 

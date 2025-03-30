@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -36,7 +38,7 @@ package org.objectweb.asm;
  * @author Eric Bruneton
  * @author Eugene Kuleshov
  */
-final class MethodWriter extends MethodVisitor {
+final class MethodWriter implements IMethodVisitor {
 
   /** Indicates that nothing must be computed. */
   static final int COMPUTE_NOTHING = 0;
@@ -466,7 +468,7 @@ final class MethodWriter extends MethodVisitor {
 
   /**
    * Indicates what must be computed. Must be one of {@link #COMPUTE_ALL_FRAMES}, {@link
-   * #COMPUTE_INSERTED_FRAMES}, {@link COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES}, {@link
+   * #COMPUTE_INSERTED_FRAMES}, {@link #COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES}, {@link
    * #COMPUTE_MAX_STACK_AND_LOCAL} or {@link #COMPUTE_NOTHING}.
    */
   private final int compute;
@@ -571,6 +573,8 @@ final class MethodWriter extends MethodVisitor {
    */
   private int sourceLength;
 
+  MethodWriter mv = null;
+
   // -----------------------------------------------------------------------------------------------
   // Constructor and accessors
   // -----------------------------------------------------------------------------------------------
@@ -594,7 +598,6 @@ final class MethodWriter extends MethodVisitor {
       final String signature,
       final String[] exceptions,
       final int compute) {
-    super(/* latest api = */ Opcodes.ASM9);
     this.symbolTable = symbolTable;
     this.accessFlags = "<init>".equals(name) ? access | Constants.ACC_CONSTRUCTOR : access;
     this.nameIndex = symbolTable.addConstantUtf8(name);
@@ -649,13 +652,13 @@ final class MethodWriter extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitAnnotationDefault() {
+  public IAnnotationVisitor visitAnnotationDefault() {
     defaultValue = new ByteVector();
     return new AnnotationWriter(symbolTable, /* useNamedValues= */ false, defaultValue, null);
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     if (visible) {
       return lastRuntimeVisibleAnnotation =
           AnnotationWriter.create(symbolTable, descriptor, lastRuntimeVisibleAnnotation);
@@ -666,7 +669,7 @@ final class MethodWriter extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     if (visible) {
       return lastRuntimeVisibleTypeAnnotation =
@@ -689,7 +692,7 @@ final class MethodWriter extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitParameterAnnotation(
+  public IAnnotationVisitor visitParameterAnnotation(
       final int parameter, final String annotationDescriptor, final boolean visible) {
     if (visible) {
       if (lastRuntimeVisibleParameterAnnotations == null) {
@@ -1404,7 +1407,7 @@ final class MethodWriter extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitInsnAnnotation(
+  public IAnnotationVisitor visitInsnAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     if (visible) {
       return lastCodeRuntimeVisibleTypeAnnotation =
@@ -1440,7 +1443,7 @@ final class MethodWriter extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitTryCatchAnnotation(
+  public IAnnotationVisitor visitTryCatchAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     if (visible) {
       return lastCodeRuntimeVisibleTypeAnnotation =
@@ -1493,7 +1496,7 @@ final class MethodWriter extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitLocalVariableAnnotation(
+  public IAnnotationVisitor visitLocalVariableAnnotation(
       final int typeRef,
       final TypePath typePath,
       final Label[] start,

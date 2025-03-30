@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -29,22 +31,17 @@ package org.objectweb.asm.tree;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.ModuleVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.RecordComponentVisitor;
-import org.objectweb.asm.TypePath;
+import java.util.function.Consumer;
+
+import org.objectweb.asm.*;
 
 /**
  * A node that represents a class.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
-public class ClassNode extends ClassVisitor {
+public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
 
   /**
    * The class version. The minor version is stored in the 16 most significant bits, and the major
@@ -157,16 +154,13 @@ public class ClassNode extends ClassVisitor {
   public List<MethodNode> methods;
 
   /**
-   * Constructs a new {@link ClassNode}. <i>Subclasses must not use this constructor</i>. Instead,
-   * they must use the {@link #ClassNode(int)} version.
-   *
-   * @throws IllegalStateException If a subclass calls this constructor.
+   * Constructs a new {@link ClassNode}.
    */
   public ClassNode() {
-    this(Opcodes.ASM9);
-    if (getClass() != ClassNode.class) {
-      throw new IllegalStateException();
-    }
+    this.interfaces = new ArrayList<>();
+    this.innerClasses = new ArrayList<>();
+    this.fields = new ArrayList<>();
+    this.methods = new ArrayList<>();
   }
 
   /**
@@ -175,8 +169,8 @@ public class ClassNode extends ClassVisitor {
    * @param api the ASM API version implemented by this visitor. Must be one of the {@code
    *     ASM}<i>x</i> values in {@link Opcodes}.
    */
+  @Deprecated(forRemoval = true)
   public ClassNode(final int api) {
-    super(api);
     this.interfaces = new ArrayList<>();
     this.innerClasses = new ArrayList<>();
     this.fields = new ArrayList<>();
@@ -210,7 +204,7 @@ public class ClassNode extends ClassVisitor {
   }
 
   @Override
-  public ModuleVisitor visitModule(final String name, final int access, final String version) {
+  public IModuleVisitor visitModule(final String name, final int access, final String version) {
     module = new ModuleNode(name, access, version);
     return module;
   }
@@ -228,7 +222,7 @@ public class ClassNode extends ClassVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     AnnotationNode annotation = new AnnotationNode(descriptor);
     if (visible) {
       visibleAnnotations = Util.add(visibleAnnotations, annotation);
@@ -239,7 +233,7 @@ public class ClassNode extends ClassVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     TypeAnnotationNode typeAnnotation = new TypeAnnotationNode(typeRef, typePath, descriptor);
     if (visible) {
@@ -273,7 +267,7 @@ public class ClassNode extends ClassVisitor {
   }
 
   @Override
-  public RecordComponentVisitor visitRecordComponent(
+  public IRecordComponentVisitor visitRecordComponent(
       final String name, final String descriptor, final String signature) {
     RecordComponentNode recordComponent = new RecordComponentNode(name, descriptor, signature);
     recordComponents = Util.add(recordComponents, recordComponent);
@@ -281,7 +275,7 @@ public class ClassNode extends ClassVisitor {
   }
 
   @Override
-  public FieldVisitor visitField(
+  public IFieldVisitor visitField(
       final int access,
       final String name,
       final String descriptor,
@@ -293,7 +287,7 @@ public class ClassNode extends ClassVisitor {
   }
 
   @Override
-  public MethodVisitor visitMethod(
+  public IMethodVisitor visitMethod(
       final int access,
       final String name,
       final String descriptor,
@@ -318,61 +312,59 @@ public class ClassNode extends ClassVisitor {
    * that this node, and all its children recursively, do not contain elements that were introduced
    * in more recent versions of the ASM API than the given version.
    *
-   * @param api an ASM API version. Must be one of the {@code ASM}<i>x</i> values in {@link
+   * @param version an ASM API version. Must be one of the {@code ASM}<i>x</i> values in {@link
    *     Opcodes}.
    */
-  public void check(final int api) {
-    if (api < Opcodes.ASM9 && permittedSubclasses != null) {
-      throw new UnsupportedClassVersionException();
+  public void check(final int version) {
+    if (permittedSubclasses != null) {
+      VersionChecker.permit(version);
     }
-    if (api < Opcodes.ASM8 && ((access & Opcodes.ACC_RECORD) != 0 || recordComponents != null)) {
-      throw new UnsupportedClassVersionException();
+    if ((access & Opcodes.ACC_RECORD) != 0 || recordComponents != null) {
+      VersionChecker.record_(version);
     }
-    if (api < Opcodes.ASM7 && (nestHostClass != null || nestMembers != null)) {
-      throw new UnsupportedClassVersionException();
+    if (nestHostClass != null || nestMembers != null) {
+      VersionChecker.nest(version);
     }
-    if (api < Opcodes.ASM6 && module != null) {
-      throw new UnsupportedClassVersionException();
+    if (module != null) {
+      VersionChecker.module_(version);
     }
-    if (api < Opcodes.ASM5) {
-      if (visibleTypeAnnotations != null && !visibleTypeAnnotations.isEmpty()) {
-        throw new UnsupportedClassVersionException();
-      }
-      if (invisibleTypeAnnotations != null && !invisibleTypeAnnotations.isEmpty()) {
-        throw new UnsupportedClassVersionException();
-      }
+    if (visibleTypeAnnotations != null && !visibleTypeAnnotations.isEmpty() ||
+            (invisibleTypeAnnotations != null && !invisibleTypeAnnotations.isEmpty())) {
+      VersionChecker.typeAnn(version);
     }
+    //todo: I think it is not necessary.
+
     // Check the annotations.
-    if (visibleAnnotations != null) {
-      for (int i = visibleAnnotations.size() - 1; i >= 0; --i) {
-        visibleAnnotations.get(i).check(api);
-      }
-    }
-    if (invisibleAnnotations != null) {
-      for (int i = invisibleAnnotations.size() - 1; i >= 0; --i) {
-        invisibleAnnotations.get(i).check(api);
-      }
-    }
-    if (visibleTypeAnnotations != null) {
-      for (int i = visibleTypeAnnotations.size() - 1; i >= 0; --i) {
-        visibleTypeAnnotations.get(i).check(api);
-      }
-    }
-    if (invisibleTypeAnnotations != null) {
-      for (int i = invisibleTypeAnnotations.size() - 1; i >= 0; --i) {
-        invisibleTypeAnnotations.get(i).check(api);
-      }
-    }
-    if (recordComponents != null) {
-      for (int i = recordComponents.size() - 1; i >= 0; --i) {
-        recordComponents.get(i).check(api);
-      }
-    }
+//    if (visibleAnnotations != null) {
+//      for (int i = visibleAnnotations.size() - 1; i >= 0; --i) {
+//        visibleAnnotations.get(i).check(version);
+//      }
+//    }
+//    if (invisibleAnnotations != null) {
+//      for (int i = invisibleAnnotations.size() - 1; i >= 0; --i) {
+//        invisibleAnnotations.get(i).check(version);
+//      }
+//    }
+//    if (visibleTypeAnnotations != null) {
+//      for (int i = visibleTypeAnnotations.size() - 1; i >= 0; --i) {
+//        visibleTypeAnnotations.get(i).check(version);
+//      }
+//    }
+//    if (invisibleTypeAnnotations != null) {
+//      for (int i = invisibleTypeAnnotations.size() - 1; i >= 0; --i) {
+//        invisibleTypeAnnotations.get(i).check(version);
+//      }
+//    }
+//    if (recordComponents != null) {
+//      for (int i = recordComponents.size() - 1; i >= 0; --i) {
+//        recordComponents.get(i).check(version);
+//      }
+//    }
     for (int i = fields.size() - 1; i >= 0; --i) {
-      fields.get(i).check(api);
+      fields.get(i).check(version);
     }
     for (int i = methods.size() - 1; i >= 0; --i) {
-      methods.get(i).check(api);
+      methods.get(i).check(version);
     }
   }
 
@@ -381,7 +373,8 @@ public class ClassNode extends ClassVisitor {
    *
    * @param classVisitor a class visitor.
    */
-  public void accept(final ClassVisitor classVisitor) {
+  @Override
+  public void accept(final IClassVisitor classVisitor) {
     // Visit the header.
     String[] interfacesArray = new String[this.interfaces.size()];
     this.interfaces.toArray(interfacesArray);

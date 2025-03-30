@@ -961,7 +961,7 @@ class ClassWriterComputeMaxsTest {
     classReader.accept(
         new ClassVisitor(Opcodes.ASM5) {
           @Override
-          public MethodVisitor visitMethod(
+          public IMethodVisitor visitMethod(
               final int access,
               final String name,
               final String descriptor,
@@ -1011,7 +1011,7 @@ class ClassWriterComputeMaxsTest {
   private static final class TestCaseBuilder { // NOPMD(TestClassWithoutTestCases)
 
     private final ClassWriter classWriter;
-    private final MethodVisitor methodVisitor;
+    private final IMethodVisitor methodVisitor;
     private final Label start;
 
     TestCaseBuilder() {
@@ -1021,7 +1021,7 @@ class ClassWriterComputeMaxsTest {
     TestCaseBuilder(final int classVersion) {
       classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
       classWriter.visit(classVersion, Opcodes.ACC_PUBLIC, "C", null, "java/lang/Object", null);
-      MethodVisitor constructor =
+      IMethodVisitor constructor =
           classWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
       constructor.visitCode();
       constructor.visitVarInsn(Opcodes.ALOAD, 0);

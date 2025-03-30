@@ -64,7 +64,7 @@ class AnnotationVisitorTest extends AsmTest {
 
   @Test
   void testGetDelegate() {
-    AnnotationVisitor delegate = new AnnotationVisitor(Opcodes.ASM4) {};
+    IAnnotationVisitor delegate = new AnnotationVisitor(Opcodes.ASM4) {};
     AnnotationVisitor visitor = new AnnotationVisitor(Opcodes.ASM4, delegate) {};
 
     assertSame(delegate, visitor.getDelegate());
@@ -81,9 +81,9 @@ class AnnotationVisitorTest extends AsmTest {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     ClassWriter removedAnnotationsClassWriter = new ClassWriter(0);
     ClassWriter deletedAnnotationsClassWriter = new ClassWriter(0);
-    ClassVisitor removeAnnotationsAdapter =
+    IClassVisitor removeAnnotationsAdapter =
         new RemoveAnnotationsAdapter(apiParameter.value(), removedAnnotationsClassWriter);
-    ClassVisitor deleteAnnotationsAdapter =
+    IClassVisitor deleteAnnotationsAdapter =
         new DeleteAnnotationsAdapter(apiParameter.value(), deletedAnnotationsClassWriter);
 
     Executable removeAnnotations = () -> classReader.accept(removeAnnotationsAdapter, 0);
@@ -112,91 +112,91 @@ class AnnotationVisitorTest extends AsmTest {
     }
 
     @Override
-    public AnnotationVisitor visitAnnotation(final String name, final String descriptor) {
+    public IAnnotationVisitor visitAnnotation(final String name, final String descriptor) {
       return this;
     }
 
     @Override
-    public AnnotationVisitor visitArray(final String name) {
+    public IAnnotationVisitor visitArray(final String name) {
       return this;
     }
   }
 
   private static class RemoveAnnotationsAdapter extends ClassVisitor {
 
-    RemoveAnnotationsAdapter(final int api, final ClassVisitor classVisitor) {
+    RemoveAnnotationsAdapter(final int api, final IClassVisitor classVisitor) {
       super(api, classVisitor);
     }
 
     @Override
-    public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
-      return new EmptyAnnotationVisitor(api);
+    public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+      return new EmptyAnnotationVisitor(ver);
     }
 
     @Override
-    public AnnotationVisitor visitTypeAnnotation(
+    public IAnnotationVisitor visitTypeAnnotation(
         final int typeRef,
         final TypePath typePath,
         final String descriptor,
         final boolean visible) {
-      return new EmptyAnnotationVisitor(api);
+      return new EmptyAnnotationVisitor(ver);
     }
 
     @Override
-    public MethodVisitor visitMethod(
+    public IMethodVisitor visitMethod(
         final int access,
         final String name,
         final String descriptor,
         final String signature,
         final String[] exceptions) {
       return new MethodVisitor(
-          api, super.visitMethod(access, name, descriptor, signature, exceptions)) {
+              ver, super.visitMethod(access, name, descriptor, signature, exceptions)) {
 
         @Override
-        public AnnotationVisitor visitAnnotationDefault() {
-          return new EmptyAnnotationVisitor(api);
+        public IAnnotationVisitor visitAnnotationDefault() {
+          return new EmptyAnnotationVisitor(ver);
         }
 
         @Override
-        public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
-          return new EmptyAnnotationVisitor(api);
+        public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+          return new EmptyAnnotationVisitor(ver);
         }
 
         @Override
-        public AnnotationVisitor visitTypeAnnotation(
+        public IAnnotationVisitor visitTypeAnnotation(
             final int typeRef,
             final TypePath typePath,
             final String descriptor,
             final boolean visible) {
-          return new EmptyAnnotationVisitor(api);
+          return new EmptyAnnotationVisitor(ver);
         }
 
         @Override
-        public AnnotationVisitor visitParameterAnnotation(
+        public IAnnotationVisitor visitParameterAnnotation(
             final int parameter, final String descriptor, final boolean visible) {
-          return new EmptyAnnotationVisitor(api);
+          return new EmptyAnnotationVisitor(ver);
         }
 
         @Override
-        public AnnotationVisitor visitInsnAnnotation(
+        public IAnnotationVisitor visitInsnAnnotation(
             final int typeRef,
             final TypePath typePath,
             final String descriptor,
             final boolean visible) {
-          return new EmptyAnnotationVisitor(api);
+          return new EmptyAnnotationVisitor(ver);
         }
 
         @Override
-        public AnnotationVisitor visitTryCatchAnnotation(
+        public IAnnotationVisitor visitTryCatchAnnotation(
             final int typeRef,
             final TypePath typePath,
             final String descriptor,
             final boolean visible) {
-          return new EmptyAnnotationVisitor(api);
+          return new EmptyAnnotationVisitor(ver);
         }
 
         @Override
-        public AnnotationVisitor visitLocalVariableAnnotation(
+        public IAnnotationVisitor visitLocalVariableAnnotation(
             final int typeRef,
             final TypePath typePath,
             final Label[] start,
@@ -204,7 +204,7 @@ class AnnotationVisitorTest extends AsmTest {
             final int[] index,
             final String descriptor,
             final boolean visible) {
-          return new EmptyAnnotationVisitor(api);
+          return new EmptyAnnotationVisitor(ver);
         }
       };
     }
@@ -212,17 +212,17 @@ class AnnotationVisitorTest extends AsmTest {
 
   private static class DeleteAnnotationsAdapter extends ClassVisitor {
 
-    DeleteAnnotationsAdapter(final int api, final ClassVisitor classVisitor) {
+    DeleteAnnotationsAdapter(final int api, final IClassVisitor classVisitor) {
       super(api, classVisitor);
     }
 
     @Override
-    public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+    public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
       return null;
     }
 
     @Override
-    public AnnotationVisitor visitTypeAnnotation(
+    public IAnnotationVisitor visitTypeAnnotation(
         final int typeRef,
         final TypePath typePath,
         final String descriptor,
@@ -231,27 +231,27 @@ class AnnotationVisitorTest extends AsmTest {
     }
 
     @Override
-    public MethodVisitor visitMethod(
+    public IMethodVisitor visitMethod(
         final int access,
         final String name,
         final String descriptor,
         final String signature,
         final String[] exceptions) {
       return new MethodVisitor(
-          api, super.visitMethod(access, name, descriptor, signature, exceptions)) {
+              ver, super.visitMethod(access, name, descriptor, signature, exceptions)) {
 
         @Override
-        public AnnotationVisitor visitAnnotationDefault() {
+        public IAnnotationVisitor visitAnnotationDefault() {
           return null;
         }
 
         @Override
-        public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+        public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
           return null;
         }
 
         @Override
-        public AnnotationVisitor visitTypeAnnotation(
+        public IAnnotationVisitor visitTypeAnnotation(
             final int typeRef,
             final TypePath typePath,
             final String descriptor,
@@ -260,13 +260,13 @@ class AnnotationVisitorTest extends AsmTest {
         }
 
         @Override
-        public AnnotationVisitor visitParameterAnnotation(
+        public IAnnotationVisitor visitParameterAnnotation(
             final int parameter, final String descriptor, final boolean visible) {
           return null;
         }
 
         @Override
-        public AnnotationVisitor visitInsnAnnotation(
+        public IAnnotationVisitor visitInsnAnnotation(
             final int typeRef,
             final TypePath typePath,
             final String descriptor,
@@ -275,7 +275,7 @@ class AnnotationVisitorTest extends AsmTest {
         }
 
         @Override
-        public AnnotationVisitor visitTryCatchAnnotation(
+        public IAnnotationVisitor visitTryCatchAnnotation(
             final int typeRef,
             final TypePath typePath,
             final String descriptor,
@@ -284,7 +284,7 @@ class AnnotationVisitorTest extends AsmTest {
         }
 
         @Override
-        public AnnotationVisitor visitLocalVariableAnnotation(
+        public IAnnotationVisitor visitLocalVariableAnnotation(
             final int typeRef,
             final TypePath typePath,
             final Label[] start,

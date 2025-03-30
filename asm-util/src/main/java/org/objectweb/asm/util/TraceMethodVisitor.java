@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,18 +29,13 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.util;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.TypePath;
+import org.objectweb.asm.*;
 
 /**
  * A {@link MethodVisitor} that prints the methods it visits with a {@link Printer}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public final class TraceMethodVisitor extends MethodVisitor {
 
@@ -61,8 +58,8 @@ public final class TraceMethodVisitor extends MethodVisitor {
    * @param methodVisitor the method visitor to which to delegate calls. May be {@literal null}.
    * @param printer the printer to convert the visited method into text.
    */
-  public TraceMethodVisitor(final MethodVisitor methodVisitor, final Printer printer) {
-    super(/* latest api = */ Opcodes.ASM9, methodVisitor);
+  public TraceMethodVisitor(final IMethodVisitor methodVisitor, final Printer printer) {
+    super(/* latest api = */ Opcodes.V_DYNA, methodVisitor);
     this.p = printer;
   }
 
@@ -73,14 +70,14 @@ public final class TraceMethodVisitor extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     Printer annotationPrinter = p.visitMethodAnnotation(descriptor, visible);
     return new TraceAnnotationVisitor(
         super.visitAnnotation(descriptor, visible), annotationPrinter);
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     Printer annotationPrinter = p.visitMethodTypeAnnotation(typeRef, typePath, descriptor, visible);
     return new TraceAnnotationVisitor(
@@ -94,7 +91,7 @@ public final class TraceMethodVisitor extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitAnnotationDefault() {
+  public IAnnotationVisitor visitAnnotationDefault() {
     Printer annotationPrinter = p.visitAnnotationDefault();
     return new TraceAnnotationVisitor(super.visitAnnotationDefault(), annotationPrinter);
   }
@@ -106,7 +103,7 @@ public final class TraceMethodVisitor extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitParameterAnnotation(
+  public IAnnotationVisitor visitParameterAnnotation(
       final int parameter, final String descriptor, final boolean visible) {
     Printer annotationPrinter = p.visitParameterAnnotation(parameter, descriptor, visible);
     return new TraceAnnotationVisitor(
@@ -162,28 +159,16 @@ public final class TraceMethodVisitor extends MethodVisitor {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public void visitMethodInsn(
       final int opcode,
       final String owner,
       final String name,
       final String descriptor,
       final boolean isInterface) {
-    // Call the method that p is supposed to implement, depending on its api version.
-    if (p.api < Opcodes.ASM5) {
-      if (isInterface != (opcode == Opcodes.INVOKEINTERFACE)) {
-        throw new IllegalArgumentException("INVOKESPECIAL/STATIC on interfaces require ASM5");
-      }
-      // If p is an ASMifier (resp. Textifier), or a subclass that does not override the old
-      // visitMethodInsn method, the default implementation in Printer will redirect this to the
-      // new method in ASMifier (resp. Textifier). In all other cases, p overrides the old method
-      // and this call executes it.
-      p.visitMethodInsn(opcode, owner, name, descriptor);
-    } else {
-      p.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
-    }
-    if (mv != null) {
-      mv.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+    checkInterfaceInvoke(ver, opcode, isInterface);
+    p.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+    if (parent != null) {
+      parent.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
     }
   }
 
@@ -241,7 +226,7 @@ public final class TraceMethodVisitor extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitInsnAnnotation(
+  public IAnnotationVisitor visitInsnAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     Printer annotationPrinter = p.visitInsnAnnotation(typeRef, typePath, descriptor, visible);
     return new TraceAnnotationVisitor(
@@ -256,7 +241,7 @@ public final class TraceMethodVisitor extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitTryCatchAnnotation(
+  public IAnnotationVisitor visitTryCatchAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     Printer annotationPrinter = p.visitTryCatchAnnotation(typeRef, typePath, descriptor, visible);
     return new TraceAnnotationVisitor(
@@ -276,7 +261,7 @@ public final class TraceMethodVisitor extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitLocalVariableAnnotation(
+  public IAnnotationVisitor visitLocalVariableAnnotation(
       final int typeRef,
       final TypePath typePath,
       final Label[] start,

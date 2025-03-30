@@ -52,7 +52,7 @@ class SignatureReaderTest extends AsmTest {
   void testAccept_validClassOrMethodSignature(final String signature) {
     SignatureReader signatureReader = new SignatureReader(signature);
     SignatureVisitor signatureVisitor =
-        new SignatureVisitor(/* latest */ Opcodes.ASM10_EXPERIMENTAL) {};
+        new SignatureVisitor() {};//todo: ----/* latest */ Opcodes.ASM10_EXPERIMENTAL) {};
 
     Executable acceptVisitor = () -> signatureReader.accept(signatureVisitor);
 
@@ -64,7 +64,7 @@ class SignatureReaderTest extends AsmTest {
   void testAccept_validFieldSignature(final String signature) {
     SignatureReader signatureReader = new SignatureReader(signature);
     SignatureVisitor signatureVisitor =
-        new SignatureVisitor(/* latest */ Opcodes.ASM10_EXPERIMENTAL) {};
+        new SignatureVisitor() {};//todo: ----/* latest */ Opcodes.ASM10_EXPERIMENTAL) {};
 
     Executable acceptVisitor = () -> signatureReader.acceptType(signatureVisitor);
 
@@ -76,7 +76,7 @@ class SignatureReaderTest extends AsmTest {
     String invalidSignature = "-";
     SignatureReader signatureReader = new SignatureReader(invalidSignature);
     SignatureVisitor signatureVisitor =
-        new SignatureVisitor(/* latest */ Opcodes.ASM10_EXPERIMENTAL) {};
+        new SignatureVisitor(){};//todo: ---/* latest */ Opcodes.ASM10_EXPERIMENTAL) {};
 
     Executable acceptVisitor = () -> signatureReader.accept(signatureVisitor);
 

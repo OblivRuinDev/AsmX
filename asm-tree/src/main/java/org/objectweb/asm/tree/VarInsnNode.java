@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,7 +30,8 @@
 package org.objectweb.asm.tree;
 
 import java.util.Map;
-import org.objectweb.asm.MethodVisitor;
+
+import org.objectweb.asm.IMethodVisitor;
 
 /**
  * A node that represents a local variable instruction. A local variable instruction is an
@@ -70,7 +73,7 @@ public class VarInsnNode extends AbstractInsnNode {
   }
 
   @Override
-  public void accept(final MethodVisitor methodVisitor) {
+  public void accept(final IMethodVisitor methodVisitor) {
     methodVisitor.visitVarInsn(opcode, var);
     acceptAnnotations(methodVisitor);
   }

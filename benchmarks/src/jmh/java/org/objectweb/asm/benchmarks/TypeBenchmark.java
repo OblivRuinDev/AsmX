@@ -2,16 +2,8 @@ package org.objectweb.asm.benchmarks;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.TypePath;
+
+import org.objectweb.asm.*;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
@@ -72,8 +64,8 @@ public class TypeBenchmark extends AbstractBenchmark {
 
   class CollectTypesVisitor extends ClassVisitor {
 
-    AnnotationVisitor annotationVisitor =
-        new AnnotationVisitor(api) {
+    IAnnotationVisitor annotationVisitor =
+        new AnnotationVisitor(ver) {
 
           @Override
           public void visitEnum(final String name, final String descriptor, final String value) {
@@ -81,14 +73,14 @@ public class TypeBenchmark extends AbstractBenchmark {
           }
 
           @Override
-          public AnnotationVisitor visitAnnotation(final String name, final String descriptor) {
+          public IAnnotationVisitor visitAnnotation(final String name, final String descriptor) {
             descriptors.add(descriptor);
             return this;
           }
         };
 
     CollectTypesVisitor() {
-      super(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+      super();//todo:-------- /* latest */ Opcodes.ASM10_EXPERIMENTAL);
     }
 
     @Override
@@ -99,13 +91,13 @@ public class TypeBenchmark extends AbstractBenchmark {
     }
 
     @Override
-    public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+    public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
       descriptors.add(descriptor);
       return annotationVisitor;
     }
 
     @Override
-    public AnnotationVisitor visitTypeAnnotation(
+    public IAnnotationVisitor visitTypeAnnotation(
         final int typeRef,
         final TypePath typePath,
         final String descriptor,
@@ -115,23 +107,23 @@ public class TypeBenchmark extends AbstractBenchmark {
     }
 
     @Override
-    public FieldVisitor visitField(
+    public IFieldVisitor visitField(
         final int access,
         final String name,
         final String descriptor,
         final String signature,
         final Object value) {
       descriptors.add(descriptor);
-      return new FieldVisitor(api) {
+      return new FieldVisitor(ver) {
 
         @Override
-        public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+        public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
           descriptors.add(descriptor);
           return annotationVisitor;
         }
 
         @Override
-        public AnnotationVisitor visitTypeAnnotation(
+        public IAnnotationVisitor visitTypeAnnotation(
             final int typeRef,
             final TypePath typePath,
             final String descriptor,
@@ -143,23 +135,23 @@ public class TypeBenchmark extends AbstractBenchmark {
     }
 
     @Override
-    public MethodVisitor visitMethod(
+    public IMethodVisitor visitMethod(
         final int access,
         final String name,
         final String descriptor,
         final String signature,
         final String[] exceptions) {
       methodDescriptors.add(descriptor);
-      return new MethodVisitor(api) {
+      return new MethodVisitor(ver) {
 
         @Override
-        public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+        public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
           descriptors.add(descriptor);
           return annotationVisitor;
         }
 
         @Override
-        public AnnotationVisitor visitTypeAnnotation(
+        public IAnnotationVisitor visitTypeAnnotation(
             final int typeRef,
             final TypePath typePath,
             final String descriptor,
@@ -169,7 +161,7 @@ public class TypeBenchmark extends AbstractBenchmark {
         }
 
         @Override
-        public AnnotationVisitor visitParameterAnnotation(
+        public IAnnotationVisitor visitParameterAnnotation(
             final int parameter, final String descriptor, final boolean visible) {
           descriptors.add(descriptor);
           return annotationVisitor;
@@ -206,7 +198,7 @@ public class TypeBenchmark extends AbstractBenchmark {
         }
 
         @Override
-        public AnnotationVisitor visitInsnAnnotation(
+        public IAnnotationVisitor visitInsnAnnotation(
             final int typeRef,
             final TypePath typePath,
             final String descriptor,
@@ -216,7 +208,7 @@ public class TypeBenchmark extends AbstractBenchmark {
         }
 
         @Override
-        public AnnotationVisitor visitTryCatchAnnotation(
+        public IAnnotationVisitor visitTryCatchAnnotation(
             final int typeRef,
             final TypePath typePath,
             final String descriptor,
@@ -237,7 +229,7 @@ public class TypeBenchmark extends AbstractBenchmark {
         }
 
         @Override
-        public AnnotationVisitor visitLocalVariableAnnotation(
+        public IAnnotationVisitor visitLocalVariableAnnotation(
             final int typeRef,
             final TypePath typePath,
             final Label[] start,

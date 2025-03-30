@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -365,7 +367,7 @@ public class Label {
    * @param methodVisitor a method visitor.
    * @param visitLineNumbers whether to visit of the label's source line numbers, if any.
    */
-  final void accept(final MethodVisitor methodVisitor, final boolean visitLineNumbers) {
+  final void accept(final IMethodVisitor methodVisitor, final boolean visitLineNumbers) {
     methodVisitor.visitLabel(this);
     if (visitLineNumbers && (flags & FLAG_LINE_NUMBER) != 0) {
       methodVisitor.visitLineNumber(lineNumber & 0xFFFF, this);

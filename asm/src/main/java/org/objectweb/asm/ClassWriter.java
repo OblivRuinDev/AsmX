@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -36,7 +38,7 @@ package org.objectweb.asm;
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html">JVMS 4</a>
  * @author Eric Bruneton
  */
-public class ClassWriter extends ClassVisitor {
+public class ClassWriter implements IClassVisitor {
 
   /**
    * A flag to automatically compute the maximum stack size and the maximum number of local
@@ -261,7 +263,6 @@ public class ClassWriter extends ClassVisitor {
    *     maximum stack size nor the stack frames will be computed for these methods</i>.
    */
   public ClassWriter(final ClassReader classReader, final int flags) {
-    super(/* latest api = */ Opcodes.ASM9);
     this.flags = flags;
     symbolTable = classReader == null ? new SymbolTable(this) : new SymbolTable(this, classReader);
     setFlags(flags);
@@ -283,7 +284,7 @@ public class ClassWriter extends ClassVisitor {
   }
 
   // -----------------------------------------------------------------------------------------------
-  // Implementation of the ClassVisitor abstract class
+  // Implementation of the IClassVisitor interface class
   // -----------------------------------------------------------------------------------------------
 
   @Override
@@ -324,7 +325,7 @@ public class ClassWriter extends ClassVisitor {
   }
 
   @Override
-  public final ModuleVisitor visitModule(
+  public final IModuleVisitor visitModule(
       final String name, final int access, final String version) {
     return moduleWriter =
         new ModuleWriter(
@@ -349,7 +350,7 @@ public class ClassWriter extends ClassVisitor {
   }
 
   @Override
-  public final AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public final IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     if (visible) {
       return lastRuntimeVisibleAnnotation =
           AnnotationWriter.create(symbolTable, descriptor, lastRuntimeVisibleAnnotation);
@@ -360,7 +361,7 @@ public class ClassWriter extends ClassVisitor {
   }
 
   @Override
-  public final AnnotationVisitor visitTypeAnnotation(
+  public final IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     if (visible) {
       return lastRuntimeVisibleTypeAnnotation =
@@ -424,7 +425,7 @@ public class ClassWriter extends ClassVisitor {
   }
 
   @Override
-  public final RecordComponentVisitor visitRecordComponent(
+  public final IRecordComponentVisitor visitRecordComponent(
       final String name, final String descriptor, final String signature) {
     RecordComponentWriter recordComponentWriter =
         new RecordComponentWriter(symbolTable, name, descriptor, signature);
@@ -437,7 +438,7 @@ public class ClassWriter extends ClassVisitor {
   }
 
   @Override
-  public final FieldVisitor visitField(
+  public final IFieldVisitor visitField(
       final int access,
       final String name,
       final String descriptor,
@@ -454,7 +455,7 @@ public class ClassWriter extends ClassVisitor {
   }
 
   @Override
-  public final MethodVisitor visitMethod(
+  public final IMethodVisitor visitMethod(
       final int access,
       final String name,
       final String descriptor,

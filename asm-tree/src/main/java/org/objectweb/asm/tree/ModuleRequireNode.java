@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,14 +29,16 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.tree;
 
-import org.objectweb.asm.ModuleVisitor;
+import org.objectweb.asm.IModuleVisitor;
+
+import java.util.function.Consumer;
 
 /**
  * A node that represents a required module with its name and access of a module descriptor.
  *
  * @author Remi Forax
  */
-public class ModuleRequireNode {
+public class ModuleRequireNode implements Consumer<IModuleVisitor> {
 
   /** The fully qualified name (using dots) of the dependence. */
   public String module;
@@ -67,7 +71,8 @@ public class ModuleRequireNode {
    *
    * @param moduleVisitor a module visitor.
    */
-  public void accept(final ModuleVisitor moduleVisitor) {
+  @Override
+  public void accept(final IModuleVisitor moduleVisitor) {
     moduleVisitor.visitRequire(module, access, version);
   }
 }

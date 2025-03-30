@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -40,8 +42,9 @@ package org.objectweb.asm;
  *     4.7.20</a>
  * @author Eric Bruneton
  * @author Eugene Kuleshov
+ * @author OblivRuinDev
  */
-final class AnnotationWriter extends AnnotationVisitor {
+final class AnnotationWriter implements IAnnotationVisitor {
 
   /** Where the constants used in this AnnotationWriter must be stored. */
   private final SymbolTable symbolTable;
@@ -112,7 +115,6 @@ final class AnnotationWriter extends AnnotationVisitor {
       final boolean useNamedValues,
       final ByteVector annotation,
       final AnnotationWriter previousAnnotation) {
-    super(/* latest api = */ Opcodes.ASM9);
     this.symbolTable = symbolTable;
     this.useNamedValues = useNamedValues;
     this.annotation = annotation;
@@ -197,14 +199,14 @@ final class AnnotationWriter extends AnnotationVisitor {
     if (value instanceof String) {
       annotation.put12('s', symbolTable.addConstantUtf8((String) value));
     } else if (value instanceof Byte) {
-      annotation.put12('B', symbolTable.addConstantInteger(((Byte) value).byteValue()).index);
+      annotation.put12('B', symbolTable.addConstantInteger((Byte) value).index);
     } else if (value instanceof Boolean) {
-      int booleanValue = ((Boolean) value).booleanValue() ? 1 : 0;
+      int booleanValue = (Boolean) value ? 1 : 0;
       annotation.put12('Z', symbolTable.addConstantInteger(booleanValue).index);
     } else if (value instanceof Character) {
-      annotation.put12('C', symbolTable.addConstantInteger(((Character) value).charValue()).index);
+      annotation.put12('C', symbolTable.addConstantInteger((Character) value).index);
     } else if (value instanceof Short) {
-      annotation.put12('S', symbolTable.addConstantInteger(((Short) value).shortValue()).index);
+      annotation.put12('S', symbolTable.addConstantInteger((Short) value).index);
     } else if (value instanceof Type) {
       annotation.put12('c', symbolTable.addConstantUtf8(((Type) value).getDescriptor()));
     } else if (value instanceof byte[]) {
@@ -275,7 +277,7 @@ final class AnnotationWriter extends AnnotationVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String name, final String descriptor) {
+  public IAnnotationVisitor visitAnnotation(final String name, final String descriptor) {
     // Case of an element_value with an annotation_value field.
     // See https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.16.1.
     ++numElementValuePairs;
@@ -288,7 +290,7 @@ final class AnnotationWriter extends AnnotationVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitArray(final String name) {
+  public IAnnotationVisitor visitArray(final String name) {
     // Case of an element_value with an array_value field.
     // https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.16.1
     ++numElementValuePairs;

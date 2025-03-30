@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -29,15 +31,14 @@
 package org.objectweb.asm.tree;
 
 import java.util.List;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.TypePath;
+
+import org.objectweb.asm.*;
 
 /**
  * A node that represents a type annotation on a local or resource variable.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class LocalVariableAnnotationNode extends TypeAnnotationNode {
 
@@ -84,7 +85,10 @@ public class LocalVariableAnnotationNode extends TypeAnnotationNode {
       final LabelNode[] end,
       final int[] index,
       final String descriptor) {
-    this(/* latest api = */ Opcodes.ASM9, typeRef, typePath, start, end, index, descriptor);
+    super(typeRef, typePath, descriptor);
+    this.start =  Util.asArrayList(start);
+    this.end = Util.asArrayList(end);
+    this.index = Util.asArrayList(index);
   }
 
   /**
@@ -104,6 +108,7 @@ public class LocalVariableAnnotationNode extends TypeAnnotationNode {
    *     'typeRef' as a whole.
    * @param descriptor the class descriptor of the annotation class.
    */
+  @Deprecated
   public LocalVariableAnnotationNode(
       final int api,
       final int typeRef,
@@ -112,10 +117,7 @@ public class LocalVariableAnnotationNode extends TypeAnnotationNode {
       final LabelNode[] end,
       final int[] index,
       final String descriptor) {
-    super(api, typeRef, typePath, descriptor);
-    this.start = Util.asArrayList(start);
-    this.end = Util.asArrayList(end);
-    this.index = Util.asArrayList(index);
+    this(typeRef, typePath, start, end, index, descriptor);
   }
 
   /**
@@ -124,7 +126,7 @@ public class LocalVariableAnnotationNode extends TypeAnnotationNode {
    * @param methodVisitor the visitor that must visit this annotation.
    * @param visible {@literal true} if the annotation is visible at runtime.
    */
-  public void accept(final MethodVisitor methodVisitor, final boolean visible) {
+  public void accept(final IMethodVisitor methodVisitor, final boolean visible) {
     Label[] startLabels = new Label[this.start.size()];
     Label[] endLabels = new Label[this.end.size()];
     int[] indices = new int[this.index.size()];

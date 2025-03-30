@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,10 +30,7 @@
 
 package org.objectweb.asm.commons;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.RecordComponentVisitor;
-import org.objectweb.asm.TypePath;
+import org.objectweb.asm.*;
 
 /**
  * A {@link RecordComponentVisitor} that remaps types with a {@link Remapper}.
@@ -46,14 +45,14 @@ public class RecordComponentRemapper extends RecordComponentVisitor {
   /**
    * Constructs a new {@link RecordComponentRemapper}. <i>Subclasses must not use this
    * constructor</i>. Instead, they must use the {@link
-   * #RecordComponentRemapper(int,RecordComponentVisitor,Remapper)} version.
+   * #RecordComponentRemapper(int, IRecordComponentVisitor,Remapper)} version.
    *
    * @param recordComponentVisitor the record component visitor this remapper must delegate to.
    * @param remapper the remapper to use to remap the types in the visited record component.
    */
   public RecordComponentRemapper(
-      final RecordComponentVisitor recordComponentVisitor, final Remapper remapper) {
-    this(/* latest api = */ Opcodes.ASM9, recordComponentVisitor, remapper);
+          final IRecordComponentVisitor recordComponentVisitor, final Remapper remapper) {
+    this(/* latest api = */ Opcodes.V_DYNA, recordComponentVisitor, remapper);
   }
 
   /**
@@ -65,14 +64,14 @@ public class RecordComponentRemapper extends RecordComponentVisitor {
    * @param remapper the remapper to use to remap the types in the visited record component.
    */
   protected RecordComponentRemapper(
-      final int api, final RecordComponentVisitor recordComponentVisitor, final Remapper remapper) {
+          final int api, final IRecordComponentVisitor recordComponentVisitor, final Remapper remapper) {
     super(api, recordComponentVisitor);
     this.remapper = remapper;
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
-    AnnotationVisitor annotationVisitor =
+  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+    IAnnotationVisitor annotationVisitor =
         super.visitAnnotation(remapper.mapDesc(descriptor), visible);
     return annotationVisitor == null
         ? null
@@ -80,9 +79,9 @@ public class RecordComponentRemapper extends RecordComponentVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
-    AnnotationVisitor annotationVisitor =
+    IAnnotationVisitor annotationVisitor =
         super.visitTypeAnnotation(typeRef, typePath, remapper.mapDesc(descriptor), visible);
     return annotationVisitor == null
         ? null
@@ -95,11 +94,11 @@ public class RecordComponentRemapper extends RecordComponentVisitor {
    *
    * @param annotationVisitor the AnnotationVisitor the remapper must delegate to.
    * @return the newly created remapper.
-   * @deprecated use {@link #createAnnotationRemapper(String, AnnotationVisitor)} instead.
+   * @deprecated use {@link #createAnnotationRemapper(String, IAnnotationVisitor)} instead.
    */
   @Deprecated
-  protected AnnotationVisitor createAnnotationRemapper(final AnnotationVisitor annotationVisitor) {
-    return new AnnotationRemapper(api, /* descriptor= */ null, annotationVisitor, remapper);
+  protected IAnnotationVisitor createAnnotationRemapper(final IAnnotationVisitor annotationVisitor) {
+    return new AnnotationRemapper(ver, /* descriptor= */ null, annotationVisitor, remapper);
   }
 
   /**
@@ -110,9 +109,9 @@ public class RecordComponentRemapper extends RecordComponentVisitor {
    * @param annotationVisitor the AnnotationVisitor the remapper must delegate to.
    * @return the newly created remapper.
    */
-  protected AnnotationVisitor createAnnotationRemapper(
-      final String descriptor, final AnnotationVisitor annotationVisitor) {
-    return new AnnotationRemapper(api, descriptor, annotationVisitor, remapper)
+  protected IAnnotationVisitor createAnnotationRemapper(
+      final String descriptor, final IAnnotationVisitor annotationVisitor) {
+    return new AnnotationRemapper(ver, descriptor, annotationVisitor, remapper)
         .orDeprecatedValue(createAnnotationRemapper(annotationVisitor));
   }
 }

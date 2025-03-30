@@ -40,12 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 import org.objectweb.asm.test.AsmTest;
 import org.objectweb.asm.test.ClassFile;
 import org.objectweb.asm.tree.MethodNode;
@@ -195,7 +190,7 @@ class LocalVariablesSorterTest extends AsmTest {
       final PrecompiledClass classParameter, final Api apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     ClassWriter classWriter = new ClassWriter(0);
-    ClassVisitor localVariablesSorter =
+    IClassVisitor localVariablesSorter =
         new LocalVariablesSorterClassAdapter(apiParameter.value(), classWriter);
 
     Executable accept = () -> classReader.accept(localVariablesSorter, ClassReader.EXPAND_FRAMES);
@@ -219,7 +214,7 @@ class LocalVariablesSorterTest extends AsmTest {
     ClassReader classReader =
         new ClassReader(Files.newInputStream(Paths.get("src/test/resources/Issue317586.class")));
     ClassWriter classWriter = new ClassWriter(0);
-    ClassVisitor localVariablesSorter =
+    IClassVisitor localVariablesSorter =
         new LocalVariablesSorterClassAdapter(/* latest */ Opcodes.ASM10_EXPERIMENTAL, classWriter);
 
     classReader.accept(localVariablesSorter, ClassReader.EXPAND_FRAMES);
@@ -229,20 +224,20 @@ class LocalVariablesSorterTest extends AsmTest {
 
   static class LocalVariablesSorterClassAdapter extends ClassVisitor {
 
-    LocalVariablesSorterClassAdapter(final int api, final ClassVisitor classVisitor) {
+    LocalVariablesSorterClassAdapter(final int api, final IClassVisitor classVisitor) {
       super(api, classVisitor);
     }
 
     @Override
-    public MethodVisitor visitMethod(
+    public IMethodVisitor visitMethod(
         final int access,
         final String name,
         final String descriptor,
         final String signature,
         final String[] exceptions) {
-      MethodVisitor methodVisitor =
+      IMethodVisitor methodVisitor =
           super.visitMethod(access, name, descriptor, signature, exceptions);
-      return new LocalVariablesSorter(api, access, descriptor, methodVisitor) {};
+      return new LocalVariablesSorter(ver, access, descriptor, methodVisitor) {};
     }
   }
 }

@@ -59,7 +59,7 @@ class RecordComponentVisitorTest {
 
   @Test
   void testGetDelegate() {
-    RecordComponentVisitor delegate = new RecordComponentVisitor(Opcodes.ASM4) {};
+    IRecordComponentVisitor delegate = new RecordComponentVisitor(Opcodes.ASM4) {};
     RecordComponentVisitor visitor = new RecordComponentVisitor(Opcodes.ASM4, delegate) {};
 
     assertSame(delegate, visitor.getDelegate());

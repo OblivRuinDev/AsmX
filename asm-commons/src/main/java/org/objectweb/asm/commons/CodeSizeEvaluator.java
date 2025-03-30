@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,11 +29,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.commons;
 
-import org.objectweb.asm.ConstantDynamic;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 
 /**
  * A {@link MethodVisitor} that approximates the size of the methods it visits.
@@ -46,11 +44,11 @@ public class CodeSizeEvaluator extends MethodVisitor implements Opcodes {
   /** The maximum size in bytes of the visited method. */
   private int maxSize;
 
-  public CodeSizeEvaluator(final MethodVisitor methodVisitor) {
-    this(/* latest api = */ Opcodes.ASM9, methodVisitor);
+  public CodeSizeEvaluator(final IMethodVisitor methodVisitor) {
+    this(/* latest api = */ V_DYNA, methodVisitor);
   }
 
-  protected CodeSizeEvaluator(final int api, final MethodVisitor methodVisitor) {
+  protected CodeSizeEvaluator(final int api, final IMethodVisitor methodVisitor) {
     super(api, methodVisitor);
   }
 
@@ -117,15 +115,10 @@ public class CodeSizeEvaluator extends MethodVisitor implements Opcodes {
       final String owner,
       final String name,
       final String descriptor,
-      final boolean isInterface) {
-    if (api < Opcodes.ASM5 && (opcodeAndSource & Opcodes.SOURCE_DEPRECATED) == 0) {
-      // Redirect the call to the deprecated version of this method.
-      super.visitMethodInsn(opcodeAndSource, owner, name, descriptor, isInterface);
-      return;
-    }
-    int opcode = opcodeAndSource & ~Opcodes.SOURCE_MASK;
+      final boolean isInterface) {//todo: uncheck
+    checkInterfaceInvoke(ver, opcodeAndSource, isInterface);
 
-    if (opcode == INVOKEINTERFACE) {
+    if (opcodeAndSource == INVOKEINTERFACE) {
       minSize += 5;
       maxSize += 5;
     } else {

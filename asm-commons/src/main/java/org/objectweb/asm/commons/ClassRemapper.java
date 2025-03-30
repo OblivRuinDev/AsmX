@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -29,15 +31,8 @@
 package org.objectweb.asm.commons;
 
 import java.util.List;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.ModuleVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.RecordComponentVisitor;
-import org.objectweb.asm.TypePath;
+
+import org.objectweb.asm.*;
 
 /**
  * A {@link ClassVisitor} that remaps types with a {@link Remapper}.
@@ -68,13 +63,13 @@ public class ClassRemapper extends ClassVisitor {
 
   /**
    * Constructs a new {@link ClassRemapper}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #ClassRemapper(int,ClassVisitor,Remapper)} version.
+   * Instead, they must use the {@link #ClassRemapper(int, IClassVisitor,Remapper)} version.
    *
    * @param classVisitor the class visitor this remapper must delegate to.
    * @param remapper the remapper to use to remap the types in the visited class.
    */
-  public ClassRemapper(final ClassVisitor classVisitor, final Remapper remapper) {
-    this(/* latest api = */ Opcodes.ASM9, classVisitor, remapper);
+  public ClassRemapper(final IClassVisitor classVisitor, final Remapper remapper) {
+    this(/* latest api = */ Opcodes.V_DYNA, classVisitor, remapper);
   }
 
   /**
@@ -85,7 +80,7 @@ public class ClassRemapper extends ClassVisitor {
    * @param classVisitor the class visitor this remapper must delegate to.
    * @param remapper the remapper to use to remap the types in the visited class.
    */
-  protected ClassRemapper(final int api, final ClassVisitor classVisitor, final Remapper remapper) {
+  protected ClassRemapper(final int api, final IClassVisitor classVisitor, final Remapper remapper) {
     super(api, classVisitor);
     this.remapper = remapper;
   }
@@ -109,14 +104,14 @@ public class ClassRemapper extends ClassVisitor {
   }
 
   @Override
-  public ModuleVisitor visitModule(final String name, final int flags, final String version) {
-    ModuleVisitor moduleVisitor = super.visitModule(remapper.mapModuleName(name), flags, version);
+  public IModuleVisitor visitModule(final String name, final int flags, final String version) {
+    IModuleVisitor moduleVisitor = super.visitModule(remapper.mapModuleName(name), flags, version);
     return moduleVisitor == null ? null : createModuleRemapper(moduleVisitor);
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
-    AnnotationVisitor annotationVisitor =
+  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+    IAnnotationVisitor annotationVisitor =
         super.visitAnnotation(remapper.mapDesc(descriptor), visible);
     return annotationVisitor == null
         ? null
@@ -124,9 +119,9 @@ public class ClassRemapper extends ClassVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
-    AnnotationVisitor annotationVisitor =
+    IAnnotationVisitor annotationVisitor =
         super.visitTypeAnnotation(typeRef, typePath, remapper.mapDesc(descriptor), visible);
     return annotationVisitor == null
         ? null
@@ -146,9 +141,9 @@ public class ClassRemapper extends ClassVisitor {
   }
 
   @Override
-  public RecordComponentVisitor visitRecordComponent(
+  public IRecordComponentVisitor visitRecordComponent(
       final String name, final String descriptor, final String signature) {
-    RecordComponentVisitor recordComponentVisitor =
+    IRecordComponentVisitor recordComponentVisitor =
         super.visitRecordComponent(
             remapper.mapRecordComponentName(className, name, descriptor),
             remapper.mapDesc(descriptor),
@@ -159,13 +154,13 @@ public class ClassRemapper extends ClassVisitor {
   }
 
   @Override
-  public FieldVisitor visitField(
+  public IFieldVisitor visitField(
       final int access,
       final String name,
       final String descriptor,
       final String signature,
       final Object value) {
-    FieldVisitor fieldVisitor =
+    IFieldVisitor fieldVisitor =
         super.visitField(
             access,
             remapper.mapFieldName(className, name, descriptor),
@@ -176,14 +171,14 @@ public class ClassRemapper extends ClassVisitor {
   }
 
   @Override
-  public MethodVisitor visitMethod(
+  public IMethodVisitor visitMethod(
       final int access,
       final String name,
       final String descriptor,
       final String signature,
       final String[] exceptions) {
     String remappedDescriptor = remapper.mapMethodDesc(descriptor);
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         super.visitMethod(
             access,
             remapper.mapMethodName(className, name, descriptor),
@@ -233,8 +228,8 @@ public class ClassRemapper extends ClassVisitor {
    * @param fieldVisitor the FieldVisitor the remapper must delegate to.
    * @return the newly created remapper.
    */
-  protected FieldVisitor createFieldRemapper(final FieldVisitor fieldVisitor) {
-    return new FieldRemapper(api, fieldVisitor, remapper);
+  protected IFieldVisitor createFieldRemapper(final IFieldVisitor fieldVisitor) {
+    return new FieldRemapper(ver, fieldVisitor, remapper);
   }
 
   /**
@@ -244,8 +239,8 @@ public class ClassRemapper extends ClassVisitor {
    * @param methodVisitor the MethodVisitor the remapper must delegate to.
    * @return the newly created remapper.
    */
-  protected MethodVisitor createMethodRemapper(final MethodVisitor methodVisitor) {
-    return new MethodRemapper(api, methodVisitor, remapper);
+  protected IMethodVisitor createMethodRemapper(final IMethodVisitor methodVisitor) {
+    return new MethodRemapper(ver, methodVisitor, remapper);
   }
 
   /**
@@ -254,11 +249,11 @@ public class ClassRemapper extends ClassVisitor {
    *
    * @param annotationVisitor the AnnotationVisitor the remapper must delegate to.
    * @return the newly created remapper.
-   * @deprecated use {@link #createAnnotationRemapper(String, AnnotationVisitor)} instead.
+   * @deprecated use {@link #createAnnotationRemapper(String, IAnnotationVisitor)} instead.
    */
   @Deprecated
-  protected AnnotationVisitor createAnnotationRemapper(final AnnotationVisitor annotationVisitor) {
-    return new AnnotationRemapper(api, /* descriptor= */ null, annotationVisitor, remapper);
+  protected IAnnotationVisitor createAnnotationRemapper(final IAnnotationVisitor annotationVisitor) {
+    return new AnnotationRemapper(ver, /* descriptor= */ null, annotationVisitor, remapper);
   }
 
   /**
@@ -269,9 +264,9 @@ public class ClassRemapper extends ClassVisitor {
    * @param annotationVisitor the AnnotationVisitor the remapper must delegate to.
    * @return the newly created remapper.
    */
-  protected AnnotationVisitor createAnnotationRemapper(
-      final String descriptor, final AnnotationVisitor annotationVisitor) {
-    return new AnnotationRemapper(api, descriptor, annotationVisitor, remapper)
+  protected IAnnotationVisitor createAnnotationRemapper(
+      final String descriptor, final IAnnotationVisitor annotationVisitor) {
+    return new AnnotationRemapper(ver, descriptor, annotationVisitor, remapper)
         .orDeprecatedValue(createAnnotationRemapper(annotationVisitor));
   }
 
@@ -282,8 +277,8 @@ public class ClassRemapper extends ClassVisitor {
    * @param moduleVisitor the ModuleVisitor the remapper must delegate to.
    * @return the newly created remapper.
    */
-  protected ModuleVisitor createModuleRemapper(final ModuleVisitor moduleVisitor) {
-    return new ModuleRemapper(api, moduleVisitor, remapper);
+  protected IModuleVisitor createModuleRemapper(final IModuleVisitor moduleVisitor) {
+    return new ModuleRemapper(ver, moduleVisitor, remapper);
   }
 
   /**
@@ -293,8 +288,8 @@ public class ClassRemapper extends ClassVisitor {
    * @param recordComponentVisitor the RecordComponentVisitor the remapper must delegate to.
    * @return the newly created remapper.
    */
-  protected RecordComponentVisitor createRecordComponentRemapper(
-      final RecordComponentVisitor recordComponentVisitor) {
-    return new RecordComponentRemapper(api, recordComponentVisitor, remapper);
+  protected IRecordComponentVisitor createRecordComponentRemapper(
+      final IRecordComponentVisitor recordComponentVisitor) {
+    return new RecordComponentRemapper(ver, recordComponentVisitor, remapper);
   }
 }

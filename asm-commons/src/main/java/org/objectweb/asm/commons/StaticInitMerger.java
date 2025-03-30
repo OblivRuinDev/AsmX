@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,9 +29,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.commons;
 
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 
 /**
  * A {@link ClassVisitor} that merges &lt;clinit&gt; methods into a single one. All the existing
@@ -50,18 +50,18 @@ public class StaticInitMerger extends ClassVisitor {
   private int numClinitMethods;
 
   /** The MethodVisitor for the merged &lt;clinit&gt; method. */
-  private MethodVisitor mergedClinitVisitor;
+  private IMethodVisitor mergedClinitVisitor;
 
   /**
    * Constructs a new {@link StaticInitMerger}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #StaticInitMerger(int, String, ClassVisitor)} version.
+   * Instead, they must use the {@link #StaticInitMerger(int, String, IClassVisitor)} version.
    *
    * @param prefix the prefix to use to rename the existing &lt;clinit&gt; methods.
    * @param classVisitor the class visitor to which this visitor must delegate method calls. May be
    *     null.
    */
-  public StaticInitMerger(final String prefix, final ClassVisitor classVisitor) {
-    this(/* latest api = */ Opcodes.ASM9, prefix, classVisitor);
+  public StaticInitMerger(final String prefix, final IClassVisitor classVisitor) {
+    this(/* latest api = */ Opcodes.V_DYNA, prefix, classVisitor);
   }
 
   /**
@@ -73,7 +73,7 @@ public class StaticInitMerger extends ClassVisitor {
    * @param classVisitor the class visitor to which this visitor must delegate method calls. May be
    *     null.
    */
-  protected StaticInitMerger(final int api, final String prefix, final ClassVisitor classVisitor) {
+  protected StaticInitMerger(final int api, final String prefix, final IClassVisitor classVisitor) {
     super(api, classVisitor);
     this.renamedClinitMethodPrefix = prefix;
   }
@@ -91,13 +91,13 @@ public class StaticInitMerger extends ClassVisitor {
   }
 
   @Override
-  public MethodVisitor visitMethod(
+  public IMethodVisitor visitMethod(
       final int access,
       final String name,
       final String descriptor,
       final String signature,
       final String[] exceptions) {
-    MethodVisitor methodVisitor;
+    IMethodVisitor methodVisitor;
     if ("<clinit>".equals(name)) {
       int newAccess = Opcodes.ACC_PRIVATE + Opcodes.ACC_STATIC;
       String newName = renamedClinitMethodPrefix + numClinitMethods++;

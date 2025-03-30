@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,12 +29,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.commons;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.TypePath;
+import org.objectweb.asm.*;
 
 /**
  * A {@link MethodVisitor} that renumbers local variables in their order of appearance. This adapter
@@ -71,7 +68,7 @@ public class LocalVariablesSorter extends MethodVisitor {
 
   /**
    * Constructs a new {@link LocalVariablesSorter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #LocalVariablesSorter(int, int, String, MethodVisitor)}
+   * Instead, they must use the {@link #LocalVariablesSorter(int, int, String, IMethodVisitor)}
    * version.
    *
    * @param access access flags of the adapted method.
@@ -80,8 +77,8 @@ public class LocalVariablesSorter extends MethodVisitor {
    * @throws IllegalStateException if a subclass calls this constructor.
    */
   public LocalVariablesSorter(
-      final int access, final String descriptor, final MethodVisitor methodVisitor) {
-    this(/* latest api = */ Opcodes.ASM9, access, descriptor, methodVisitor);
+      final int access, final String descriptor, final IMethodVisitor methodVisitor) {
+    this(/* latest api = */ Opcodes.V_DYNA, access, descriptor, methodVisitor);
     if (getClass() != LocalVariablesSorter.class) {
       throw new IllegalStateException();
     }
@@ -97,7 +94,7 @@ public class LocalVariablesSorter extends MethodVisitor {
    * @param methodVisitor the method visitor to which this adapter delegates calls.
    */
   protected LocalVariablesSorter(
-      final int api, final int access, final String descriptor, final MethodVisitor methodVisitor) {
+      final int api, final int access, final String descriptor, final IMethodVisitor methodVisitor) {
     super(api, methodVisitor);
     nextLocal = (Opcodes.ACC_STATIC & access) == 0 ? 1 : 0;
     for (Type argumentType : Type.getArgumentTypes(descriptor)) {
@@ -160,7 +157,7 @@ public class LocalVariablesSorter extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitLocalVariableAnnotation(
+  public IAnnotationVisitor visitLocalVariableAnnotation(
       final int typeRef,
       final TypePath typePath,
       final Label[] start,

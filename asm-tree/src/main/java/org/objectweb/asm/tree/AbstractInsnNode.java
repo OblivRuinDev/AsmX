@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -30,13 +32,15 @@ package org.objectweb.asm.tree;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.objectweb.asm.MethodVisitor;
+
+import org.objectweb.asm.IMethodVisitor;
 
 /**
  * A node that represents a bytecode instruction. <i>An instruction can appear at most once in at
  * most one {@link InsnList} at a time</i>.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public abstract class AbstractInsnNode {
 
@@ -109,17 +113,17 @@ public abstract class AbstractInsnNode {
   public List<TypeAnnotationNode> invisibleTypeAnnotations;
 
   /** The previous instruction in the list to which this instruction belongs. */
-  AbstractInsnNode previousInsn;
+  AbstractInsnNode previousInsn = null;
 
   /** The next instruction in the list to which this instruction belongs. */
-  AbstractInsnNode nextInsn;
+  AbstractInsnNode nextInsn = null;
 
   /**
    * The index of this instruction in the list to which it belongs. The value of this field is
    * correct only when {@link InsnList#cache} is not null. A value of -1 indicates that this
    * instruction does not belong to any {@link InsnList}.
    */
-  int index;
+  int index = -1;
 
   /**
    * Constructs a new {@link AbstractInsnNode}.
@@ -128,7 +132,6 @@ public abstract class AbstractInsnNode {
    */
   protected AbstractInsnNode(final int opcode) {
     this.opcode = opcode;
-    this.index = -1;
   }
 
   /**
@@ -173,29 +176,27 @@ public abstract class AbstractInsnNode {
    *
    * @param methodVisitor a method visitor.
    */
-  public abstract void accept(MethodVisitor methodVisitor);
+  public abstract void accept(IMethodVisitor methodVisitor);
 
   /**
    * Makes the given visitor visit the annotations of this instruction.
    *
    * @param methodVisitor a method visitor.
    */
-  protected final void acceptAnnotations(final MethodVisitor methodVisitor) {
+  protected final void acceptAnnotations(final IMethodVisitor methodVisitor) {
     if (visibleTypeAnnotations != null) {
-      for (int i = 0, n = visibleTypeAnnotations.size(); i < n; ++i) {
-        TypeAnnotationNode typeAnnotation = visibleTypeAnnotations.get(i);
-        typeAnnotation.accept(
-            methodVisitor.visitInsnAnnotation(
-                typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, true));
-      }
+        for (TypeAnnotationNode typeAnnotation : visibleTypeAnnotations) {
+            typeAnnotation.accept(
+                    methodVisitor.visitInsnAnnotation(
+                            typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, true));
+        }
     }
     if (invisibleTypeAnnotations != null) {
-      for (int i = 0, n = invisibleTypeAnnotations.size(); i < n; ++i) {
-        TypeAnnotationNode typeAnnotation = invisibleTypeAnnotations.get(i);
-        typeAnnotation.accept(
-            methodVisitor.visitInsnAnnotation(
-                typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, false));
-      }
+        for (TypeAnnotationNode typeAnnotation : invisibleTypeAnnotations) {
+            typeAnnotation.accept(
+                    methodVisitor.visitInsnAnnotation(
+                            typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, false));
+        }
     }
   }
 

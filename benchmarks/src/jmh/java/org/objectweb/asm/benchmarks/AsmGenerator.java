@@ -28,7 +28,7 @@
 package org.objectweb.asm.benchmarks;
 
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.IMethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 /**
@@ -61,7 +61,7 @@ public class AsmGenerator extends Generator {
         Opcodes.V1_1, Opcodes.ACC_PUBLIC, "HelloWorld", null, "java/lang/Object", null);
     classWriter.visitSource("HelloWorld.java", null);
 
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         classWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
     methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
     methodVisitor.visitMethodInsn(

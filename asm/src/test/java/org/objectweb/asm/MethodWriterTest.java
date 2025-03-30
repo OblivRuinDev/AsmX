@@ -120,7 +120,7 @@ class MethodWriterTest {
         () -> {
           ClassWriter classWriter = new ClassWriter(0);
           classWriter.visit(Opcodes.V11, Opcodes.ACC_SUPER, "Test", null, "java/lang/Object", null);
-          MethodVisitor mv = classWriter.visitMethod(Opcodes.ACC_STATIC, "m", "()V", null, null);
+          IMethodVisitor mv = classWriter.visitMethod(Opcodes.ACC_STATIC, "m", "()V", null, null);
           mv.visitCode();
           mv.visitLdcInsn(condy);
           mv.visitMaxs(0, 0);

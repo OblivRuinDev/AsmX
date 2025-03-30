@@ -38,13 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 import org.objectweb.asm.test.AsmTest;
 import org.objectweb.asm.test.ClassFile;
 
@@ -99,7 +93,7 @@ class AnalyzerAdapterTest extends AsmTest {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
-    ClassVisitor classAnalyzerAdapter = new ClassAnalyzerAdapter(apiParameter.value(), classWriter);
+    IClassVisitor classAnalyzerAdapter = new ClassAnalyzerAdapter(apiParameter.value(), classWriter);
 
     Executable accept = () -> classReader.accept(classAnalyzerAdapter, ClassReader.EXPAND_FRAMES);
 
@@ -131,7 +125,7 @@ class AnalyzerAdapterTest extends AsmTest {
 
     private String owner;
 
-    ClassAnalyzerAdapter(final int api, final ClassVisitor classVisitor) {
+    ClassAnalyzerAdapter(final int api, final IClassVisitor classVisitor) {
       super(api, classVisitor);
     }
 
@@ -148,17 +142,17 @@ class AnalyzerAdapterTest extends AsmTest {
     }
 
     @Override
-    public MethodVisitor visitMethod(
+    public IMethodVisitor visitMethod(
         final int access,
         final String name,
         final String descriptor,
         final String signature,
         final String[] exceptions) {
-      MethodVisitor methodVisitor =
+      IMethodVisitor methodVisitor =
           super.visitMethod(access, name, descriptor, signature, exceptions);
       AnalyzedFramesInserter inserter = new AnalyzedFramesInserter(methodVisitor);
       AnalyzerAdapter analyzerAdapter =
-          new AnalyzerAdapter(api, owner, access, name, descriptor, inserter) {
+          new AnalyzerAdapter(ver, owner, access, name, descriptor, inserter) {
 
             @Override
             public void visitMaxs(final int maxStack, final int maxLocals) {
@@ -180,7 +174,7 @@ class AnalyzerAdapterTest extends AsmTest {
     private AnalyzerAdapter analyzerAdapter;
     private boolean hasOriginalFrame;
 
-    AnalyzedFramesInserter(final MethodVisitor methodVisitor) {
+    AnalyzedFramesInserter(final IMethodVisitor methodVisitor) {
       super(/* latest */ Opcodes.ASM10_EXPERIMENTAL, methodVisitor);
     }
 

@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -31,12 +33,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.objectweb.asm.ConstantDynamic;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+
+import org.objectweb.asm.*;
 
 /**
  * A {@link MethodVisitor} that keeps track of stack map frame changes between {@link
@@ -102,7 +100,7 @@ public class AnalyzerAdapter extends MethodVisitor {
   /**
    * Constructs a new {@link AnalyzerAdapter}. <i>Subclasses must not use this constructor</i>.
    * Instead, they must use the {@link #AnalyzerAdapter(int, String, int, String, String,
-   * MethodVisitor)} version.
+   * IMethodVisitor)} version.
    *
    * @param owner the owner's class name.
    * @param access the method's access flags (see {@link Opcodes}).
@@ -117,8 +115,8 @@ public class AnalyzerAdapter extends MethodVisitor {
       final int access,
       final String name,
       final String descriptor,
-      final MethodVisitor methodVisitor) {
-    this(/* latest api = */ Opcodes.ASM9, owner, access, name, descriptor, methodVisitor);
+      final IMethodVisitor methodVisitor) {
+    this(/* latest api = */ Opcodes.V_DYNA, owner, access, name, descriptor, methodVisitor);
     if (getClass() != AnalyzerAdapter.class) {
       throw new IllegalStateException();
     }
@@ -142,7 +140,7 @@ public class AnalyzerAdapter extends MethodVisitor {
       final int access,
       final String name,
       final String descriptor,
-      final MethodVisitor methodVisitor) {
+      final IMethodVisitor methodVisitor) {
     super(api, methodVisitor);
     this.owner = owner;
     locals = new ArrayList<>();
@@ -262,8 +260,8 @@ public class AnalyzerAdapter extends MethodVisitor {
         Label label = new Label();
         labels = new ArrayList<>(3);
         labels.add(label);
-        if (mv != null) {
-          mv.visitLabel(label);
+        if (parent != null) {
+          parent.visitLabel(label);
         }
       }
       for (Label label : labels) {
@@ -287,23 +285,18 @@ public class AnalyzerAdapter extends MethodVisitor {
       final String owner,
       final String name,
       final String descriptor,
-      final boolean isInterface) {
-    if (api < Opcodes.ASM5 && (opcodeAndSource & Opcodes.SOURCE_DEPRECATED) == 0) {
-      // Redirect the call to the deprecated version of this method.
-      super.visitMethodInsn(opcodeAndSource, owner, name, descriptor, isInterface);
-      return;
-    }
+      final boolean isInterface) {//todo: uncheck
+    checkInterfaceInvoke(ver, opcodeAndSource, isInterface);
     super.visitMethodInsn(opcodeAndSource, owner, name, descriptor, isInterface);
-    int opcode = opcodeAndSource & ~Opcodes.SOURCE_MASK;
 
     if (this.locals == null) {
       labels = null;
       return;
     }
     pop(descriptor);
-    if (opcode != Opcodes.INVOKESTATIC) {
+    if (opcodeAndSource != Opcodes.INVOKESTATIC) {
       Object value = pop();
-      if (opcode == Opcodes.INVOKESPECIAL && name.equals("<init>")) {
+      if (opcodeAndSource == Opcodes.INVOKESPECIAL && name.equals("<init>")) {
         Object initializedValue;
         if (value == Opcodes.UNINITIALIZED_THIS) {
           initializedValue = this.owner;
@@ -446,10 +439,10 @@ public class AnalyzerAdapter extends MethodVisitor {
 
   @Override
   public void visitMaxs(final int maxStack, final int maxLocals) {
-    if (mv != null) {
+    if (parent != null) {
       this.maxStack = Math.max(this.maxStack, maxStack);
       this.maxLocals = Math.max(this.maxLocals, maxLocals);
-      mv.visitMaxs(this.maxStack, this.maxLocals);
+      parent.visitMaxs(this.maxStack, this.maxLocals);
     }
   }
 

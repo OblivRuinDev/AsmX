@@ -611,11 +611,6 @@ meth public void accept(org.objectweb.asm.MethodVisitor)
 meth public void setOpcode(int)
 supr org.objectweb.asm.tree.AbstractInsnNode
 
-CLSS public org.objectweb.asm.tree.UnsupportedClassVersionException
-cons public init()
-supr java.lang.RuntimeException
-hfds serialVersionUID
-
 CLSS public org.objectweb.asm.tree.VarInsnNode
 cons public init(int,int)
 fld public int var

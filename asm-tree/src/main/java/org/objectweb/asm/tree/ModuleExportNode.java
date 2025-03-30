@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,14 +30,17 @@
 package org.objectweb.asm.tree;
 
 import java.util.List;
-import org.objectweb.asm.ModuleVisitor;
+import java.util.function.Consumer;
+
+import org.objectweb.asm.IModuleVisitor;
 
 /**
  * A node that represents an exported package with its name and the module that can access to it.
  *
  * @author Remi Forax
+ * @author OblivRuinDev
  */
-public class ModuleExportNode {
+public class ModuleExportNode implements Consumer<IModuleVisitor> {
 
   /**
    * The internal name of the exported package (see {@link
@@ -76,7 +81,8 @@ public class ModuleExportNode {
    *
    * @param moduleVisitor a module visitor.
    */
-  public void accept(final ModuleVisitor moduleVisitor) {
+  @Override
+  public void accept(final IModuleVisitor moduleVisitor) {
     moduleVisitor.visitExport(
         packaze, access, modules == null ? null : modules.toArray(new String[0]));
   }

@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,11 +30,7 @@
 
 package org.objectweb.asm.commons;
 
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ByteVector;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Label;
+import org.objectweb.asm.*;
 
 /**
  * A ModuleTarget attribute. This attribute is specific to the OpenJDK and may change in the future.
@@ -56,7 +54,7 @@ public final class ModuleTargetAttribute extends Attribute {
 
   /**
    * Constructs an empty {@link ModuleTargetAttribute}. This object can be passed as a prototype to
-   * the {@link ClassReader#accept(org.objectweb.asm.ClassVisitor, Attribute[], int)} method.
+   * the {@link ClassReader#accept(IClassVisitor, Attribute[], int)} method.
    */
   public ModuleTargetAttribute() {
     this(null);

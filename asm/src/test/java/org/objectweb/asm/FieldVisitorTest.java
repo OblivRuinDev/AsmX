@@ -44,7 +44,7 @@ class FieldVisitorTest {
 
   @Test
   void testConstructor_validApi() {
-    Executable constructor = () -> new FieldVisitor(Opcodes.ASM4) {};
+    Executable constructor = () -> new FieldVisitor() {};//Opcodes.ASM4) {};
 
     assertDoesNotThrow(constructor);
   }
@@ -59,8 +59,8 @@ class FieldVisitorTest {
 
   @Test
   void testGetDelegate() {
-    FieldVisitor delegate = new FieldVisitor(Opcodes.ASM4) {};
-    FieldVisitor visitor = new FieldVisitor(Opcodes.ASM4, delegate) {};
+    IFieldVisitor delegate = new FieldVisitor(){};//Opcodes.ASM4) {};
+    FieldVisitor visitor = new FieldVisitor(){};//Opcodes.ASM4, delegate) {};
 
     assertSame(delegate, visitor.getDelegate());
   }

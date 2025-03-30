@@ -39,17 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.ModuleVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.RecordComponentVisitor;
-import org.objectweb.asm.TypePath;
+import org.objectweb.asm.*;
 import org.objectweb.asm.test.AsmTest;
 import org.objectweb.asm.test.ClassFile;
 
@@ -84,13 +74,13 @@ class ClassNodeTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testCheck(final PrecompiledClass classParameter, final Api apiParameter) {
-    ClassNode classNode = new ClassNode(apiParameter.value()) {};
+    ClassNode classNode = new ClassNode() {};
     new ClassReader(classParameter.getBytes()).accept(classNode, attributes(), 0);
 
     Executable check = () -> classNode.check(apiParameter.value());
 
     if (classParameter.isMoreRecentThan(apiParameter)) {
-      assertThrows(UnsupportedClassVersionException.class, check);
+      assertThrows(ClassVersionException.class, check);
     } else {
       assertDoesNotThrow(check);
     }
@@ -102,7 +92,7 @@ class ClassNodeTest extends AsmTest {
   void testVisitAndAccept(final PrecompiledClass classParameter, final Api apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
-    ClassNode classNode = new ClassNode(apiParameter.value()) {};
+    ClassNode classNode = new ClassNode() {};
     ClassWriter classWriter = new ClassWriter(0);
 
     classReader.accept(classNode, attributes(), 0);
@@ -121,7 +111,7 @@ class ClassNodeTest extends AsmTest {
       final PrecompiledClass classParameter, final Api apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
-    ClassNode classNode = new ClassNode(apiParameter.value()) {};
+    ClassNode classNode = new ClassNode() {};
     ClassWriter classWriter = new ClassWriter(0);
 
     classReader.accept(classNode, attributes(), 0);
@@ -140,7 +130,7 @@ class ClassNodeTest extends AsmTest {
       final PrecompiledClass classParameter, final Api apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
-    ClassNode classNode = new ClassNode(apiParameter.value()) {};
+    ClassNode classNode = new ClassNode() {};
     ClassWriter classWriter = new ClassWriter(0);
 
     classReader.accept(classNode, attributes(), 0);
@@ -174,7 +164,7 @@ class ClassNodeTest extends AsmTest {
 
   private static class RemoveMembersClassVisitor extends ClassVisitor {
 
-    RemoveMembersClassVisitor(final int api, final ClassVisitor classVisitor) {
+    RemoveMembersClassVisitor(final int api, final IClassVisitor classVisitor) {
       super(api, classVisitor);
     }
 
@@ -190,7 +180,7 @@ class ClassNodeTest extends AsmTest {
     }
 
     @Override
-    public ModuleVisitor visitModule(final String name, final int access, final String version) {
+    public IModuleVisitor visitModule(final String name, final int access, final String version) {
       return null;
     }
 
@@ -204,12 +194,12 @@ class ClassNodeTest extends AsmTest {
     public void visitPermittedSubclass(final String permittedSubclass) {}
 
     @Override
-    public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+    public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
       return null;
     }
 
     @Override
-    public AnnotationVisitor visitTypeAnnotation(
+    public IAnnotationVisitor visitTypeAnnotation(
         final int typeRef,
         final TypePath typePath,
         final String descriptor,
@@ -221,13 +211,13 @@ class ClassNodeTest extends AsmTest {
     public void visitAttribute(final Attribute attribute) {}
 
     @Override
-    public RecordComponentVisitor visitRecordComponent(
+    public IRecordComponentVisitor visitRecordComponent(
         final String name, final String descriptor, final String signature) {
       return null;
     }
 
     @Override
-    public FieldVisitor visitField(
+    public IFieldVisitor visitField(
         final int access,
         final String name,
         final String descriptor,
@@ -237,7 +227,7 @@ class ClassNodeTest extends AsmTest {
     }
 
     @Override
-    public MethodVisitor visitMethod(
+    public IMethodVisitor visitMethod(
         final int access,
         final String name,
         final String descriptor,

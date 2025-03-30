@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -29,15 +31,18 @@ package org.objectweb.asm.tree;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.objectweb.asm.AnnotationVisitor;
+import java.util.function.Consumer;
+
+import org.objectweb.asm.IAnnotationVisitor;
 import org.objectweb.asm.Opcodes;
 
 /**
  * A node that represents an annotation.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
-public class AnnotationNode extends AnnotationVisitor {
+public class AnnotationNode implements IAnnotationVisitor, Consumer<IAnnotationVisitor> {
 
   /** The class descriptor of the annotation class. */
   public String desc;
@@ -53,17 +58,12 @@ public class AnnotationNode extends AnnotationVisitor {
   public List<Object> values;
 
   /**
-   * Constructs a new {@link AnnotationNode}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #AnnotationNode(int, String)} version.
+   * Constructs a new {@link AnnotationNode}.
    *
    * @param descriptor the class descriptor of the annotation class.
-   * @throws IllegalStateException If a subclass calls this constructor.
    */
   public AnnotationNode(final String descriptor) {
-    this(/* latest api = */ Opcodes.ASM9, descriptor);
-    if (getClass() != AnnotationNode.class) {
-      throw new IllegalStateException();
-    }
+    this.desc = descriptor;
   }
 
   /**
@@ -73,9 +73,9 @@ public class AnnotationNode extends AnnotationVisitor {
    *     ASM}<i>x</i> values in {@link Opcodes}.
    * @param descriptor the class descriptor of the annotation class.
    */
+  @Deprecated(forRemoval = true)
   public AnnotationNode(final int api, final String descriptor) {
-    super(api);
-    this.desc = descriptor;
+    this(descriptor);
   }
 
   /**
@@ -84,7 +84,6 @@ public class AnnotationNode extends AnnotationVisitor {
    * @param values where the visited values must be stored.
    */
   AnnotationNode(final List<Object> values) {
-    super(/* latest api = */ Opcodes.ASM9);
     this.values = values;
   }
 
@@ -133,7 +132,7 @@ public class AnnotationNode extends AnnotationVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String name, final String descriptor) {
+  public AnnotationNode visitAnnotation(final String name, final String descriptor) {
     if (values == null) {
       values = new ArrayList<>(this.desc != null ? 2 : 1);
     }
@@ -146,7 +145,7 @@ public class AnnotationNode extends AnnotationVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitArray(final String name) {
+  public AnnotationNode visitArray(final String name) {
     if (values == null) {
       values = new ArrayList<>(this.desc != null ? 2 : 1);
     }
@@ -184,7 +183,8 @@ public class AnnotationNode extends AnnotationVisitor {
    *
    * @param annotationVisitor an annotation visitor. Maybe {@literal null}.
    */
-  public void accept(final AnnotationVisitor annotationVisitor) {
+  @Override
+  public void accept(final IAnnotationVisitor annotationVisitor) {
     if (annotationVisitor != null) {
       if (values != null) {
         for (int i = 0, n = values.size(); i < n; i += 2) {
@@ -205,7 +205,7 @@ public class AnnotationNode extends AnnotationVisitor {
    * @param value the actual value.
    */
   static void accept(
-      final AnnotationVisitor annotationVisitor, final String name, final Object value) {
+          final IAnnotationVisitor annotationVisitor, final String name, final Object value) {
     if (annotationVisitor != null) {
       if (value instanceof String[]) {
         String[] typeValue = (String[]) value;
@@ -214,12 +214,9 @@ public class AnnotationNode extends AnnotationVisitor {
         AnnotationNode annotationValue = (AnnotationNode) value;
         annotationValue.accept(annotationVisitor.visitAnnotation(name, annotationValue.desc));
       } else if (value instanceof List) {
-        AnnotationVisitor arrayAnnotationVisitor = annotationVisitor.visitArray(name);
+        IAnnotationVisitor arrayAnnotationVisitor = annotationVisitor.visitArray(name);
         if (arrayAnnotationVisitor != null) {
-          List<?> arrayValue = (List<?>) value;
-          for (int i = 0, n = arrayValue.size(); i < n; ++i) {
-            accept(arrayAnnotationVisitor, null, arrayValue.get(i));
-          }
+            ((List<?>) value).forEach(v -> accept(arrayAnnotationVisitor, null, v));
           arrayAnnotationVisitor.visitEnd();
         }
       } else {

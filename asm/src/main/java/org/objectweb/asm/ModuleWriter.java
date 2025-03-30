@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -39,8 +41,9 @@ package org.objectweb.asm;
  *     4.7.27</a>
  * @author Remi Forax
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
-final class ModuleWriter extends ModuleVisitor {
+final class ModuleWriter implements IModuleVisitor {
 
   /** Where the constants used in this AnnotationWriter must be stored. */
   private final SymbolTable symbolTable;
@@ -94,7 +97,6 @@ final class ModuleWriter extends ModuleVisitor {
   private int mainClassIndex;
 
   ModuleWriter(final SymbolTable symbolTable, final int name, final int access, final int version) {
-    super(/* latest api = */ Opcodes.ASM9);
     this.symbolTable = symbolTable;
     this.moduleNameIndex = name;
     this.moduleFlags = access;

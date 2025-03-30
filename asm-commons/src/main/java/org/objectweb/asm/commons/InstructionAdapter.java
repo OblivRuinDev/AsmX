@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,12 +30,7 @@
 
 package org.objectweb.asm.commons;
 
-import org.objectweb.asm.ConstantDynamic;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 
 /**
  * A {@link MethodVisitor} providing a more detailed API to generate and transform instructions.
@@ -47,13 +44,13 @@ public class InstructionAdapter extends MethodVisitor {
 
   /**
    * Constructs a new {@link InstructionAdapter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #InstructionAdapter(int, MethodVisitor)} version.
+   * Instead, they must use the {@link #InstructionAdapter(int, IMethodVisitor)} version.
    *
    * @param methodVisitor the method visitor to which this adapter delegates calls.
    * @throws IllegalStateException If a subclass calls this constructor.
    */
-  public InstructionAdapter(final MethodVisitor methodVisitor) {
-    this(/* latest api = */ Opcodes.ASM9, methodVisitor);
+  public InstructionAdapter(final IMethodVisitor methodVisitor) {
+    this(/* latest api = */ Opcodes.V_DYNA, methodVisitor);
     if (getClass() != InstructionAdapter.class) {
       throw new IllegalStateException();
     }
@@ -66,7 +63,7 @@ public class InstructionAdapter extends MethodVisitor {
    *     ASM}<i>x</i> values in {@link Opcodes}.
    * @param methodVisitor the method visitor to which this adapter delegates calls.
    */
-  protected InstructionAdapter(final int api, final MethodVisitor methodVisitor) {
+  protected InstructionAdapter(final int api, final IMethodVisitor methodVisitor) {
     super(api, methodVisitor);
   }
 
@@ -512,15 +509,10 @@ public class InstructionAdapter extends MethodVisitor {
       final String owner,
       final String name,
       final String descriptor,
-      final boolean isInterface) {
-    if (api < Opcodes.ASM5 && (opcodeAndSource & Opcodes.SOURCE_DEPRECATED) == 0) {
-      // Redirect the call to the deprecated version of this method.
-      super.visitMethodInsn(opcodeAndSource, owner, name, descriptor, isInterface);
-      return;
-    }
-    int opcode = opcodeAndSource & ~Opcodes.SOURCE_MASK;
+      final boolean isInterface) {//todo: uncheck
+    checkInterfaceInvoke(ver, opcodeAndSource, isInterface);
 
-    switch (opcode) {
+      switch (opcodeAndSource) {
       case Opcodes.INVOKESPECIAL:
         invokespecial(owner, name, descriptor, isInterface);
         break;
@@ -616,13 +608,12 @@ public class InstructionAdapter extends MethodVisitor {
 
   @Override
   public void visitLdcInsn(final Object value) {
-    if (api < Opcodes.ASM5
-        && (value instanceof Handle
-            || (value instanceof Type && ((Type) value).getSort() == Type.METHOD))) {
-      throw new UnsupportedOperationException("This feature requires ASM5");
+    if (value instanceof Handle
+            || (value instanceof Type && ((Type) value).getSort() == Type.METHOD)) {
+      VersionChecker.LDC(ver);
     }
-    if (api < Opcodes.ASM7 && value instanceof ConstantDynamic) {
-      throw new UnsupportedOperationException("This feature requires ASM7");
+    if (value instanceof ConstantDynamic) {
+      VersionChecker.constDyna(ver);
     }
     if (value instanceof Integer) {
       iconst((Integer) value);
@@ -678,7 +669,7 @@ public class InstructionAdapter extends MethodVisitor {
 
   /** Generates a nop instruction. */
   public void nop() {
-    mv.visitInsn(Opcodes.NOP);
+    parent.visitInsn(Opcodes.NOP);
   }
 
   /**
@@ -693,9 +684,9 @@ public class InstructionAdapter extends MethodVisitor {
    */
   public void aconst(final Object value) {
     if (value == null) {
-      mv.visitInsn(Opcodes.ACONST_NULL);
+      parent.visitInsn(Opcodes.ACONST_NULL);
     } else {
-      mv.visitLdcInsn(value);
+      parent.visitLdcInsn(value);
     }
   }
 
@@ -706,13 +697,13 @@ public class InstructionAdapter extends MethodVisitor {
    */
   public void iconst(final int intValue) {
     if (intValue >= -1 && intValue <= 5) {
-      mv.visitInsn(Opcodes.ICONST_0 + intValue);
+      parent.visitInsn(Opcodes.ICONST_0 + intValue);
     } else if (intValue >= Byte.MIN_VALUE && intValue <= Byte.MAX_VALUE) {
-      mv.visitIntInsn(Opcodes.BIPUSH, intValue);
+      parent.visitIntInsn(Opcodes.BIPUSH, intValue);
     } else if (intValue >= Short.MIN_VALUE && intValue <= Short.MAX_VALUE) {
-      mv.visitIntInsn(Opcodes.SIPUSH, intValue);
+      parent.visitIntInsn(Opcodes.SIPUSH, intValue);
     } else {
-      mv.visitLdcInsn(intValue);
+      parent.visitLdcInsn(intValue);
     }
   }
 
@@ -723,9 +714,9 @@ public class InstructionAdapter extends MethodVisitor {
    */
   public void lconst(final long longValue) {
     if (longValue == 0L || longValue == 1L) {
-      mv.visitInsn(Opcodes.LCONST_0 + (int) longValue);
+      parent.visitInsn(Opcodes.LCONST_0 + (int) longValue);
     } else {
-      mv.visitLdcInsn(longValue);
+      parent.visitLdcInsn(longValue);
     }
   }
 
@@ -737,9 +728,9 @@ public class InstructionAdapter extends MethodVisitor {
   public void fconst(final float floatValue) {
     int bits = Float.floatToIntBits(floatValue);
     if (bits == 0L || bits == 0x3F800000 || bits == 0x40000000) { // 0..2
-      mv.visitInsn(Opcodes.FCONST_0 + (int) floatValue);
+      parent.visitInsn(Opcodes.FCONST_0 + (int) floatValue);
     } else {
-      mv.visitLdcInsn(floatValue);
+      parent.visitLdcInsn(floatValue);
     }
   }
 
@@ -751,9 +742,9 @@ public class InstructionAdapter extends MethodVisitor {
   public void dconst(final double doubleValue) {
     long bits = Double.doubleToLongBits(doubleValue);
     if (bits == 0L || bits == 0x3FF0000000000000L) { // +0.0d and 1.0d
-      mv.visitInsn(Opcodes.DCONST_0 + (int) doubleValue);
+      parent.visitInsn(Opcodes.DCONST_0 + (int) doubleValue);
     } else {
-      mv.visitLdcInsn(doubleValue);
+      parent.visitLdcInsn(doubleValue);
     }
   }
 
@@ -763,7 +754,7 @@ public class InstructionAdapter extends MethodVisitor {
    * @param type the type to be pushed on the stack.
    */
   public void tconst(final Type type) {
-    mv.visitLdcInsn(type);
+    parent.visitLdcInsn(type);
   }
 
   /**
@@ -772,7 +763,7 @@ public class InstructionAdapter extends MethodVisitor {
    * @param handle the handle to be pushed on the stack.
    */
   public void hconst(final Handle handle) {
-    mv.visitLdcInsn(handle);
+    parent.visitLdcInsn(handle);
   }
 
   /**
@@ -781,111 +772,111 @@ public class InstructionAdapter extends MethodVisitor {
    * @param constantDynamic the constant dynamic to be pushed on the stack.
    */
   public void cconst(final ConstantDynamic constantDynamic) {
-    mv.visitLdcInsn(constantDynamic);
+    parent.visitLdcInsn(constantDynamic);
   }
 
   public void load(final int varIndex, final Type type) {
-    mv.visitVarInsn(type.getOpcode(Opcodes.ILOAD), varIndex);
+    parent.visitVarInsn(type.getOpcode(Opcodes.ILOAD), varIndex);
   }
 
   public void aload(final Type type) {
-    mv.visitInsn(type.getOpcode(Opcodes.IALOAD));
+    parent.visitInsn(type.getOpcode(Opcodes.IALOAD));
   }
 
   public void store(final int varIndex, final Type type) {
-    mv.visitVarInsn(type.getOpcode(Opcodes.ISTORE), varIndex);
+    parent.visitVarInsn(type.getOpcode(Opcodes.ISTORE), varIndex);
   }
 
   public void astore(final Type type) {
-    mv.visitInsn(type.getOpcode(Opcodes.IASTORE));
+    parent.visitInsn(type.getOpcode(Opcodes.IASTORE));
   }
 
   public void pop() {
-    mv.visitInsn(Opcodes.POP);
+    parent.visitInsn(Opcodes.POP);
   }
 
   public void pop2() {
-    mv.visitInsn(Opcodes.POP2);
+    parent.visitInsn(Opcodes.POP2);
   }
 
   public void dup() {
-    mv.visitInsn(Opcodes.DUP);
+    parent.visitInsn(Opcodes.DUP);
   }
 
   public void dup2() {
-    mv.visitInsn(Opcodes.DUP2);
+    parent.visitInsn(Opcodes.DUP2);
   }
 
   public void dupX1() {
-    mv.visitInsn(Opcodes.DUP_X1);
+    parent.visitInsn(Opcodes.DUP_X1);
   }
 
   public void dupX2() {
-    mv.visitInsn(Opcodes.DUP_X2);
+    parent.visitInsn(Opcodes.DUP_X2);
   }
 
   public void dup2X1() {
-    mv.visitInsn(Opcodes.DUP2_X1);
+    parent.visitInsn(Opcodes.DUP2_X1);
   }
 
   public void dup2X2() {
-    mv.visitInsn(Opcodes.DUP2_X2);
+    parent.visitInsn(Opcodes.DUP2_X2);
   }
 
   public void swap() {
-    mv.visitInsn(Opcodes.SWAP);
+    parent.visitInsn(Opcodes.SWAP);
   }
 
   public void add(final Type type) {
-    mv.visitInsn(type.getOpcode(Opcodes.IADD));
+    parent.visitInsn(type.getOpcode(Opcodes.IADD));
   }
 
   public void sub(final Type type) {
-    mv.visitInsn(type.getOpcode(Opcodes.ISUB));
+    parent.visitInsn(type.getOpcode(Opcodes.ISUB));
   }
 
   public void mul(final Type type) {
-    mv.visitInsn(type.getOpcode(Opcodes.IMUL));
+    parent.visitInsn(type.getOpcode(Opcodes.IMUL));
   }
 
   public void div(final Type type) {
-    mv.visitInsn(type.getOpcode(Opcodes.IDIV));
+    parent.visitInsn(type.getOpcode(Opcodes.IDIV));
   }
 
   public void rem(final Type type) {
-    mv.visitInsn(type.getOpcode(Opcodes.IREM));
+    parent.visitInsn(type.getOpcode(Opcodes.IREM));
   }
 
   public void neg(final Type type) {
-    mv.visitInsn(type.getOpcode(Opcodes.INEG));
+    parent.visitInsn(type.getOpcode(Opcodes.INEG));
   }
 
   public void shl(final Type type) {
-    mv.visitInsn(type.getOpcode(Opcodes.ISHL));
+    parent.visitInsn(type.getOpcode(Opcodes.ISHL));
   }
 
   public void shr(final Type type) {
-    mv.visitInsn(type.getOpcode(Opcodes.ISHR));
+    parent.visitInsn(type.getOpcode(Opcodes.ISHR));
   }
 
   public void ushr(final Type type) {
-    mv.visitInsn(type.getOpcode(Opcodes.IUSHR));
+    parent.visitInsn(type.getOpcode(Opcodes.IUSHR));
   }
 
   public void and(final Type type) {
-    mv.visitInsn(type.getOpcode(Opcodes.IAND));
+    parent.visitInsn(type.getOpcode(Opcodes.IAND));
   }
 
   public void or(final Type type) {
-    mv.visitInsn(type.getOpcode(Opcodes.IOR));
+    parent.visitInsn(type.getOpcode(Opcodes.IOR));
   }
 
   public void xor(final Type type) {
-    mv.visitInsn(type.getOpcode(Opcodes.IXOR));
+    parent.visitInsn(type.getOpcode(Opcodes.IXOR));
   }
 
   public void iinc(final int varIndex, final int increment) {
-    mv.visitIincInsn(varIndex, increment);
+    parent.visitIincInsn(varIndex, increment);
   }
 
   /**
@@ -895,7 +886,7 @@ public class InstructionAdapter extends MethodVisitor {
    * @param to a Type.
    */
   public void cast(final Type from, final Type to) {
-    cast(mv, from, to);
+    cast(parent, from, to);
   }
 
   /**
@@ -905,7 +896,7 @@ public class InstructionAdapter extends MethodVisitor {
    * @param from a Type.
    * @param to a Type.
    */
-  static void cast(final MethodVisitor methodVisitor, final Type from, final Type to) {
+  static void cast(final IMethodVisitor methodVisitor, final Type from, final Type to) {
     if (from != to) {
       if (from == Type.DOUBLE_TYPE) {
         if (to == Type.FLOAT_TYPE) {
@@ -953,129 +944,111 @@ public class InstructionAdapter extends MethodVisitor {
   }
 
   public void lcmp() {
-    mv.visitInsn(Opcodes.LCMP);
+    parent.visitInsn(Opcodes.LCMP);
   }
 
   public void cmpl(final Type type) {
-    mv.visitInsn(type == Type.FLOAT_TYPE ? Opcodes.FCMPL : Opcodes.DCMPL);
+    parent.visitInsn(type == Type.FLOAT_TYPE ? Opcodes.FCMPL : Opcodes.DCMPL);
   }
 
   public void cmpg(final Type type) {
-    mv.visitInsn(type == Type.FLOAT_TYPE ? Opcodes.FCMPG : Opcodes.DCMPG);
+    parent.visitInsn(type == Type.FLOAT_TYPE ? Opcodes.FCMPG : Opcodes.DCMPG);
   }
 
   public void ifeq(final Label label) {
-    mv.visitJumpInsn(Opcodes.IFEQ, label);
+    parent.visitJumpInsn(Opcodes.IFEQ, label);
   }
 
   public void ifne(final Label label) {
-    mv.visitJumpInsn(Opcodes.IFNE, label);
+    parent.visitJumpInsn(Opcodes.IFNE, label);
   }
 
   public void iflt(final Label label) {
-    mv.visitJumpInsn(Opcodes.IFLT, label);
+    parent.visitJumpInsn(Opcodes.IFLT, label);
   }
 
   public void ifge(final Label label) {
-    mv.visitJumpInsn(Opcodes.IFGE, label);
+    parent.visitJumpInsn(Opcodes.IFGE, label);
   }
 
   public void ifgt(final Label label) {
-    mv.visitJumpInsn(Opcodes.IFGT, label);
+    parent.visitJumpInsn(Opcodes.IFGT, label);
   }
 
   public void ifle(final Label label) {
-    mv.visitJumpInsn(Opcodes.IFLE, label);
+    parent.visitJumpInsn(Opcodes.IFLE, label);
   }
 
   public void ificmpeq(final Label label) {
-    mv.visitJumpInsn(Opcodes.IF_ICMPEQ, label);
+    parent.visitJumpInsn(Opcodes.IF_ICMPEQ, label);
   }
 
   public void ificmpne(final Label label) {
-    mv.visitJumpInsn(Opcodes.IF_ICMPNE, label);
+    parent.visitJumpInsn(Opcodes.IF_ICMPNE, label);
   }
 
   public void ificmplt(final Label label) {
-    mv.visitJumpInsn(Opcodes.IF_ICMPLT, label);
+    parent.visitJumpInsn(Opcodes.IF_ICMPLT, label);
   }
 
   public void ificmpge(final Label label) {
-    mv.visitJumpInsn(Opcodes.IF_ICMPGE, label);
+    parent.visitJumpInsn(Opcodes.IF_ICMPGE, label);
   }
 
   public void ificmpgt(final Label label) {
-    mv.visitJumpInsn(Opcodes.IF_ICMPGT, label);
+    parent.visitJumpInsn(Opcodes.IF_ICMPGT, label);
   }
 
   public void ificmple(final Label label) {
-    mv.visitJumpInsn(Opcodes.IF_ICMPLE, label);
+    parent.visitJumpInsn(Opcodes.IF_ICMPLE, label);
   }
 
   public void ifacmpeq(final Label label) {
-    mv.visitJumpInsn(Opcodes.IF_ACMPEQ, label);
+    parent.visitJumpInsn(Opcodes.IF_ACMPEQ, label);
   }
 
   public void ifacmpne(final Label label) {
-    mv.visitJumpInsn(Opcodes.IF_ACMPNE, label);
+    parent.visitJumpInsn(Opcodes.IF_ACMPNE, label);
   }
 
   public void goTo(final Label label) {
-    mv.visitJumpInsn(Opcodes.GOTO, label);
+    parent.visitJumpInsn(Opcodes.GOTO, label);
   }
 
   public void jsr(final Label label) {
-    mv.visitJumpInsn(Opcodes.JSR, label);
+    parent.visitJumpInsn(Opcodes.JSR, label);
   }
 
   public void ret(final int varIndex) {
-    mv.visitVarInsn(Opcodes.RET, varIndex);
+    parent.visitVarInsn(Opcodes.RET, varIndex);
   }
 
   public void tableswitch(final int min, final int max, final Label dflt, final Label... labels) {
-    mv.visitTableSwitchInsn(min, max, dflt, labels);
+    parent.visitTableSwitchInsn(min, max, dflt, labels);
   }
 
   public void lookupswitch(final Label dflt, final int[] keys, final Label[] labels) {
-    mv.visitLookupSwitchInsn(dflt, keys, labels);
+    parent.visitLookupSwitchInsn(dflt, keys, labels);
   }
 
   public void areturn(final Type type) {
-    mv.visitInsn(type.getOpcode(Opcodes.IRETURN));
+    parent.visitInsn(type.getOpcode(Opcodes.IRETURN));
   }
 
   public void getstatic(final String owner, final String name, final String descriptor) {
-    mv.visitFieldInsn(Opcodes.GETSTATIC, owner, name, descriptor);
+    parent.visitFieldInsn(Opcodes.GETSTATIC, owner, name, descriptor);
   }
 
   public void putstatic(final String owner, final String name, final String descriptor) {
-    mv.visitFieldInsn(Opcodes.PUTSTATIC, owner, name, descriptor);
+    parent.visitFieldInsn(Opcodes.PUTSTATIC, owner, name, descriptor);
   }
 
   public void getfield(final String owner, final String name, final String descriptor) {
-    mv.visitFieldInsn(Opcodes.GETFIELD, owner, name, descriptor);
+    parent.visitFieldInsn(Opcodes.GETFIELD, owner, name, descriptor);
   }
 
   public void putfield(final String owner, final String name, final String descriptor) {
-    mv.visitFieldInsn(Opcodes.PUTFIELD, owner, name, descriptor);
-  }
-
-  /**
-   * Deprecated.
-   *
-   * @param owner the internal name of the method's owner class (see {@link
-   *     Type#getInternalName()}).
-   * @param name the method's name.
-   * @param descriptor the method's descriptor (see {@link Type}).
-   * @deprecated use {@link #invokevirtual(String, String, String, boolean)} instead.
-   */
-  @Deprecated
-  public void invokevirtual(final String owner, final String name, final String descriptor) {
-    if (api >= Opcodes.ASM5) {
-      invokevirtual(owner, name, descriptor, false);
-      return;
-    }
-    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, owner, name, descriptor);
+    parent.visitFieldInsn(Opcodes.PUTFIELD, owner, name, descriptor);
   }
 
   /**
@@ -1089,32 +1062,9 @@ public class InstructionAdapter extends MethodVisitor {
    */
   public void invokevirtual(
       final String owner, final String name, final String descriptor, final boolean isInterface) {
-    if (api < Opcodes.ASM5) {
-      if (isInterface) {
-        throw new UnsupportedOperationException("INVOKEVIRTUAL on interfaces require ASM 5");
-      }
-      invokevirtual(owner, name, descriptor);
-      return;
-    }
-    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, owner, name, descriptor, isInterface);
-  }
-
-  /**
-   * Deprecated.
-   *
-   * @param owner the internal name of the method's owner class (see {@link
-   *     Type#getInternalName()}).
-   * @param name the method's name.
-   * @param descriptor the method's descriptor (see {@link Type}).
-   * @deprecated use {@link #invokespecial(String, String, String, boolean)} instead.
-   */
-  @Deprecated
-  public void invokespecial(final String owner, final String name, final String descriptor) {
-    if (api >= Opcodes.ASM5) {
-      invokespecial(owner, name, descriptor, false);
-      return;
-    }
-    mv.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, name, descriptor, false);
+    if (isInterface)
+      VersionChecker.invokeInterface(ver);
+    parent.visitMethodInsn(Opcodes.INVOKEVIRTUAL, owner, name, descriptor, isInterface);
   }
 
   /**
@@ -1128,32 +1078,8 @@ public class InstructionAdapter extends MethodVisitor {
    */
   public void invokespecial(
       final String owner, final String name, final String descriptor, final boolean isInterface) {
-    if (api < Opcodes.ASM5) {
-      if (isInterface) {
-        throw new UnsupportedOperationException("INVOKESPECIAL on interfaces require ASM 5");
-      }
-      invokespecial(owner, name, descriptor);
-      return;
-    }
-    mv.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, name, descriptor, isInterface);
-  }
-
-  /**
-   * Deprecated.
-   *
-   * @param owner the internal name of the method's owner class (see {@link
-   *     Type#getInternalName()}).
-   * @param name the method's name.
-   * @param descriptor the method's descriptor (see {@link Type}).
-   * @deprecated use {@link #invokestatic(String, String, String, boolean)} instead.
-   */
-  @Deprecated
-  public void invokestatic(final String owner, final String name, final String descriptor) {
-    if (api >= Opcodes.ASM5) {
-      invokestatic(owner, name, descriptor, false);
-      return;
-    }
-    mv.visitMethodInsn(Opcodes.INVOKESTATIC, owner, name, descriptor, false);
+    VersionChecker.invokeInterface(ver);
+    parent.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, name, descriptor, isInterface);
   }
 
   /**
@@ -1167,14 +1093,8 @@ public class InstructionAdapter extends MethodVisitor {
    */
   public void invokestatic(
       final String owner, final String name, final String descriptor, final boolean isInterface) {
-    if (api < Opcodes.ASM5) {
-      if (isInterface) {
-        throw new UnsupportedOperationException("INVOKESTATIC on interfaces require ASM 5");
-      }
-      invokestatic(owner, name, descriptor);
-      return;
-    }
-    mv.visitMethodInsn(Opcodes.INVOKESTATIC, owner, name, descriptor, isInterface);
+    VersionChecker.invokeInterface(ver);
+    parent.visitMethodInsn(Opcodes.INVOKESTATIC, owner, name, descriptor, isInterface);
   }
 
   /**
@@ -1186,7 +1106,7 @@ public class InstructionAdapter extends MethodVisitor {
    * @param descriptor the method's descriptor (see {@link Type}).
    */
   public void invokeinterface(final String owner, final String name, final String descriptor) {
-    mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, owner, name, descriptor, true);
+    parent.visitMethodInsn(Opcodes.INVOKEINTERFACE, owner, name, descriptor, true);
   }
 
   /**
@@ -1205,11 +1125,11 @@ public class InstructionAdapter extends MethodVisitor {
       final String descriptor,
       final Handle bootstrapMethodHandle,
       final Object[] bootstrapMethodArguments) {
-    mv.visitInvokeDynamicInsn(name, descriptor, bootstrapMethodHandle, bootstrapMethodArguments);
+    parent.visitInvokeDynamicInsn(name, descriptor, bootstrapMethodHandle, bootstrapMethodArguments);
   }
 
   public void anew(final Type type) {
-    mv.visitTypeInsn(Opcodes.NEW, type.getInternalName());
+    parent.visitTypeInsn(Opcodes.NEW, type.getInternalName());
   }
 
   /**
@@ -1218,7 +1138,7 @@ public class InstructionAdapter extends MethodVisitor {
    * @param type an array Type.
    */
   public void newarray(final Type type) {
-    newarray(mv, type);
+    newarray(parent, type);
   }
 
   /**
@@ -1227,7 +1147,7 @@ public class InstructionAdapter extends MethodVisitor {
    * @param methodVisitor the method visitor to use to generate the instruction.
    * @param type an array Type.
    */
-  static void newarray(final MethodVisitor methodVisitor, final Type type) {
+  static void newarray(final IMethodVisitor methodVisitor, final Type type) {
     int arrayType;
     switch (type.getSort()) {
       case Type.BOOLEAN:
@@ -1262,42 +1182,42 @@ public class InstructionAdapter extends MethodVisitor {
   }
 
   public void arraylength() {
-    mv.visitInsn(Opcodes.ARRAYLENGTH);
+    parent.visitInsn(Opcodes.ARRAYLENGTH);
   }
 
   public void athrow() {
-    mv.visitInsn(Opcodes.ATHROW);
+    parent.visitInsn(Opcodes.ATHROW);
   }
 
   public void checkcast(final Type type) {
-    mv.visitTypeInsn(Opcodes.CHECKCAST, type.getInternalName());
+    parent.visitTypeInsn(Opcodes.CHECKCAST, type.getInternalName());
   }
 
   public void instanceOf(final Type type) {
-    mv.visitTypeInsn(Opcodes.INSTANCEOF, type.getInternalName());
+    parent.visitTypeInsn(Opcodes.INSTANCEOF, type.getInternalName());
   }
 
   public void monitorenter() {
-    mv.visitInsn(Opcodes.MONITORENTER);
+    parent.visitInsn(Opcodes.MONITORENTER);
   }
 
   public void monitorexit() {
-    mv.visitInsn(Opcodes.MONITOREXIT);
+    parent.visitInsn(Opcodes.MONITOREXIT);
   }
 
   public void multianewarray(final String descriptor, final int numDimensions) {
-    mv.visitMultiANewArrayInsn(descriptor, numDimensions);
+    parent.visitMultiANewArrayInsn(descriptor, numDimensions);
   }
 
   public void ifnull(final Label label) {
-    mv.visitJumpInsn(Opcodes.IFNULL, label);
+    parent.visitJumpInsn(Opcodes.IFNULL, label);
   }
 
   public void ifnonnull(final Label label) {
-    mv.visitJumpInsn(Opcodes.IFNONNULL, label);
+    parent.visitJumpInsn(Opcodes.IFNONNULL, label);
   }
 
   public void mark(final Label label) {
-    mv.visitLabel(label);
+    parent.visitLabel(label);
   }
 }

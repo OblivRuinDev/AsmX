@@ -111,7 +111,7 @@ class ClassWriterFlagsTest {
           .accept(
               new ClassVisitor(Opcodes.ASM5) {
                 @Override
-                public MethodVisitor visitMethod(
+                public IMethodVisitor visitMethod(
                     final int access,
                     final String name,
                     final String descriptor,
@@ -157,7 +157,7 @@ class ClassWriterFlagsTest {
 
     DummyClass withDummyMethod(final String method) {
       final Label start = new Label();
-      final MethodVisitor mvisitor =
+      final IMethodVisitor mvisitor =
           writer.visitMethod(Opcodes.ACC_PUBLIC, method, "()V", null, null);
       mvisitor.visitCode();
       mvisitor.visitLabel(start);

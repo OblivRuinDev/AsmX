@@ -38,15 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 import org.objectweb.asm.test.AsmTest;
 import org.objectweb.asm.test.ClassFile;
 import org.objectweb.asm.tree.MethodNode;
@@ -124,17 +116,6 @@ class InstructionAdapterTest extends AsmTest {
   }
 
   @Test
-  @SuppressWarnings("deprecation")
-  void testDeprecatedVisitMethodInsn_illegalArgument() {
-    InstructionAdapter instructionAdapter = new InstructionAdapter(new MethodNode());
-
-    Executable visitMethodInsn =
-        () -> instructionAdapter.visitMethodInsn(Opcodes.GETFIELD, "pkg/Class", "name", "I");
-
-    assertThrows(IllegalArgumentException.class, visitMethodInsn);
-  }
-
-  @Test
   void testVisitMethodInsn_illegalArgument() {
     InstructionAdapter instructionAdapter = new InstructionAdapter(new MethodNode());
 
@@ -191,16 +172,16 @@ class InstructionAdapterTest extends AsmTest {
     assertThrows(IllegalArgumentException.class, visitLdcInsn);
   }
 
-  @Test
-  @SuppressWarnings("deprecation")
-  void testDeprecatedInvokeSpecial() {
-    MethodNode methodNode = new MethodNode();
-    InstructionAdapter instructionAdapter = new InstructionAdapter(methodNode);
-
-    instructionAdapter.invokespecial("pkg/Class", "name", "()V");
-
-    assertTrue(toText(methodNode).trim().startsWith("INVOKESPECIAL pkg/Class.name ()V"));
-  }
+//  @Test
+//  @SuppressWarnings("deprecation")
+//  void testDeprecatedInvokeSpecial() {
+//    MethodNode methodNode = new MethodNode();
+//    InstructionAdapter instructionAdapter = new InstructionAdapter(methodNode);
+//
+//    instructionAdapter.invokespecial("pkg/Class", "name", "()V");
+//
+//    assertTrue(toText(methodNode).trim().startsWith("INVOKESPECIAL pkg/Class.name ()V"));
+//  }
 
   @Test
   void testInvokeSpecial_unsupportedOperation() {
@@ -210,17 +191,6 @@ class InstructionAdapterTest extends AsmTest {
         () -> instructionAdapter.invokespecial("pkg/Class", "name", "()V", /* isInterface= */ true);
 
     assertThrows(UnsupportedOperationException.class, invokeSpecial);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  void testDeprecatedInvokeVirtual() {
-    MethodNode methodNode = new MethodNode();
-    InstructionAdapter instructionAdapter = new InstructionAdapter(methodNode);
-
-    instructionAdapter.invokevirtual("pkg/Class", "name", "()V");
-
-    assertTrue(toText(methodNode).trim().startsWith("INVOKEVIRTUAL pkg/Class.name ()V"));
   }
 
   @Test
@@ -262,7 +232,7 @@ class InstructionAdapterTest extends AsmTest {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
-    ClassVisitor instructionClassAdapter =
+    IClassVisitor instructionClassAdapter =
         new InstructionClassAdapter(apiParameter.value(), classWriter);
 
     Executable accept = () -> classReader.accept(instructionClassAdapter, attributes(), 0);
@@ -282,19 +252,19 @@ class InstructionAdapterTest extends AsmTest {
 
   static class InstructionClassAdapter extends ClassVisitor {
 
-    InstructionClassAdapter(final int api, final ClassVisitor classVisitor) {
+    InstructionClassAdapter(final int api, final IClassVisitor classVisitor) {
       super(api, classVisitor);
     }
 
     @Override
-    public MethodVisitor visitMethod(
+    public IMethodVisitor visitMethod(
         final int access,
         final String name,
         final String descriptor,
         final String signature,
         final String[] exceptions) {
       return new InstructionAdapter(
-          api, super.visitMethod(access, name, descriptor, signature, exceptions)) {};
+              ver, super.visitMethod(access, name, descriptor, signature, exceptions)) {};
     }
   }
 }

@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,17 +29,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.benchmarks;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.ModuleVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.TypePath;
+import org.objectweb.asm.*;
 import org.objectweb.asm.tree.ClassNode;
 
 /**
@@ -58,8 +50,7 @@ public class AsmAdapter extends Adapter {
           asmApi = Opcodes.class.getField(version).getInt(null);
           return version;
         }
-      } catch (NoSuchFieldException e) {
-        continue;
+      } catch (NoSuchFieldException ignored) {
       } catch (IllegalAccessException e) {
         throw new AssertionError(e);
       }
@@ -86,7 +77,7 @@ public class AsmAdapter extends Adapter {
 
   @Override
   public int read(final byte[] classFile) {
-    CountingVisitor countingVisitor = new CountingVisitor(asmApi);
+    CountingVisitor countingVisitor = new CountingVisitor();
     new ClassReader(classFile).accept(countingVisitor, 0);
     return countingVisitor.count;
   }
@@ -124,12 +115,12 @@ public class AsmAdapter extends Adapter {
     return classWriter.toByteArray();
   }
 
-  private static class CountingVisitor extends ClassVisitor {
+  private static class CountingVisitor implements IClassVisitor {
 
     int count;
 
-    AnnotationVisitor annotationVisitor =
-        new AnnotationVisitor(api) {
+    IAnnotationVisitor annotationVisitor =
+        new IAnnotationVisitor() {
 
           @Override
           public void visit(final String name, final Object value) {
@@ -142,21 +133,23 @@ public class AsmAdapter extends Adapter {
           }
 
           @Override
-          public AnnotationVisitor visitAnnotation(final String name, final String descriptor) {
+          public IAnnotationVisitor visitAnnotation(final String name, final String descriptor) {
             ++count;
             return this;
           }
 
           @Override
-          public AnnotationVisitor visitArray(final String name) {
+          public IAnnotationVisitor visitArray(final String name) {
             ++count;
             return this;
           }
+
+          @Override
+          public void visitEnd() {
+          }
         };
 
-    public CountingVisitor(final int api) {
-      super(api);
-    }
+    public CountingVisitor() {}
 
     @Override
     public void visit(
@@ -175,9 +168,14 @@ public class AsmAdapter extends Adapter {
     }
 
     @Override
-    public ModuleVisitor visitModule(final String name, final int access, final String version) {
+    public IModuleVisitor visitModule(final String name, final int access, final String version) {
       ++count;
       return null;
+    }
+
+    @Override
+    public void visitNestHost(String nestHost) {
+
     }
 
     @Override
@@ -186,13 +184,13 @@ public class AsmAdapter extends Adapter {
     }
 
     @Override
-    public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+    public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
       ++count;
       return annotationVisitor;
     }
 
     @Override
-    public AnnotationVisitor visitTypeAnnotation(
+    public IAnnotationVisitor visitTypeAnnotation(
         final int typeRef,
         final TypePath typePath,
         final String descriptor,
@@ -202,29 +200,46 @@ public class AsmAdapter extends Adapter {
     }
 
     @Override
+    public void visitAttribute(Attribute attribute) {
+    }
+
+    @Override
+    public void visitNestMember(String nestMember) {
+    }
+
+    @Override
+    public void visitPermittedSubclass(String permittedSubclass) {
+    }
+
+    @Override
     public void visitInnerClass(
         final String name, final String outerName, final String innerName, final int access) {
       ++count;
     }
 
     @Override
-    public FieldVisitor visitField(
+    public IRecordComponentVisitor visitRecordComponent(String name, String descriptor, String signature) {
+      return null;
+    }
+
+    @Override
+    public IFieldVisitor visitField(
         final int access,
         final String name,
         final String descriptor,
         final String signature,
         final Object value) {
       ++count;
-      return new FieldVisitor(api) {
+      return new IFieldVisitor() {
 
         @Override
-        public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+        public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
           ++count;
           return annotationVisitor;
         }
 
         @Override
-        public AnnotationVisitor visitTypeAnnotation(
+        public IAnnotationVisitor visitTypeAnnotation(
             final int typeRef,
             final TypePath typePath,
             final String descriptor,
@@ -232,17 +247,25 @@ public class AsmAdapter extends Adapter {
           ++count;
           return annotationVisitor;
         }
+
+        @Override
+        public void visitAttribute(Attribute attribute) {
+        }
+
+        @Override
+        public void visitEnd() {
+        }
       };
     }
 
     @Override
-    public MethodVisitor visitMethod(
+    public IMethodVisitor visitMethod(
         final int access,
         final String name,
         final String descriptor,
         final String signature,
         final String[] exceptions) {
-      return new MethodVisitor(api) {
+      return new IMethodVisitor() {
 
         @Override
         public void visitParameter(final String name, final int access) {
@@ -250,19 +273,19 @@ public class AsmAdapter extends Adapter {
         }
 
         @Override
-        public AnnotationVisitor visitAnnotationDefault() {
+        public IAnnotationVisitor visitAnnotationDefault() {
           ++count;
           return annotationVisitor;
         }
 
         @Override
-        public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+        public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
           ++count;
           return annotationVisitor;
         }
 
         @Override
-        public AnnotationVisitor visitTypeAnnotation(
+        public IAnnotationVisitor visitTypeAnnotation(
             final int typeRef,
             final TypePath typePath,
             final String descriptor,
@@ -277,10 +300,18 @@ public class AsmAdapter extends Adapter {
         }
 
         @Override
-        public AnnotationVisitor visitParameterAnnotation(
+        public IAnnotationVisitor visitParameterAnnotation(
             final int parameter, final String descriptor, final boolean visible) {
           ++count;
           return annotationVisitor;
+        }
+
+        @Override
+        public void visitAttribute(Attribute attribute) {
+        }
+
+        @Override
+        public void visitCode() {
         }
 
         @Override
@@ -315,13 +346,6 @@ public class AsmAdapter extends Adapter {
 
         @Override
         public void visitFieldInsn(
-            final int opcode, final String owner, final String name, final String descriptor) {
-          ++count;
-        }
-
-        @Override
-        @Deprecated
-        public void visitMethodInsn(
             final int opcode, final String owner, final String name, final String descriptor) {
           ++count;
         }
@@ -383,7 +407,7 @@ public class AsmAdapter extends Adapter {
         }
 
         @Override
-        public AnnotationVisitor visitInsnAnnotation(
+        public IAnnotationVisitor visitInsnAnnotation(
             final int typeRef,
             final TypePath typePath,
             final String descriptor,
@@ -399,7 +423,7 @@ public class AsmAdapter extends Adapter {
         }
 
         @Override
-        public AnnotationVisitor visitTryCatchAnnotation(
+        public IAnnotationVisitor visitTryCatchAnnotation(
             final int typeRef,
             final TypePath typePath,
             final String descriptor,
@@ -420,7 +444,7 @@ public class AsmAdapter extends Adapter {
         }
 
         @Override
-        public AnnotationVisitor visitLocalVariableAnnotation(
+        public IAnnotationVisitor visitLocalVariableAnnotation(
             final int typeRef,
             final TypePath typePath,
             final Label[] start,
@@ -441,7 +465,16 @@ public class AsmAdapter extends Adapter {
         public void visitMaxs(final int maxStack, final int maxLocals) {
           ++count;
         }
+
+        @Override
+        public void visitEnd() {
+        }
       };
+    }
+
+    @Override
+    public void visitEnd() {
+
     }
   }
 }

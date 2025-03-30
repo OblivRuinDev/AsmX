@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -29,23 +31,19 @@ package org.objectweb.asm.tree;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ConstantDynamic;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.TypePath;
+
+import org.objectweb.asm.*;
+
+import static org.objectweb.asm.Opcodes.V11;
+import static org.objectweb.asm.Opcodes.V1_7;
 
 /**
  * A node that represents a method.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
-public class MethodNode extends MethodVisitor {
+public class MethodNode implements IMethodVisitor {
 
   /**
    * The method's access flags (see {@link Opcodes}). This field also indicates if the method is
@@ -155,7 +153,7 @@ public class MethodNode extends MethodVisitor {
    * @throws IllegalStateException If a subclass calls this constructor.
    */
   public MethodNode() {
-    this(/* latest api = */ Opcodes.ASM9);
+    this.instructions = new InsnList();
     if (getClass() != MethodNode.class) {
       throw new IllegalStateException();
     }
@@ -167,9 +165,9 @@ public class MethodNode extends MethodVisitor {
    * @param api the ASM API version implemented by this visitor. Must be one of the {@code
    *     ASM}<i>x</i> values in {@link Opcodes}.
    */
+  @Deprecated(forRemoval = true)
   public MethodNode(final int api) {
-    super(api);
-    this.instructions = new InsnList();
+    this();
   }
 
   /**
@@ -191,10 +189,16 @@ public class MethodNode extends MethodVisitor {
       final String descriptor,
       final String signature,
       final String[] exceptions) {
-    this(/* latest api = */ Opcodes.ASM9, access, name, descriptor, signature, exceptions);
-    if (getClass() != MethodNode.class) {
-      throw new IllegalStateException();
+    this.access = access;
+    this.name = name;
+    this.desc = descriptor;
+    this.signature = signature;
+    this.exceptions = Util.asArrayList(exceptions);
+    if ((access & Opcodes.ACC_ABSTRACT) == 0) {
+      this.localVariables = new ArrayList<>(5);
     }
+    this.tryCatchBlocks = new ArrayList<>();
+    this.instructions = new InsnList();
   }
 
   /**
@@ -210,6 +214,7 @@ public class MethodNode extends MethodVisitor {
    * @param exceptions the internal names of the method's exception classes (see {@link
    *     Type#getInternalName()}). May be {@literal null}.
    */
+  @Deprecated
   public MethodNode(
       final int api,
       final int access,
@@ -217,17 +222,7 @@ public class MethodNode extends MethodVisitor {
       final String descriptor,
       final String signature,
       final String[] exceptions) {
-    super(api);
-    this.access = access;
-    this.name = name;
-    this.desc = descriptor;
-    this.signature = signature;
-    this.exceptions = Util.asArrayList(exceptions);
-    if ((access & Opcodes.ACC_ABSTRACT) == 0) {
-      this.localVariables = new ArrayList<>(5);
-    }
-    this.tryCatchBlocks = new ArrayList<>();
-    this.instructions = new InsnList();
+    this(access, name, descriptor, signature, exceptions);
   }
 
   // -----------------------------------------------------------------------------------------------
@@ -243,10 +238,9 @@ public class MethodNode extends MethodVisitor {
   }
 
   @Override
-  @SuppressWarnings("serial")
-  public AnnotationVisitor visitAnnotationDefault() {
+  public IAnnotationVisitor visitAnnotationDefault() {
     return new AnnotationNode(
-        new ArrayList<Object>(0) {
+        new ArrayList<>(0) {
           @Override
           public boolean add(final Object o) {
             annotationDefault = o;
@@ -256,7 +250,7 @@ public class MethodNode extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     AnnotationNode annotation = new AnnotationNode(descriptor);
     if (visible) {
       visibleAnnotations = Util.add(visibleAnnotations, annotation);
@@ -267,7 +261,7 @@ public class MethodNode extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     TypeAnnotationNode typeAnnotation = new TypeAnnotationNode(typeRef, typePath, descriptor);
     if (visible) {
@@ -289,7 +283,7 @@ public class MethodNode extends MethodVisitor {
 
   @Override
   @SuppressWarnings("unchecked")
-  public AnnotationVisitor visitParameterAnnotation(
+  public IAnnotationVisitor visitParameterAnnotation(
       final int parameter, final String descriptor, final boolean visible) {
     AnnotationNode annotation = new AnnotationNode(descriptor);
     if (visible) {
@@ -369,14 +363,8 @@ public class MethodNode extends MethodVisitor {
       final String name,
       final String descriptor,
       final boolean isInterface) {
-    if (api < Opcodes.ASM5 && (opcodeAndSource & Opcodes.SOURCE_DEPRECATED) == 0) {
-      // Redirect the call to the deprecated version of this method.
-      super.visitMethodInsn(opcodeAndSource, owner, name, descriptor, isInterface);
-      return;
-    }
-    int opcode = opcodeAndSource & ~Opcodes.SOURCE_MASK;
-
-    instructions.add(new MethodInsnNode(opcode, owner, name, descriptor, isInterface));
+    //todo: class version check
+    instructions.add(new MethodInsnNode(opcodeAndSource, owner, name, descriptor, isInterface));
   }
 
   @Override
@@ -427,7 +415,7 @@ public class MethodNode extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitInsnAnnotation(
+  public IAnnotationVisitor visitInsnAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     // Find the last real instruction, i.e. the instruction targeted by this annotation.
     AbstractInsnNode currentInsn = instructions.getLast();
@@ -455,7 +443,7 @@ public class MethodNode extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitTryCatchAnnotation(
+  public IAnnotationVisitor visitTryCatchAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     TryCatchBlockNode tryCatchBlock = tryCatchBlocks.get((typeRef & 0x00FFFF00) >> 8);
     TypeAnnotationNode typeAnnotation = new TypeAnnotationNode(typeRef, typePath, descriptor);
@@ -484,7 +472,7 @@ public class MethodNode extends MethodVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitLocalVariableAnnotation(
+  public IAnnotationVisitor visitLocalVariableAnnotation(
       final int typeRef,
       final TypePath typePath,
       final Label[] start,
@@ -565,69 +553,62 @@ public class MethodNode extends MethodVisitor {
    * that this node, and all its children recursively, do not contain elements that were introduced
    * in more recent versions of the ASM API than the given version.
    *
-   * @param api an ASM API version. Must be one of the {@code ASM}<i>x</i> values in {@link
+   * @param version an ASM API version. Must be one of the {@code ASM}<i>x</i> values in {@link
    *     Opcodes}.
    */
-  public void check(final int api) {
-    if (api == Opcodes.ASM4) {
+  public void check(final int version) {
+    if (version <= V1_7) {
       if (parameters != null && !parameters.isEmpty()) {
-        throw new UnsupportedClassVersionException();
+        VersionChecker.methodPara();
       }
-      if (visibleTypeAnnotations != null && !visibleTypeAnnotations.isEmpty()) {
-        throw new UnsupportedClassVersionException();
+
+      if ((visibleTypeAnnotations != null && !visibleTypeAnnotations.isEmpty()) ||
+              (invisibleTypeAnnotations != null && !invisibleTypeAnnotations.isEmpty())) {
+        VersionChecker.typeAnn();
       }
-      if (invisibleTypeAnnotations != null && !invisibleTypeAnnotations.isEmpty()) {
-        throw new UnsupportedClassVersionException();
-      }
+
       if (tryCatchBlocks != null) {
-        for (int i = tryCatchBlocks.size() - 1; i >= 0; --i) {
-          TryCatchBlockNode tryCatchBlock = tryCatchBlocks.get(i);
-          if (tryCatchBlock.visibleTypeAnnotations != null
-              && !tryCatchBlock.visibleTypeAnnotations.isEmpty()) {
-            throw new UnsupportedClassVersionException();
-          }
-          if (tryCatchBlock.invisibleTypeAnnotations != null
-              && !tryCatchBlock.invisibleTypeAnnotations.isEmpty()) {
-            throw new UnsupportedClassVersionException();
+        for (TryCatchBlockNode tryCatchBlock : tryCatchBlocks) {
+          if ((tryCatchBlock.visibleTypeAnnotations != null && !tryCatchBlock.visibleTypeAnnotations.isEmpty()) ||
+                  (tryCatchBlock.invisibleTypeAnnotations != null && !tryCatchBlock.invisibleTypeAnnotations.isEmpty())) {
+            VersionChecker.tryTypeAnn();
           }
         }
       }
+
       for (int i = instructions.size() - 1; i >= 0; --i) {
         AbstractInsnNode insn = instructions.get(i);
-        if (insn.visibleTypeAnnotations != null && !insn.visibleTypeAnnotations.isEmpty()) {
-          throw new UnsupportedClassVersionException();
-        }
-        if (insn.invisibleTypeAnnotations != null && !insn.invisibleTypeAnnotations.isEmpty()) {
-          throw new UnsupportedClassVersionException();
+        if ((insn.visibleTypeAnnotations != null && !insn.visibleTypeAnnotations.isEmpty()) ||
+                (insn.invisibleTypeAnnotations != null && !insn.invisibleTypeAnnotations.isEmpty())) {
+          VersionChecker.insnTypeAnn();
         }
         if (insn instanceof MethodInsnNode) {
-          boolean isInterface = ((MethodInsnNode) insn).itf;
-          if (isInterface != (insn.opcode == Opcodes.INVOKEINTERFACE)) {
-            throw new UnsupportedClassVersionException();
+            if (((MethodInsnNode) insn).itf != (insn.opcode == Opcodes.INVOKEINTERFACE)) {
+            VersionChecker.invokeInterface();
           }
-        } else if (insn instanceof LdcInsnNode) {
+        } else if (insn instanceof LdcInsnNode &&
+                version != V1_7) {//version < V1_7
           Object value = ((LdcInsnNode) insn).cst;
           if (value instanceof Handle
               || (value instanceof Type && ((Type) value).getSort() == Type.METHOD)) {
-            throw new UnsupportedClassVersionException();
+            VersionChecker.LDC();
           }
         }
       }
-      if (visibleLocalVariableAnnotations != null && !visibleLocalVariableAnnotations.isEmpty()) {
-        throw new UnsupportedClassVersionException();
-      }
-      if (invisibleLocalVariableAnnotations != null
-          && !invisibleLocalVariableAnnotations.isEmpty()) {
-        throw new UnsupportedClassVersionException();
+
+      if ((visibleLocalVariableAnnotations != null && !visibleLocalVariableAnnotations.isEmpty()) ||
+              (invisibleLocalVariableAnnotations != null && !invisibleLocalVariableAnnotations.isEmpty())) {
+        VersionChecker.localVarAnn();
       }
     }
-    if (api < Opcodes.ASM7) {
+
+    if (version < V11) {
       for (int i = instructions.size() - 1; i >= 0; --i) {
         AbstractInsnNode insn = instructions.get(i);
         if (insn instanceof LdcInsnNode) {
           Object value = ((LdcInsnNode) insn).cst;
           if (value instanceof ConstantDynamic) {
-            throw new UnsupportedClassVersionException();
+            VersionChecker.constDyna(version);
           }
         }
       }
@@ -639,9 +620,9 @@ public class MethodNode extends MethodVisitor {
    *
    * @param classVisitor a class visitor.
    */
-  public void accept(final ClassVisitor classVisitor) {
+  public void accept(final IClassVisitor classVisitor) {
     String[] exceptionsArray = exceptions == null ? null : exceptions.toArray(new String[0]);
-    MethodVisitor methodVisitor =
+    IMethodVisitor methodVisitor =
         classVisitor.visitMethod(access, name, desc, signature, exceptionsArray);
     if (methodVisitor != null) {
       accept(methodVisitor);
@@ -653,7 +634,7 @@ public class MethodNode extends MethodVisitor {
    *
    * @param methodVisitor a method visitor.
    */
-  public void accept(final MethodVisitor methodVisitor) {
+  public void accept(final IMethodVisitor methodVisitor) {
     // Visit the parameters.
     if (parameters != null) {
       for (int i = 0, n = parameters.size(); i < n; i++) {
@@ -662,7 +643,7 @@ public class MethodNode extends MethodVisitor {
     }
     // Visit the annotations.
     if (annotationDefault != null) {
-      AnnotationVisitor annotationVisitor = methodVisitor.visitAnnotationDefault();
+      IAnnotationVisitor annotationVisitor = methodVisitor.visitAnnotationDefault();
       AnnotationNode.accept(annotationVisitor, null, annotationDefault);
       if (annotationVisitor != null) {
         annotationVisitor.visitEnd();

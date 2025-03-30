@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -35,8 +37,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.objectweb.asm.IMethodVisitor;
 import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
@@ -79,7 +82,7 @@ public class JSRInlinerAdapter extends MethodNode implements Opcodes {
 
   /**
    * Constructs a new {@link JSRInlinerAdapter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #JSRInlinerAdapter(int, MethodVisitor, int, String, String,
+   * Instead, they must use the {@link #JSRInlinerAdapter(int, IMethodVisitor, int, String, String,
    * String, String[])} version.
    *
    * @param methodVisitor the method visitor to send the resulting inlined method code to, or <code>
@@ -93,14 +96,14 @@ public class JSRInlinerAdapter extends MethodNode implements Opcodes {
    * @throws IllegalStateException if a subclass calls this constructor.
    */
   public JSRInlinerAdapter(
-      final MethodVisitor methodVisitor,
+      final IMethodVisitor methodVisitor,
       final int access,
       final String name,
       final String descriptor,
       final String signature,
       final String[] exceptions) {
     this(
-        /* latest api = */ Opcodes.ASM9,
+        /* latest api = */ V_DYNA,
         methodVisitor,
         access,
         name,
@@ -129,7 +132,7 @@ public class JSRInlinerAdapter extends MethodNode implements Opcodes {
    */
   protected JSRInlinerAdapter(
       final int api,
-      final MethodVisitor methodVisitor,
+      final IMethodVisitor methodVisitor,
       final int access,
       final String name,
       final String descriptor,

@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,19 +30,19 @@
 package org.objectweb.asm.tree;
 
 import java.util.List;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.TypePath;
+import java.util.function.Consumer;
+
+import org.objectweb.asm.*;
+
+import static org.objectweb.asm.Opcodes.V1_8;
 
 /**
  * A node that represents a field.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
-public class FieldNode extends FieldVisitor {
+public class FieldNode implements IFieldVisitor, Consumer<IClassVisitor> {
 
   /**
    * The field's access flags (see {@link org.objectweb.asm.Opcodes}). This field also indicates if
@@ -80,8 +82,7 @@ public class FieldNode extends FieldVisitor {
   public List<Attribute> attrs;
 
   /**
-   * Constructs a new {@link FieldNode}. <i>Subclasses must not use this constructor</i>. Instead,
-   * they must use the {@link #FieldNode(int, int, String, String, String, Object)} version.
+   * Constructs a new {@link FieldNode}.
    *
    * @param access the field's access flags (see {@link org.objectweb.asm.Opcodes}). This parameter
    *     also indicates if the field is synthetic and/or deprecated.
@@ -91,7 +92,6 @@ public class FieldNode extends FieldVisitor {
    * @param value the field's initial value. This parameter, which may be {@literal null} if the
    *     field does not have an initial value, must be an {@link Integer}, a {@link Float}, a {@link
    *     Long}, a {@link Double} or a {@link String}.
-   * @throws IllegalStateException If a subclass calls this constructor.
    */
   public FieldNode(
       final int access,
@@ -99,10 +99,11 @@ public class FieldNode extends FieldVisitor {
       final String descriptor,
       final String signature,
       final Object value) {
-    this(/* latest api = */ Opcodes.ASM9, access, name, descriptor, signature, value);
-    if (getClass() != FieldNode.class) {
-      throw new IllegalStateException();
-    }
+    this.access = access;
+    this.name = name;
+    this.desc = descriptor;
+    this.signature = signature;
+    this.value = value;
   }
 
   /**
@@ -119,6 +120,7 @@ public class FieldNode extends FieldVisitor {
    *     field does not have an initial value, must be an {@link Integer}, a {@link Float}, a {@link
    *     Long}, a {@link Double} or a {@link String}.
    */
+  @Deprecated(forRemoval = true)
   public FieldNode(
       final int api,
       final int access,
@@ -126,12 +128,7 @@ public class FieldNode extends FieldVisitor {
       final String descriptor,
       final String signature,
       final Object value) {
-    super(api);
-    this.access = access;
-    this.name = name;
-    this.desc = descriptor;
-    this.signature = signature;
-    this.value = value;
+    this(access, name, descriptor, signature, value);
   }
 
   // -----------------------------------------------------------------------------------------------
@@ -139,7 +136,7 @@ public class FieldNode extends FieldVisitor {
   // -----------------------------------------------------------------------------------------------
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public AnnotationNode visitAnnotation(final String descriptor, final boolean visible) {
     AnnotationNode annotation = new AnnotationNode(descriptor);
     if (visible) {
       visibleAnnotations = Util.add(visibleAnnotations, annotation);
@@ -150,7 +147,7 @@ public class FieldNode extends FieldVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public AnnotationNode visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     TypeAnnotationNode typeAnnotation = new TypeAnnotationNode(typeRef, typePath, descriptor);
     if (visible) {
@@ -180,17 +177,13 @@ public class FieldNode extends FieldVisitor {
    * that this node, and all its children recursively, do not contain elements that were introduced
    * in more recent versions of the ASM API than the given version.
    *
-   * @param api an ASM API version. Must be one of the {@code ASM}<i>x</i> values in {@link
+   * @param version a Java ClassFile version. Must be one of the {@code V}<i>x</i> values in {@link
    *     Opcodes}.
    */
-  public void check(final int api) {
-    if (api == Opcodes.ASM4) {
-      if (visibleTypeAnnotations != null && !visibleTypeAnnotations.isEmpty()) {
-        throw new UnsupportedClassVersionException();
-      }
-      if (invisibleTypeAnnotations != null && !invisibleTypeAnnotations.isEmpty()) {
-        throw new UnsupportedClassVersionException();
-      }
+  public void check(final int version) {
+    if (visibleTypeAnnotations != null && !visibleTypeAnnotations.isEmpty() ||
+            (invisibleTypeAnnotations != null && !invisibleTypeAnnotations.isEmpty())) {
+      VersionChecker.typeAnn(version);
     }
   }
 
@@ -199,8 +192,9 @@ public class FieldNode extends FieldVisitor {
    *
    * @param classVisitor a class visitor.
    */
-  public void accept(final ClassVisitor classVisitor) {
-    FieldVisitor fieldVisitor = classVisitor.visitField(access, name, desc, signature, value);
+  @Override
+  public void accept(final IClassVisitor classVisitor) {
+    IFieldVisitor fieldVisitor = classVisitor.visitField(access, name, desc, signature, value);
     if (fieldVisitor == null) {
       return;
     }

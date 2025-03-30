@@ -36,15 +36,7 @@ import java.util.ArrayList;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.ConstantDynamic;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 import org.objectweb.asm.test.AsmTest;
 import org.objectweb.asm.test.ClassFile;
 
@@ -67,7 +59,7 @@ class CodeSizeEvaluatorTest extends AsmTest {
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
     ArrayList<CodeSizeEvaluation> evaluations = new ArrayList<>();
-    ClassVisitor codeSizesEvaluator =
+    IClassVisitor codeSizesEvaluator =
         new CodeSizesEvaluator(apiParameter.value(), classWriter, evaluations);
 
     Executable accept = () -> classReader.accept(codeSizesEvaluator, attributes(), 0);
@@ -108,22 +100,22 @@ class CodeSizeEvaluatorTest extends AsmTest {
 
     CodeSizesEvaluator(
         final int api,
-        final ClassWriter classWriter,
+        final IClassVisitor classWriter,
         final ArrayList<CodeSizeEvaluation> evaluations) {
       super(api, classWriter);
       this.evaluations = evaluations;
     }
 
     @Override
-    public MethodVisitor visitMethod(
+    public IMethodVisitor visitMethod(
         final int access,
         final String name,
         final String descriptor,
         final String signature,
         final String[] exceptions) {
-      MethodVisitor methodVisitor =
+      IMethodVisitor methodVisitor =
           super.visitMethod(access, name, descriptor, signature, exceptions);
-      return new CodeSizeEvaluator(api, methodVisitor) {
+      return new CodeSizeEvaluator(ver, methodVisitor) {
 
         @Override
         public void visitLdcInsn(final Object value) {

@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -38,8 +40,9 @@ import java.util.regex.Pattern;
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se11/html/jvms-6.html">JVMS 6</a>
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
-final class Constants {
+public final class Constants {
 
   // The ClassFile attribute names, in the order they are defined in
   // https://docs.oracle.com/javase/specs/jvms/se11/html/jvms-4.html#jvms-4.7-300.
@@ -187,6 +190,11 @@ final class Constants {
     String internalName = callerClass.getName().replace('.', '/');
     if (!isWhitelisted(internalName)) {
       checkIsPreview(callerClass.getClassLoader().getResourceAsStream(internalName + ".class"));
+    }
+  }
+  public static void checkClassVer(int version) throws IllegalArgumentException {
+    if (version < 46 || version > 69) {
+      throw new IllegalArgumentException("Unsupported ClassFile version " + version);
     }
   }
 

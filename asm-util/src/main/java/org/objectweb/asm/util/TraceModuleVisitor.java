@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,6 +29,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.util;
 
+import org.objectweb.asm.IModuleVisitor;
 import org.objectweb.asm.ModuleVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -56,8 +59,8 @@ public final class TraceModuleVisitor extends ModuleVisitor {
    * @param moduleVisitor the module visitor to which to delegate calls. May be {@literal null}.
    * @param printer the printer to convert the visited module into text.
    */
-  public TraceModuleVisitor(final ModuleVisitor moduleVisitor, final Printer printer) {
-    super(/* latest api = */ Opcodes.ASM9, moduleVisitor);
+  public TraceModuleVisitor(final IModuleVisitor moduleVisitor, final Printer printer) {
+    super(/* latest api = */ Opcodes.V_DYNA, moduleVisitor);
     this.p = printer;
   }
 

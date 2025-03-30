@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,6 +30,7 @@
 package org.objectweb.asm.util;
 
 import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.IAnnotationVisitor;
 import org.objectweb.asm.Opcodes;
 
 /**
@@ -56,8 +59,8 @@ public final class TraceAnnotationVisitor extends AnnotationVisitor {
    *     null}.
    * @param printer the printer to convert the visited annotation into text.
    */
-  public TraceAnnotationVisitor(final AnnotationVisitor annotationVisitor, final Printer printer) {
-    super(/* latest api = */ Opcodes.ASM9, annotationVisitor);
+  public TraceAnnotationVisitor(final IAnnotationVisitor annotationVisitor, final Printer printer) {
+    super(/* latest api = */ Opcodes.V_DYNA, annotationVisitor);
     this.printer = printer;
   }
 
@@ -74,13 +77,13 @@ public final class TraceAnnotationVisitor extends AnnotationVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String name, final String descriptor) {
+  public IAnnotationVisitor visitAnnotation(final String name, final String descriptor) {
     Printer annotationPrinter = printer.visitAnnotation(name, descriptor);
     return new TraceAnnotationVisitor(super.visitAnnotation(name, descriptor), annotationPrinter);
   }
 
   @Override
-  public AnnotationVisitor visitArray(final String name) {
+  public IAnnotationVisitor visitArray(final String name) {
     Printer arrayPrinter = printer.visitArray(name);
     return new TraceAnnotationVisitor(super.visitArray(name), arrayPrinter);
   }

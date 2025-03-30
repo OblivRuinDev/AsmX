@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,14 +30,16 @@
 package org.objectweb.asm.tree;
 
 import java.util.List;
-import org.objectweb.asm.ModuleVisitor;
+import java.util.function.Consumer;
+
+import org.objectweb.asm.IModuleVisitor;
 
 /**
  * A node that represents an opened package with its name and the module that can access it.
  *
  * @author Remi Forax
  */
-public class ModuleOpenNode {
+public class ModuleOpenNode implements Consumer<IModuleVisitor> {
 
   /**
    * The internal name of the opened package (see {@link org.objectweb.asm.Type#getInternalName()}).
@@ -75,7 +79,8 @@ public class ModuleOpenNode {
    *
    * @param moduleVisitor a module visitor.
    */
-  public void accept(final ModuleVisitor moduleVisitor) {
+  @Override
+  public void accept(final IModuleVisitor moduleVisitor) {
     moduleVisitor.visitOpen(
         packaze, access, modules == null ? null : modules.toArray(new String[0]));
   }

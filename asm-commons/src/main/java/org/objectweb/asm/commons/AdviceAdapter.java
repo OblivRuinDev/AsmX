@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -31,12 +33,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.objectweb.asm.ConstantDynamic;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+
+import org.objectweb.asm.*;
 
 /**
  * A {@link MethodVisitor} to insert before, after and around advices in methods and constructors.
@@ -107,7 +105,7 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
    */
   protected AdviceAdapter(
       final int api,
-      final MethodVisitor methodVisitor,
+      final IMethodVisitor methodVisitor,
       final int access,
       final String name,
       final String descriptor) {
@@ -447,16 +445,10 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
       final String owner,
       final String name,
       final String descriptor,
-      final boolean isInterface) {
-    if (api < Opcodes.ASM5 && (opcodeAndSource & Opcodes.SOURCE_DEPRECATED) == 0) {
-      // Redirect the call to the deprecated version of this method.
-      super.visitMethodInsn(opcodeAndSource, owner, name, descriptor, isInterface);
-      return;
-    }
+      final boolean isInterface) {//todo: uncheck
+    checkInterfaceInvoke(ver, opcodeAndSource, isInterface);
     super.visitMethodInsn(opcodeAndSource, owner, name, descriptor, isInterface);
-    int opcode = opcodeAndSource & ~Opcodes.SOURCE_MASK;
-
-    doVisitMethodInsn(opcode, name, descriptor);
+    doVisitMethodInsn(opcodeAndSource, name, descriptor);
   }
 
   private void doVisitMethodInsn(final int opcode, final String name, final String descriptor) {
@@ -653,7 +645,7 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
    *     box(Type.getReturnType(this.methodDesc));
    *   }
    *   visitIntInsn(SIPUSH, opcode);
-   *   visitMethodInsn(INVOKESTATIC, owner, "onExit", "(Ljava/lang/Object;I)V");
+   *   visitMethodInsn(INVOKESTATIC, owner, "onExit", "(Ljava/lang/Object;I)V", false);
    * }
    *
    * // An actual call back method.

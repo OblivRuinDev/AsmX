@@ -29,6 +29,7 @@ package org.objectweb.asm.benchmarks;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.IClassVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -36,7 +37,7 @@ import org.objectweb.asm.tree.ClassNode;
 public class AsmFactory implements Factory {
 
   @Override
-  public String getVersion() {
+  public String getVersion() {//todo: need delete
     for (int i = 9; i >= 4; --i) {
       try {
         String version = "ASM" + i;
@@ -53,7 +54,7 @@ public class AsmFactory implements Factory {
   @Override
   public Object newClass(final byte[] classFile) {
     ClassReader classReader = new ClassReader(classFile);
-    ClassWriter classWriter = new ClassWriter(0);
+    IClassVisitor classWriter = new ClassWriter(0);
     classReader.accept(classWriter, 0);
     return classWriter;
   }

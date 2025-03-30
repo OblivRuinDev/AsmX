@@ -32,9 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ModuleVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 import org.objectweb.asm.test.AsmTest;
 
 /**
@@ -49,10 +47,11 @@ class ModuleNodeTest extends AsmTest {
     ModuleNode moduleNode1 = new ModuleNode("module1", 123, "1.0");
     ModuleNode moduleNode2 =
         new ModuleNode(
-            /* latest */ Opcodes.ASM10_EXPERIMENTAL,
             "module2",
             456,
             "2.0",
+            null,
+            null,
             null,
             null,
             null,
@@ -78,10 +77,10 @@ class ModuleNodeTest extends AsmTest {
   void testAccept() {
     ModuleNode moduleNode = new ModuleNode("module", 123, "1.0");
     ModuleNode dstModuleNode = new ModuleNode("", 0, "");
-    ClassVisitor copyModuleVisitor =
+    IClassVisitor copyModuleVisitor =
         new ClassVisitor(/* latest */ Opcodes.ASM10_EXPERIMENTAL) {
           @Override
-          public ModuleVisitor visitModule(
+          public IModuleVisitor visitModule(
               final String name, final int access, final String version) {
             dstModuleNode.name = name;
             dstModuleNode.access = access;

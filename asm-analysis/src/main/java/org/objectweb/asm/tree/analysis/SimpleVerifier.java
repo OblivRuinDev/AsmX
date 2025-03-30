@@ -98,7 +98,7 @@ public class SimpleVerifier extends BasicVerifier {
       final List<Type> currentClassInterfaces,
       final boolean isInterface) {
     this(
-        /* latest api = */ ASM9,
+        V_DYNA,
         currentClass,
         currentSuperClass,
         currentClassInterfaces,

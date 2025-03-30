@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,6 +30,8 @@
 package org.objectweb.asm.util;
 
 import java.util.HashSet;
+
+import org.objectweb.asm.IModuleVisitor;
 import org.objectweb.asm.ModuleVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -63,15 +67,15 @@ public class CheckModuleAdapter extends ModuleVisitor {
 
   /**
    * Constructs a new {@link CheckModuleAdapter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #CheckModuleAdapter(int, ModuleVisitor, boolean)} version.
+   * Instead, they must use the {@link #CheckModuleAdapter(int, IModuleVisitor, boolean)} version.
    *
    * @param moduleVisitor the module visitor to which this adapter must delegate calls.
    * @param isOpen whether the visited module is open. Open modules have their {@link
    *     Opcodes#ACC_OPEN} access flag set in {@link org.objectweb.asm.ClassVisitor#visitModule}.
    * @throws IllegalStateException If a subclass calls this constructor.
    */
-  public CheckModuleAdapter(final ModuleVisitor moduleVisitor, final boolean isOpen) {
-    this(/* latest api = */ Opcodes.ASM9, moduleVisitor, isOpen);
+  public CheckModuleAdapter(final IModuleVisitor moduleVisitor, final boolean isOpen) {
+    this(/* latest api = */ Opcodes.V_DYNA, moduleVisitor, isOpen);
     if (getClass() != CheckModuleAdapter.class) {
       throw new IllegalStateException();
     }
@@ -87,7 +91,7 @@ public class CheckModuleAdapter extends ModuleVisitor {
    *     Opcodes#ACC_OPEN} access flag set in {@link org.objectweb.asm.ClassVisitor#visitModule}.
    */
   protected CheckModuleAdapter(
-      final int api, final ModuleVisitor moduleVisitor, final boolean isOpen) {
+          final int api, final IModuleVisitor moduleVisitor, final boolean isOpen) {
     super(api, moduleVisitor);
     this.isOpen = isOpen;
   }

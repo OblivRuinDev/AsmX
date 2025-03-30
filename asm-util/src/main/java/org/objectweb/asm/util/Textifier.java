@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -115,7 +117,7 @@ public class Textifier extends Printer {
    * @throws IllegalStateException If a subclass calls this constructor.
    */
   public Textifier() {
-    this(/* latest api = */ Opcodes.ASM9);
+    this(/* latest api = */ Opcodes.V_DYNA);
     if (getClass() != Textifier.class) {
       throw new IllegalStateException();
     }

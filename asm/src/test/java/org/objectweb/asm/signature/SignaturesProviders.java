@@ -5,11 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+
+import org.objectweb.asm.*;
 import org.objectweb.asm.test.AsmTest;
 import org.objectweb.asm.test.AsmTest.PrecompiledClass;
 
@@ -42,7 +39,7 @@ public final class SignaturesProviders {
   private static void collectSignatures(final PrecompiledClass classParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     classReader.accept(
-        new ClassVisitor(/*latest api */ Opcodes.ASM9) {
+        new ClassVisitor(/*latest api */ Opcodes.V_DYNA) {
           @Override
           public void visit(
               final int version,
@@ -57,7 +54,7 @@ public final class SignaturesProviders {
           }
 
           @Override
-          public FieldVisitor visitField(
+          public IFieldVisitor visitField(
               final int access,
               final String name,
               final String descriptor,
@@ -70,7 +67,7 @@ public final class SignaturesProviders {
           }
 
           @Override
-          public MethodVisitor visitMethod(
+          public IMethodVisitor visitMethod(
               final int access,
               final String name,
               final String descriptor,

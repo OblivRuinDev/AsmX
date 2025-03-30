@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -123,7 +125,7 @@ public class CheckSignatureAdapter extends SignatureVisitor {
    *     null}.
    */
   public CheckSignatureAdapter(final int type, final SignatureVisitor signatureVisitor) {
-    this(/* latest api = */ Opcodes.ASM9, type, signatureVisitor);
+    this(/* latest api = */ Opcodes.V_DYNA, type, signatureVisitor);
   }
 
   /**

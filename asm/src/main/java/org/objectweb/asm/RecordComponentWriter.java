@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,7 +29,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
-final class RecordComponentWriter extends RecordComponentVisitor {
+final class RecordComponentWriter implements IRecordComponentVisitor {
   /** Where the constants used in this RecordComponentWriter must be stored. */
   private final SymbolTable symbolTable;
 
@@ -81,6 +83,8 @@ final class RecordComponentWriter extends RecordComponentVisitor {
    */
   private Attribute firstAttribute;
 
+  RecordComponentWriter delegate = null;
+
   /**
    * Constructs a new {@link RecordComponentWriter}.
    *
@@ -94,7 +98,6 @@ final class RecordComponentWriter extends RecordComponentVisitor {
       final String name,
       final String descriptor,
       final String signature) {
-    super(/* latest api = */ Opcodes.ASM9);
     this.symbolTable = symbolTable;
     this.nameIndex = symbolTable.addConstantUtf8(name);
     this.descriptorIndex = symbolTable.addConstantUtf8(descriptor);
@@ -108,7 +111,7 @@ final class RecordComponentWriter extends RecordComponentVisitor {
   // -----------------------------------------------------------------------------------------------
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     if (visible) {
       return lastRuntimeVisibleAnnotation =
           AnnotationWriter.create(symbolTable, descriptor, lastRuntimeVisibleAnnotation);
@@ -119,7 +122,7 @@ final class RecordComponentWriter extends RecordComponentVisitor {
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     if (visible) {
       return lastRuntimeVisibleTypeAnnotation =

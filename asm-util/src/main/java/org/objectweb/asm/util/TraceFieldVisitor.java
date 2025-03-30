@@ -2,6 +2,8 @@
 // Copyright (c) 2000-2011 INRIA, France Telecom
 // All rights reserved.
 //
+// Modifications (c) 2025 OblivRuinDev
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,11 +29,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.util;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.TypePath;
+import org.objectweb.asm.*;
 
 /**
  * A {@link FieldVisitor} that prints the fields it visits with a {@link Printer}.
@@ -59,20 +57,20 @@ public final class TraceFieldVisitor extends FieldVisitor {
    * @param fieldVisitor the field visitor to which to delegate calls. May be {@literal null}.
    * @param printer the printer to convert the visited field into text.
    */
-  public TraceFieldVisitor(final FieldVisitor fieldVisitor, final Printer printer) {
-    super(/* latest api = */ Opcodes.ASM9, fieldVisitor);
+  public TraceFieldVisitor(final IFieldVisitor fieldVisitor, final Printer printer) {
+    super(/* latest api = */ Opcodes.V_DYNA, fieldVisitor);
     this.p = printer;
   }
 
   @Override
-  public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     Printer annotationPrinter = p.visitFieldAnnotation(descriptor, visible);
     return new TraceAnnotationVisitor(
         super.visitAnnotation(descriptor, visible), annotationPrinter);
   }
 
   @Override
-  public AnnotationVisitor visitTypeAnnotation(
+  public IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     Printer annotationPrinter = p.visitFieldTypeAnnotation(typeRef, typePath, descriptor, visible);
     return new TraceAnnotationVisitor(
