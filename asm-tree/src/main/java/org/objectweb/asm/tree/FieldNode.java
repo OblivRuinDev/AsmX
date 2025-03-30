@@ -32,9 +32,8 @@ package org.objectweb.asm.tree;
 import java.util.List;
 import java.util.function.Consumer;
 
+import dev.oblivruin.asmx.VersionChecker;
 import org.objectweb.asm.*;
-
-import static org.objectweb.asm.Opcodes.V1_8;
 
 /**
  * A node that represents a field.

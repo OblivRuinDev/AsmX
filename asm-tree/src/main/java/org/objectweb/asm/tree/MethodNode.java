@@ -32,6 +32,7 @@ package org.objectweb.asm.tree;
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.oblivruin.asmx.VersionChecker;
 import org.objectweb.asm.*;
 
 import static org.objectweb.asm.Opcodes.V11;

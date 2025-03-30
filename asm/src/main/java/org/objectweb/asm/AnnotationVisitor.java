@@ -38,14 +38,10 @@ package org.objectweb.asm;
  * @author Eugene Kuleshov
  * @author OblivRuinDev
  */
-public abstract class AnnotationVisitor extends VerObj implements IAnnotationVisitor {
-
-  public final IAnnotationVisitor parent;
+public abstract class AnnotationVisitor extends DelegateVisitor<IAnnotationVisitor> implements IAnnotationVisitor {
 
   protected AnnotationVisitor() {
     super();
-
-    this.parent = null;
   }
 
   /**
@@ -56,8 +52,6 @@ public abstract class AnnotationVisitor extends VerObj implements IAnnotationVis
    */
   protected AnnotationVisitor(final int ver) {
     super(ver);
-
-    this.parent = null;
   }
 
   /**
@@ -69,20 +63,11 @@ public abstract class AnnotationVisitor extends VerObj implements IAnnotationVis
    *     calls. May be {@literal null}.
    */
   protected AnnotationVisitor(final int ver, final IAnnotationVisitor annotationVisitor) {
-    super(ver);
-
-    this.parent = annotationVisitor;
+    super(ver, annotationVisitor);
   }
 
-  /**
-   * The annotation visitor to which this visitor must delegate method calls. May be {@literal
-   * null}.
-   *
-   * @return the annotation visitor to which this visitor must delegate method calls, or {@literal
-   *     null}.
-   */
-  public IAnnotationVisitor getDelegate() {
-    return parent;
+  protected AnnotationVisitor(IAnnotationVisitor visitor) {
+    super(visitor);
   }
 
   @Override

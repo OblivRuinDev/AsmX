@@ -41,7 +41,7 @@ package org.objectweb.asm;
  *
  * @author OblivRuinDev
  */
-public interface IAnnotationVisitor {
+public interface IAnnotationVisitor extends IVisitor {
     /**
      * Visits a primitive value of the annotation.
      *

@@ -30,6 +30,7 @@
 
 package org.objectweb.asm.commons;
 
+import dev.oblivruin.asmx.VersionChecker;
 import org.objectweb.asm.*;
 
 /**

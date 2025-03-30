@@ -5,7 +5,7 @@
 //      All rights reserved.
 //
 // Modifications and structural adaptations copyright:
-//      ASMX: A modifications of ASM
+//      ASMX: A modifications of ASM(ASMX is just a modified branch of ASM and has nothing else to do with it)
 //      Copyright (c) 2025 OblivRuinDev
 //      All rights reserved.
 //
@@ -34,26 +34,43 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
-import static org.objectweb.asm.Opcodes.V_DYNA;
-
 /**
- * An abstract class to simplify Visitor Framework implementations.
+ * An abstract class to simplify the implementation of parent delegation visitors.
+ *
+ * @param <T> The type of the delegate visitor
  *
  * @author OblivRuinDev
  */
-public abstract class VerObj {
-
+public abstract class DelegateVisitor<T extends IVisitor> extends VerObj {
     /**
-     * Java ClassFile Version
+     * The parent visitor for delegation.
      */
-    public final int ver;
+    public final T parent;
 
-    protected VerObj(int ver) {
-        Constants.checkClassVer(ver);
-        this.ver = ver;
+    protected DelegateVisitor(T parent) {
+        super();
+        this.parent = parent;
     }
 
-    protected VerObj() {
-        this.ver = V_DYNA;
+    protected DelegateVisitor() {
+        super();
+        this.parent = null;
+    }
+
+    protected DelegateVisitor(int ver, T parent) {
+        super(ver);
+        this.parent = parent;
+    }
+
+    protected DelegateVisitor(int ver) {
+        super(ver);
+        this.parent = null;
+    }
+
+    /**
+     * @return The visitor to which this visitor must delegate method calls, or {@literal null}.
+     */
+    public final T getDelegate() {
+        return parent;
     }
 }

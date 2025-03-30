@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import dev.oblivruin.asmx.VersionChecker;
 import org.objectweb.asm.*;
 
 /**

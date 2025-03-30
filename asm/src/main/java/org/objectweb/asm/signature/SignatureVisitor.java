@@ -30,6 +30,7 @@
 package org.objectweb.asm.signature;
 
 import org.objectweb.asm.Constants;
+import org.objectweb.asm.IVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.VerObj;
 
@@ -53,7 +54,7 @@ import org.objectweb.asm.VerObj;
  * @author Eric Bruneton
  * @author OblivRuinDev
  */
-public abstract class SignatureVisitor extends VerObj {
+public abstract class SignatureVisitor extends VerObj implements IVisitor {
 
   /** Wildcard for an "extends" type argument. */
   public static final char EXTENDS = '+';

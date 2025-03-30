@@ -41,7 +41,7 @@ package org.objectweb.asm;
  *
  * @author OblivRuinDev
  */
-public interface IFieldVisitor {
+public interface IFieldVisitor extends IVisitor {
     /**
      * Visits an annotation of the field.
      *

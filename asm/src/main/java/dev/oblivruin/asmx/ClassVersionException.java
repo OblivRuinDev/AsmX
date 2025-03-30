@@ -1,13 +1,5 @@
-// Original code derived from ASM framework (https://asm.ow2.io/)
-// Original copyright notice:
-//      ASM: a very small and fast Java bytecode manipulation framework
-//      Copyright (c) 2000-2011 INRIA, France Telecom
-//      All rights reserved.
-//
-// Modifications and structural adaptations copyright:
-//      ASMX: A modifications of ASM
-//      Copyright (c) 2025 OblivRuinDev
-//      All rights reserved.
+// ASMX: A modification of ASM(ASMX is just a modified branch of ASM and has nothing else to do with it)
+// Copyright (c) 2025 OblivRuinDev
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -32,28 +24,15 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
-package org.objectweb.asm;
-
-import static org.objectweb.asm.Opcodes.V_DYNA;
+package dev.oblivruin.asmx;
 
 /**
- * An abstract class to simplify Visitor Framework implementations.
- *
+ * Exception thrown when meet Java ClassFile Version problem.
  * @author OblivRuinDev
  */
-public abstract class VerObj {
-
-    /**
-     * Java ClassFile Version
-     */
-    public final int ver;
-
-    protected VerObj(int ver) {
-        Constants.checkClassVer(ver);
-        this.ver = ver;
+public class ClassVersionException extends RuntimeException {
+    public ClassVersionException(String message) {
+        super(message);
     }
-
-    protected VerObj() {
-        this.ver = V_DYNA;
-    }
+    public ClassVersionException() {}
 }

@@ -38,17 +38,10 @@ package org.objectweb.asm;
  * @author Eric Bruneton
  * @author OblivRuinDev
  */
-public abstract class RecordComponentVisitor extends VerObj implements IRecordComponentVisitor {
-
-  /**
-   * The record visitor to which this visitor must delegate method calls. May be {@literal null}.
-   */
-  public final IRecordComponentVisitor parent;
+public abstract class RecordComponentVisitor extends DelegateVisitor<IRecordComponentVisitor> implements IRecordComponentVisitor {
 
   protected RecordComponentVisitor() {
     super();
-
-    this.parent = null;
   }
 
   /**
@@ -59,8 +52,6 @@ public abstract class RecordComponentVisitor extends VerObj implements IRecordCo
    */
   protected RecordComponentVisitor(final int ver) {
     super(ver);
-
-    this.parent = null;
   }
 
   /**
@@ -72,19 +63,11 @@ public abstract class RecordComponentVisitor extends VerObj implements IRecordCo
    */
   protected RecordComponentVisitor(
           final int ver, final IRecordComponentVisitor recordComponentVisitor) {
-    super(ver);
-
-    this.parent = recordComponentVisitor;
+    super(ver, recordComponentVisitor);
   }
 
-  /**
-   * The record visitor to which this visitor must delegate method calls. May be {@literal null}.
-   *
-   * @return the record visitor to which this visitor must delegate method calls, or {@literal
-   *     null}.
-   */
-  public IRecordComponentVisitor getDelegate() {
-    return parent;
+  protected RecordComponentVisitor(IRecordComponentVisitor visitor) {
+    super(visitor);
   }
 
   @Override

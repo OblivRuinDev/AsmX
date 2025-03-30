@@ -29,6 +29,8 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
+import dev.oblivruin.asmx.VersionChecker;
+
 /**
  * A visitor to visit a Java field. The methods of this class must be called in the following order:
  * ( {@code visitAnnotation} | {@code visitTypeAnnotation} | {@code visitAttribute} )* {@code
@@ -37,15 +39,10 @@ package org.objectweb.asm;
  * @author Eric Bruneton
  * @author OblivRuinDev
  */
-public abstract class FieldVisitor extends VerObj implements IFieldVisitor {
-
-  /** The field visitor to which this visitor must delegate method calls. May be {@literal null}. */
-  public final IFieldVisitor parent;
+public abstract class FieldVisitor extends DelegateVisitor<IFieldVisitor> implements IFieldVisitor {
 
   protected FieldVisitor() {
     super();
-
-    this.parent = null;
   }
 
   /**
@@ -56,8 +53,6 @@ public abstract class FieldVisitor extends VerObj implements IFieldVisitor {
    */
   protected FieldVisitor(final int ver) {
     super(ver);
-
-    this.parent = null;
   }
 
   /**
@@ -69,18 +64,11 @@ public abstract class FieldVisitor extends VerObj implements IFieldVisitor {
    *     null.
    */
   protected FieldVisitor(final int ver, final IFieldVisitor fieldVisitor) {
-    super(ver);
-
-    this.parent = fieldVisitor;
+    super(ver, fieldVisitor);
   }
 
-  /**
-   * The field visitor to which this visitor must delegate method calls. May be {@literal null}.
-   *
-   * @return the field visitor to which this visitor must delegate method calls, or {@literal null}.
-   */
-  public IFieldVisitor getDelegate() {
-    return parent;
+  protected FieldVisitor(IFieldVisitor visitor) {
+    super(visitor);
   }
 
   @Override

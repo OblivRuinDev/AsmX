@@ -35,6 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import dev.oblivruin.asmx.ClassVersionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;

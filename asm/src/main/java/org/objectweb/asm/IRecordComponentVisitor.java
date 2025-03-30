@@ -41,7 +41,7 @@ package org.objectweb.asm;
  *
  * @author OblivRuinDev
  */
-public interface IRecordComponentVisitor {
+public interface IRecordComponentVisitor extends IVisitor {
     /**
      * Visits an annotation of the record component.
      *

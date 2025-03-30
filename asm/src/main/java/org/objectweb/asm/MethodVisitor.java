@@ -29,6 +29,8 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
+import dev.oblivruin.asmx.VersionChecker;
+
 import static org.objectweb.asm.Opcodes.*;
 
 /**
@@ -52,16 +54,9 @@ import static org.objectweb.asm.Opcodes.*;
  * @author Eric Bruneton
  * @author OblivRuinDev
  */
-public abstract class MethodVisitor extends VerObj implements IMethodVisitor {
-  /**
-   * The method visitor to which this visitor must delegate method calls. May be {@literal null}.
-   */
-  public final IMethodVisitor parent;
-
+public abstract class MethodVisitor extends DelegateVisitor<IMethodVisitor> implements IMethodVisitor {
   protected MethodVisitor() {
     super();
-
-    this.parent = null;
   }
 
   /**
@@ -72,8 +67,6 @@ public abstract class MethodVisitor extends VerObj implements IMethodVisitor {
    */
   protected MethodVisitor(final int ver) {
     super(ver);
-
-    this.parent = null;
   }
 
   /**
@@ -85,19 +78,11 @@ public abstract class MethodVisitor extends VerObj implements IMethodVisitor {
    *     be null.
    */
   protected MethodVisitor(final int ver, final IMethodVisitor methodVisitor) {
-    super(ver);
-
-    this.parent = methodVisitor;
+    super(ver, methodVisitor);
   }
 
-  /**
-   * The method visitor to which this visitor must delegate method calls. May be {@literal null}.
-   *
-   * @return the method visitor to which this visitor must delegate method calls, or {@literal
-   *     null}.
-   */
-  public IMethodVisitor getDelegate() {
-    return parent;
+  protected MethodVisitor(IMethodVisitor visitor) {
+    super(visitor);
   }
 
   @Override

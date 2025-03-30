@@ -1,5 +1,13 @@
-// ASMX: A modification of ASM(ASMX is just a modified branch of ASM and has nothing else to do with it)
-// Copyright (c) 2025 OblivRuinDev
+// Original code derived from ASM framework (https://asm.ow2.io/)
+// Original copyright notice:
+//      ASM: a very small and fast Java bytecode manipulation framework
+//      Copyright (c) 2000-2011 INRIA, France Telecom
+//      All rights reserved.
+//
+// Modifications and structural adaptations copyright:
+//      ASMX: A modifications of ASM(ASMX is just a modified branch of ASM and has nothing else to do with it)
+//      Copyright (c) 2025 OblivRuinDev
+//      All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -27,12 +35,9 @@
 package org.objectweb.asm;
 
 /**
- * Exception thrown when meet Java ClassFile Version problem.
+ * The interface indicates that the implementation class is a visitor.
+ *
  * @author OblivRuinDev
  */
-public class ClassVersionException extends RuntimeException {
-    public ClassVersionException(String message) {
-        super(message);
-    }
-    public ClassVersionException() {}
+public interface IVisitor {
 }

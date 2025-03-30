@@ -29,6 +29,8 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
+import dev.oblivruin.asmx.VersionChecker;
+
 /**
  * A visitor to visit a Java class. The methods of this class must be called in the following order:
  * {@code visit} [ {@code visitSource} ] [ {@code visitModule} ][ {@code visitNestHost} ][ {@code
@@ -40,16 +42,9 @@ package org.objectweb.asm;
  * @author Eric Bruneton
  * @author OblivRuinDev
  */
-public abstract class ClassVisitor extends VerObj implements IClassVisitor {
-  /**
-   * The parent IClassVisitor for delegation.
-   */
-  public final IClassVisitor parent;
-
+public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implements IClassVisitor {
   protected ClassVisitor() {
       super();
-
-      this.parent = null;
   }
 
   /**
@@ -60,8 +55,6 @@ public abstract class ClassVisitor extends VerObj implements IClassVisitor {
    */
   protected ClassVisitor(final int ver) {
     super(ver);
-
-    this.parent = null;
   }
 
   /**
@@ -73,19 +66,11 @@ public abstract class ClassVisitor extends VerObj implements IClassVisitor {
    *     null.
    */
   protected ClassVisitor(final int ver, final IClassVisitor classVisitor) {
-    super(ver);
-
-    this.parent = classVisitor;
+    super(ver, classVisitor);
   }
 
-  /**
-   * The class visitor to which this visitor must delegate method calls. May be {@literal null}.
-   *
-   * @return the class visitor to which this visitor must delegate method calls, or {@literal null}.
-   */
-  @Deprecated
-  public IClassVisitor getDelegate() {
-    return parent;
+  protected ClassVisitor(IClassVisitor visitor) {
+    super(visitor);
   }
 
   @Override

@@ -38,16 +38,10 @@ package org.objectweb.asm;
  * @author Eric Bruneton
  * @author OblivRuinDev
  */
-public abstract class ModuleVisitor extends VerObj implements IModuleVisitor {
-  /**
-   * The parent IModuleVisitor for delegation
-   */
-  public final IModuleVisitor parent;
+public abstract class ModuleVisitor extends DelegateVisitor<IModuleVisitor> implements IModuleVisitor {
 
   protected ModuleVisitor() {
     super();
-
-    this.parent = null;
   }
 
   /**
@@ -58,8 +52,6 @@ public abstract class ModuleVisitor extends VerObj implements IModuleVisitor {
    */
   protected ModuleVisitor(final int ver) {
     super(ver);
-
-    this.parent = null;
   }
 
   /**
@@ -71,20 +63,11 @@ public abstract class ModuleVisitor extends VerObj implements IModuleVisitor {
    *     be null.
    */
   protected ModuleVisitor(final int ver, final IModuleVisitor moduleVisitor) {
-    super(ver);
-
-    this.parent = moduleVisitor;
+    super(ver, moduleVisitor);
   }
 
-  /**
-   * The module visitor to which this visitor must delegate method calls. May be {@literal null}.
-   *
-   * @return the module visitor to which this visitor must delegate method calls, or {@literal
-   *     null}.
-   */
-  @Deprecated
-  public IModuleVisitor getDelegate() {
-    return parent;
+  protected ModuleVisitor(IModuleVisitor visitor) {
+    super(visitor);
   }
 
   @Override
