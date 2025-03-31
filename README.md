@@ -1,4 +1,4 @@
-# ASM
+# AsmX
 
 ![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)
 [![Project Status](https://img.shields.io/badge/Status-Active-brightgreen.svg)](https://github.com/OblivRuinDev/AsmX)
