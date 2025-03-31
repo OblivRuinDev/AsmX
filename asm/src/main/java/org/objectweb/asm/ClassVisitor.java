@@ -81,8 +81,11 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
           final String signature,
           final String superName,
           final String[] interfaces) {
+    if (version > ver && ver != 0) {
+      throw new ClassVersionException();
+    }
     if ((access & Opcodes.ACC_RECORD) != 0) {
-      VersionChecker.record_(access);
+      VersionChecker.record_(version);
     }
     if (parent != null) {
       parent.visit(version, access, name, signature, superName, interfaces);

@@ -148,16 +148,10 @@ public class MethodNode implements IMethodVisitor {
   private boolean visited;
 
   /**
-   * Constructs an uninitialized {@link MethodNode}. <i>Subclasses must not use this
-   * constructor</i>. Instead, they must use the {@link #MethodNode(int)} version.
-   *
-   * @throws IllegalStateException If a subclass calls this constructor.
+   * Constructs an uninitialized {@link MethodNode}.
    */
   public MethodNode() {
     this.instructions = new InsnList();
-    if (getClass() != MethodNode.class) {
-      throw new IllegalStateException();
-    }
   }
 
   /**
@@ -172,8 +166,7 @@ public class MethodNode implements IMethodVisitor {
   }
 
   /**
-   * Constructs a new {@link MethodNode}. <i>Subclasses must not use this constructor</i>. Instead,
-   * they must use the {@link #MethodNode(int, int, String, String, String, String[])} version.
+   * Constructs a new {@link MethodNode}.
    *
    * @param access the method's access flags (see {@link Opcodes}). This parameter also indicates if
    *     the method is synthetic and/or deprecated.
@@ -182,7 +175,6 @@ public class MethodNode implements IMethodVisitor {
    * @param signature the method's signature. May be {@literal null}.
    * @param exceptions the internal names of the method's exception classes (see {@link
    *     Type#getInternalName()}). May be {@literal null}.
-   * @throws IllegalStateException If a subclass calls this constructor.
    */
   public MethodNode(
       final int access,
@@ -558,6 +550,9 @@ public class MethodNode implements IMethodVisitor {
    *     Opcodes}.
    */
   public void check(final int version) {
+    if (version == 0) {
+      return;
+    }
     if (version <= V1_7) {
       if (parameters != null && !parameters.isEmpty()) {
         VersionChecker.methodPara();

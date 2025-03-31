@@ -317,6 +317,9 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
    *     Opcodes}.
    */
   public void check(final int version) {
+    if (version == 0) {
+      return;
+    }
     if (permittedSubclasses != null) {
       VersionChecker.permit(version);
     }

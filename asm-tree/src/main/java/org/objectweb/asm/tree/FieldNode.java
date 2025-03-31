@@ -180,7 +180,8 @@ public class FieldNode implements IFieldVisitor, Consumer<IClassVisitor> {
    *     Opcodes}.
    */
   public void check(final int version) {
-    if (visibleTypeAnnotations != null && !visibleTypeAnnotations.isEmpty() ||
+    if (version != 0 &&
+            (visibleTypeAnnotations != null && !visibleTypeAnnotations.isEmpty()) ||
             (invisibleTypeAnnotations != null && !invisibleTypeAnnotations.isEmpty())) {
       VersionChecker.typeAnn(version);
     }

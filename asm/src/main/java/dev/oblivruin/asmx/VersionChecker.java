@@ -36,7 +36,7 @@ public final class VersionChecker {
      * Method Parameters Exception
      */
     public static void methodPara(int version) {
-        if (version < V1_8)
+        if (version < V1_8 && version != 0)
             methodPara();
     }
 
@@ -49,12 +49,12 @@ public final class VersionChecker {
     }
 
     public static void typeAnn(int version) {
-        if (version < V1_8)
+        if (version < V1_8 && version != 0)
             typeAnn();
     }
 
     public static void tryTypeAnn(int version) {
-        if (version < V1_8)
+        if (version < V1_8 && version != 0)
             tryTypeAnn();
     }
 
@@ -63,7 +63,7 @@ public final class VersionChecker {
     }
 
     public static void insnTypeAnn(int version) {
-        if (version < V1_8)
+        if (version < V1_8 && version != 0)
             insnTypeAnn();
     }
 
@@ -76,14 +76,14 @@ public final class VersionChecker {
     }
 
     public static void invokeInterface(int version) {
-        if (version < V1_7)
+        if (version < V1_7 && version != 0)
             invokeInterface();
     }
 
 //(value instanceof Handle
 // || (value instanceof Type && ((Type) value).getSort() == Type.METHOD))
     public static void LDC(int version) {
-        if (version < V1_7)
+        if (version < V1_7 && version != 0)
             LDC();
     }
 
@@ -96,12 +96,12 @@ public final class VersionChecker {
     }
 
     public static void localVarAnn(int version) {
-        if (version < V1_8)
+        if (version < V1_8 && version != 0)
             localVarAnn();
     }
 
     public static void constDyna(int version) {
-        if (version < V11)
+        if (version < V11 && version != 0)
             constDyna();
     }
 
@@ -110,27 +110,27 @@ public final class VersionChecker {
     }
 
     public static void module_(int version) {
-        if (version < V9)
+        if (version < V9 && version != 0)
             throw new ClassVersionException("Modules require Java 9+ (class version 53+)");
     }
 
     public static void nest(int version) {
-        if (version < V11)
+        if (version < V11 && version != 0)
             throw new ClassVersionException("Nest-based access requires Java 11+ (class version 55+)");
     }
 
     public static void record_(int version) {
-        if (version < V16)
+        if (version < V16 && version != 0)
             throw new ClassVersionException("Records require Java 16+ (class version 60+)");
     }
 
     public static void permit(int version) {
-        if (version < V17)
+        if (version < V17 && version != 0)
             throw new ClassVersionException("Permitted subclasses require Java 17+ (class version 61+)");
     }
 
     public static void invokeDyna(int version) {
-        if (version < V1_7)
+        if (version < V1_7 && version != 0)
             throw new ClassVersionException("invokedynamic requires Java 7+ (class version 51+)");
     }
 }

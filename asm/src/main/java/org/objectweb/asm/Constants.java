@@ -193,7 +193,7 @@ public final class Constants {
     }
   }
   public static void checkClassVer(int version) throws IllegalArgumentException {
-    if (version < 46 || version > 69) {
+    if (version != 0 && (version < 46 || version > 69)) {
       throw new IllegalArgumentException("Unsupported ClassFile version " + version);
     }
   }

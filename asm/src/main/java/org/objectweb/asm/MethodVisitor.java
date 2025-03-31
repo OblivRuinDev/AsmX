@@ -241,8 +241,7 @@ public abstract class MethodVisitor extends DelegateVisitor<IMethodVisitor> impl
     if (value instanceof Handle
             || (value instanceof Type && ((Type) value).getSort() == Type.METHOD)) {
       VersionChecker.LDC(ver);
-    }
-    if (value instanceof ConstantDynamic) {
+    } else if (value instanceof ConstantDynamic) {
       VersionChecker.constDyna(ver);
     }
     if (parent != null) {
