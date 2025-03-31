@@ -80,9 +80,14 @@ public interface Opcodes {
   int V23 = 0 << 16 | 67;
   int V24 = 0 << 16 | 68;
   int V25 = 0 << 16 | 69;
-
+  /**
+   * Current JVM's ClassFile version.
+   */
   int V_DYNA = Integer.parseInt(System.getProperty("java.lang.version"));
-  int V_SPECIAL = -1;
+  /**
+   * Indicates that don't check Java ClassFile version while visit.
+   */
+  int V_BYPASS = 0;
 
   /**
    * Version flag indicating that the class is using 'preview' features.
