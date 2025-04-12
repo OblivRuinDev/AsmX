@@ -27,38 +27,52 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.tree;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
-import org.objectweb.asm.MethodVisitor;
+
+import org.objectweb.asm.IMethodVisitor;
 
 /**
  * A doubly linked list of {@link AbstractInsnNode} objects. <i>This implementation is not thread
  * safe</i>.
+ *
+ * @author OblivRuinDev
+ * @see AbstractInsnNode
  */
-public class InsnList implements Iterable<AbstractInsnNode> {
-
-  /** The number of instructions in this list. */
-  private int size;
+public class InsnList implements Iterable<AbstractInsnNode>, List<AbstractInsnNode> {
+  int size;
 
   /** The first instruction in this list. May be {@literal null}. */
-  private AbstractInsnNode firstInsn;
+  AbstractInsnNode firstInsn;
 
   /** The last instruction in this list. May be {@literal null}. */
-  private AbstractInsnNode lastInsn;
+  AbstractInsnNode lastInsn;
 
-  /**
-   * A cache of the instructions of this list. This cache is used to improve the performance of the
-   * {@link #get} method.
-   */
   AbstractInsnNode[] cache;
 
   /**
-   * Returns the number of instructions in this list.
-   *
-   * @return the number of instructions in this list.
+   * Points to the next unused position in array.
    */
-  public int size() {
+  int pointer = 0;
+
+  boolean array = true;
+
+  public InsnList() {
+    this(100);
+  }
+
+  public InsnList(int size) {
+    cache = new AbstractInsnNode[size];
+  }
+
+  public final int size() {
     return size;
+  }
+
+  public final boolean isEmpty() {
+    return size == 0;
   }
 
   /**
@@ -67,7 +81,9 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * @return the first instruction in this list, or {@literal null} if the list is empty.
    */
   public AbstractInsnNode getFirst() {
-    return firstInsn;
+    AbstractInsnNode node = cache[0];
+    AbstractInsnNode node1;
+    return node != null && (node1 = node.link) != null ? node1 : node;
   }
 
   /**
@@ -76,7 +92,7 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * @return the last instruction in this list, or {@literal null} if the list is empty.
    */
   public AbstractInsnNode getLast() {
-    return lastInsn;
+    return cache[pointer - 1];
   }
 
   /**
@@ -88,15 +104,84 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * @param index the index of the instruction that must be returned.
    * @return the instruction whose index is given.
    * @throws IndexOutOfBoundsException if (index &lt; 0 || index &gt;= size()).
+   *
+   * @deprecated This incurs a significant performance overhead.
+   *
+   * @see #get(int, int)
    */
+  @Deprecated
   public AbstractInsnNode get(final int index) {
     if (index < 0 || index >= size) {
       throw new IndexOutOfBoundsException();
     }
-    if (cache == null) {
-      cache = toArray();
-    }
+    reArray(0);
     return cache[index];
+  }
+
+  /**
+   * Unsafe element getter. May throw Exception if arguments are bad.
+   * @param index the element at the specified position in this list
+   * @return Most of the time it's not null
+   * @throws NullPointerException if index out of bound or offset is bad
+   * @throws IndexOutOfBoundsException if index out of bound
+   */
+  public AbstractInsnNode get(int index, int offset) {
+    return cache[index].getOffset0(offset);
+  }
+
+  /**
+   * Safe element getter. Don't throw any Exception.
+   * @param index the element at the specified position in this list
+   * @return Maybe null if it doesn't exist
+   */
+  public AbstractInsnNode get1(int index, int offset) {
+    if (index < 0 || index >= pointer) {
+      return null;
+    }
+    return cache[index].getOffset(offset);
+  }
+
+  /**
+   * If there are links in the array's elements,the array is rearranged to remove all links
+   * @param extraExpand must {@code >= 0}, will use to add additional size to excepted array size
+   */
+  public void reArray(int extraExpand) {
+    if (extraExpand < 0) {
+      throw new IllegalArgumentException();
+    }
+    int size = this.size;
+    int pointer0 = this.pointer;
+    if (pointer0 != size) {
+      this.pointer = size;
+      int pointer = 0;
+      AbstractInsnNode[] temp = new AbstractInsnNode[size + extraExpand];
+      AbstractInsnNode node;
+      for (int index = 0; index < pointer0; index++) {
+        node = this.cache[index];
+        if (node.offset == 0) {
+          //This means element doesn't hold link
+          node.index = pointer;
+          temp[pointer++] = node;
+        } else {
+          //Element (in array) 's offset should <=0
+          //This means a link is holden by this element
+          //Sets the element using a positive value of the offset
+          int index1 = pointer - node.offset;
+          node.index = index1;
+          node.offset = 0;
+          temp[index1] = node;
+          //Now start store links to array
+          while ((node = node.link) != null) {
+            node.index = pointer;
+            node.offset = 0;
+            temp[pointer++] = node;
+          }
+          //Increment to prevent element being overwritten
+          pointer++;
+        }
+      }
+      this.cache = temp;
+    }
   }
 
   /**
@@ -108,11 +193,13 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * @return {@literal true} if the given instruction belongs to this list.
    */
   public boolean contains(final AbstractInsnNode insnNode) {
-    AbstractInsnNode currentInsn = firstInsn;
-    while (currentInsn != null && currentInsn != insnNode) {
-      currentInsn = currentInsn.nextInsn;
+    if (insnNode == null)
+      throw new NullPointerException();
+    int index = insnNode.index;
+    if (index == -1 || index >= pointer) {
+      return false;
     }
-    return currentInsn != null;
+    return cache[index].getOffset(insnNode.offset) == insnNode;
   }
 
   /**
@@ -127,10 +214,7 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    *     to test if an instruction belongs to an instruction list or not.
    */
   public int indexOf(final AbstractInsnNode insnNode) {
-    if (cache == null) {
-      cache = toArray();
-    }
-    return insnNode.index;
+    return contains(insnNode) ? insnNode.index : -1;
   }
 
   /**
@@ -138,22 +222,15 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    *
    * @param methodVisitor the method visitor that must visit the instructions.
    */
-  public void accept(final MethodVisitor methodVisitor) {
-    AbstractInsnNode currentInsn = firstInsn;
-    while (currentInsn != null) {
-      currentInsn.accept(methodVisitor);
-      currentInsn = currentInsn.nextInsn;
+  public void accept(final IMethodVisitor methodVisitor) {
+    for (AbstractInsnNode node : cache) {
+      node.accept0(methodVisitor);
     }
   }
 
-  /**
-   * Returns an iterator over the instructions in this list.
-   *
-   * @return an iterator over the instructions in this list.
-   */
   @Override
   public ListIterator<AbstractInsnNode> iterator() {
-    return iterator(0);
+    return new Iterator(0, 0);
   }
 
   /**
@@ -162,9 +239,8 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * @param index index of instruction for the iterator to start at.
    * @return an iterator over the instructions in this list.
    */
-  @SuppressWarnings("unchecked")
-  public ListIterator<AbstractInsnNode> iterator(final int index) {
-    return new InsnListIterator(index);
+  public final Iterator iterator(int index) {
+    return new Iterator(index, 0);
   }
 
   /**
@@ -173,15 +249,8 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * @return an array containing all the instructions in this list.
    */
   public AbstractInsnNode[] toArray() {
-    int currentInsnIndex = 0;
-    AbstractInsnNode currentInsn = firstInsn;
-    AbstractInsnNode[] insnNodeArray = new AbstractInsnNode[size];
-    while (currentInsn != null) {
-      insnNodeArray[currentInsnIndex] = currentInsn;
-      currentInsn.index = currentInsnIndex++;
-      currentInsn = currentInsn.nextInsn;
-    }
-    return insnNodeArray;
+    reArray(0);
+    return cache.clone();
   }
 
   /**
@@ -191,30 +260,31 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * @param newInsnNode another instruction, <i>which must not belong to any {@link InsnList}</i>.
    */
   public void set(final AbstractInsnNode oldInsnNode, final AbstractInsnNode newInsnNode) {
-    AbstractInsnNode nextInsn = oldInsnNode.nextInsn;
-    newInsnNode.nextInsn = nextInsn;
-    if (nextInsn != null) {
-      nextInsn.previousInsn = newInsnNode;
-    } else {
-      lastInsn = newInsnNode;
+    if (newInsnNode.index != -1) {
+      throw new IllegalArgumentException("The new value is belonging to other InsnList.");
     }
-    AbstractInsnNode previousInsn = oldInsnNode.previousInsn;
-    newInsnNode.previousInsn = previousInsn;
-    if (previousInsn != null) {
-      previousInsn.nextInsn = newInsnNode;
-    } else {
-      firstInsn = newInsnNode;
+    int index = oldInsnNode.index;
+    if (index == -1 || index >= pointer) {
+      throw new IllegalArgumentException("The old value isn't belonging to this.");
     }
-    if (cache != null) {
-      int index = oldInsnNode.index;
+    int offset = oldInsnNode.offset;
+    if (offset <= 0) {
+      if (cache[index] != oldInsnNode) {
+        throw new IllegalArgumentException("The old value isn't belonging to this.");
+      }
       cache[index] = newInsnNode;
-      newInsnNode.index = index;
     } else {
-      newInsnNode.index = 0; // newInsnNode now belongs to an InsnList.
+      //Get previous element
+      AbstractInsnNode node = cache[index].getOffset0(offset - 1);
+      if (node.link != oldInsnNode) {
+        throw new IllegalArgumentException("The old value isn't belonging to this.");
+      }
+      node.link = newInsnNode;
     }
-    oldInsnNode.index = -1; // oldInsnNode no longer belongs to an InsnList.
-    oldInsnNode.previousInsn = null;
-    oldInsnNode.nextInsn = null;
+    newInsnNode.offset = offset;
+    newInsnNode.index = index;
+    newInsnNode.link = oldInsnNode.link;
+    oldInsnNode.index = -1;
   }
 
   /**
@@ -224,16 +294,44 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    */
   public void add(final AbstractInsnNode insnNode) {
     ++size;
-    if (lastInsn == null) {
-      firstInsn = insnNode;
-      lastInsn = insnNode;
-    } else {
-      lastInsn.nextInsn = insnNode;
-      insnNode.previousInsn = lastInsn;
+    ensure();
+    insnNode.index = pointer;
+    cache[pointer++] = insnNode;
+  }
+
+  /**
+   * @param size the desired minimum capacity
+   *
+   * @see InsnList#ensure(int, int)
+   */
+  public final void ensure(int size) {
+    ensure(size, size);
+  }
+
+  /**
+   * Increases the capacity of this {@code InsnList} instance, if necessary,
+   * to ensure that it can hold at least the number of elements specified by the minimum capacity argument.
+   * @param size the desired minimum capacity
+   * @param except the length used if the array growth
+   */
+  public final void ensure(int size, int except) {
+    if (size >= this.cache.length) {
+      AbstractInsnNode[] temp = new AbstractInsnNode[except == 0 ? size : except];
+      System.arraycopy(cache, 0, temp, 0, this.cache.length);
+      this.cache = temp;
     }
-    lastInsn = insnNode;
-    cache = null;
-    insnNode.index = 0; // insnNode now belongs to an InsnList.
+  }
+
+  /**
+   * Ensure array adapt current {@link #pointer}.
+   */
+  public final void ensure() {
+    int length = this.cache.length;
+    if (pointer >= length) {
+      AbstractInsnNode[] temp = new AbstractInsnNode[length > 5000 ? length + 1500 : length * 2];//todo: Capacity expansion to be discussed.
+      System.arraycopy(cache, 0, temp, 0, length);
+      this.cache = temp;
+    }
   }
 
   /**
@@ -246,18 +344,36 @@ public class InsnList implements Iterable<AbstractInsnNode> {
     if (insnList.size == 0) {
       return;
     }
-    size += insnList.size;
-    if (lastInsn == null) {
-      firstInsn = insnList.firstInsn;
-      lastInsn = insnList.lastInsn;
-    } else {
-      AbstractInsnNode firstInsnListElement = insnList.firstInsn;
-      lastInsn.nextInsn = firstInsnListElement;
-      firstInsnListElement.previousInsn = lastInsn;
-      lastInsn = insnList.lastInsn;
+    this.size += insnList.size;
+    ensure(pointer + insnList.pointer);
+    for (AbstractInsnNode node : insnList.cache) {
+      node.index = this.pointer;
+      cache[this.pointer++] = node;
     }
-    cache = null;
-    insnList.removeAll(false);
+    insnList.cache = new AbstractInsnNode[0];
+  }
+
+  public void addAll(Collection<? extends AbstractInsnNode> collection) {
+    int size = collection.size();
+    if (size == 0) {
+      return;
+    }
+    ensure(pointer + size);
+    this.size += size;
+    for (AbstractInsnNode node : collection) {
+      cache[pointer++] = node;
+    }
+  }
+
+  public void addAll(AbstractInsnNode[] array) {
+    if (array.length == 0) {
+      return;
+    }
+    ensure(pointer + array.length);
+    this.size += array.length;
+    for (AbstractInsnNode node : array) {
+      cache[pointer++] = node;
+    }
   }
 
   /**
@@ -266,17 +382,19 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * @param insnNode an instruction, <i>which must not belong to any {@link InsnList}</i>.
    */
   public void insert(final AbstractInsnNode insnNode) {
-    ++size;
-    if (firstInsn == null) {
-      firstInsn = insnNode;
-      lastInsn = insnNode;
-    } else {
-      firstInsn.previousInsn = insnNode;
-      insnNode.nextInsn = firstInsn;
+    if (pointer == 0) {
+      add(insnNode);
+      return;
     }
-    firstInsn = insnNode;
-    cache = null;
-    insnNode.index = 0; // insnNode now belongs to an InsnList.
+    ++size;
+    AbstractInsnNode node = cache[0];
+    node.offset--;
+    insnNode.index = 0;
+    insnNode.offset = 1;
+    if (node.link != null) {
+      (insnNode.link = node.link).updateOffset(1);
+    }
+    node.link = insnNode;
   }
 
   /**
@@ -289,18 +407,20 @@ public class InsnList implements Iterable<AbstractInsnNode> {
     if (insnList.size == 0) {
       return;
     }
-    size += insnList.size;
-    if (firstInsn == null) {
-      firstInsn = insnList.firstInsn;
-      lastInsn = insnList.lastInsn;
-    } else {
-      AbstractInsnNode lastInsnListElement = insnList.lastInsn;
-      firstInsn.previousInsn = lastInsnListElement;
-      lastInsnListElement.nextInsn = firstInsn;
-      firstInsn = insnList.firstInsn;
+    this.size += insnList.size;
+    int amount = insnList.pointer;
+    for (AbstractInsnNode node : cache) {
+      node.addIndex(amount);//update index
     }
-    cache = null;
-    insnList.removeAll(false);
+    if (insnList.cache.length - amount > pointer) {
+      System.arraycopy(cache, 0, (cache = insnList.cache), amount, pointer);
+    } else {
+      AbstractInsnNode[] temp = new AbstractInsnNode[pointer + amount];
+      System.arraycopy(insnList.cache, 0, temp, 0, amount);
+      System.arraycopy(cache, 0, (cache = temp), amount, pointer);
+    }
+    this.pointer += amount;
+    insnList.cache = null;
   }
 
   /**
@@ -311,19 +431,33 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    *     InsnList}</i>.
    */
   public void insert(final AbstractInsnNode previousInsn, final AbstractInsnNode insnNode) {
-    ++size;
-    AbstractInsnNode nextInsn = previousInsn.nextInsn;
-    if (nextInsn == null) {
-      lastInsn = insnNode;
-    } else {
-      nextInsn.previousInsn = insnNode;
+    if (insnNode.index != -1) {
+      throw new IllegalArgumentException("The value is belonging to other InsnList.");
     }
-    previousInsn.nextInsn = insnNode;
-    insnNode.nextInsn = nextInsn;
-    insnNode.previousInsn = previousInsn;
-    cache = null;
-    insnNode.index = 0; // insnNode now belongs to an InsnList.
+    if (previousInsn.index == pointer-1) {
+
+    }
+    int amount = insnNode.offset == 0 ? 1 : -insnNode.offset;
+    size+=amount;
+    if (previousInsn.offset <= 0) {
+      previousInsn.offset-=amount;
+      AbstractInsnNode node = previousInsn.link;
+      if (node != null) {
+        insnNode.link = node;
+        node.updateOffset(amount);
+      }
+      previousInsn.link = insnNode;
+    }
   }
+
+  private void insertBeforeInArray(AbstractInsnNode node, AbstractInsnNode target, int number) {
+    size+=number;
+    node.offset-=number;
+    node.link.updateOffset(number);
+    node.link = target;
+  }
+
+  private void insertAfterInLink(AbstractInsnNode node, AbstractInsnNode target, int number) {}
 
   /**
    * Inserts the given instructions after the specified instruction.
@@ -458,6 +592,7 @@ public class InsnList implements Iterable<AbstractInsnNode> {
   }
 
   /** Removes all the instructions of this list. */
+  @Override
   public void clear() {
     removeAll(false);
   }
@@ -473,6 +608,62 @@ public class InsnList implements Iterable<AbstractInsnNode> {
         ((LabelNode) currentInsn).resetLabel();
       }
       currentInsn = currentInsn.nextInsn;
+    }
+  }
+
+  public final class Iterator implements ListIterator<AbstractInsnNode> {
+    int index;
+    int offset;
+    AbstractInsnNode obj;
+
+    public Iterator(int index, int offset) {
+      this.index = index;
+      this.offset = offset;
+    }
+
+    @Override
+    public boolean hasNext() {
+      return false;
+    }
+
+    @Override
+    public AbstractInsnNode next() {
+      return null;
+    }
+
+    @Override
+    public boolean hasPrevious() {
+      return false;
+    }
+
+    @Override
+    public AbstractInsnNode previous() {
+      return null;
+    }
+
+    @Override
+    public int nextIndex() {
+      return 0;
+    }
+
+    @Override
+    public int previousIndex() {
+      return 0;
+    }
+
+    @Override
+    public void remove() {
+
+    }
+
+    @Override
+    public void set(AbstractInsnNode abstractInsnNode) {
+
+    }
+
+    @Override
+    public void add(AbstractInsnNode abstractInsnNode) {
+
     }
   }
 

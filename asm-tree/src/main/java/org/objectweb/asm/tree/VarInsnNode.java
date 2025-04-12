@@ -75,7 +75,7 @@ public class VarInsnNode extends AbstractInsnNode {
   @Override
   public void accept(final IMethodVisitor methodVisitor) {
     methodVisitor.visitVarInsn(opcode, var);
-    acceptAnnotations(methodVisitor);
+    acceptTypeAnn(methodVisitor);
   }
 
   @Override

@@ -44,17 +44,12 @@ public class InstructionAdapter extends MethodVisitor {
   public static final Type OBJECT_TYPE = Type.getType("Ljava/lang/Object;");
 
   /**
-   * Constructs a new {@link InstructionAdapter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #InstructionAdapter(int, IMethodVisitor)} version.
+   * Constructs a new {@link InstructionAdapter}.
    *
    * @param methodVisitor the method visitor to which this adapter delegates calls.
-   * @throws IllegalStateException If a subclass calls this constructor.
    */
   public InstructionAdapter(final IMethodVisitor methodVisitor) {
-    this(/* latest api = */ Opcodes.V_DYNA, methodVisitor);
-    if (getClass() != InstructionAdapter.class) {
-      throw new IllegalStateException();
-    }
+    super(methodVisitor);
   }
 
   /**

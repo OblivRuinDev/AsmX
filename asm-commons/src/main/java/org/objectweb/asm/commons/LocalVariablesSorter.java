@@ -67,21 +67,20 @@ public class LocalVariablesSorter extends MethodVisitor {
   protected int nextLocal;
 
   /**
-   * Constructs a new {@link LocalVariablesSorter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #LocalVariablesSorter(int, int, String, IMethodVisitor)}
-   * version.
+   * Constructs a new {@link LocalVariablesSorter}.
    *
    * @param access access flags of the adapted method.
    * @param descriptor the method's descriptor (see {@link Type}).
    * @param methodVisitor the method visitor to which this adapter delegates calls.
-   * @throws IllegalStateException if a subclass calls this constructor.
    */
   public LocalVariablesSorter(
       final int access, final String descriptor, final IMethodVisitor methodVisitor) {
-    this(/* latest api = */ Opcodes.V_DYNA, access, descriptor, methodVisitor);
-    if (getClass() != LocalVariablesSorter.class) {
-      throw new IllegalStateException();
+    super(methodVisitor);
+    nextLocal = (Opcodes.ACC_STATIC & access) == 0 ? 1 : 0;
+    for (Type argumentType : Type.getArgumentTypes(descriptor)) {
+      nextLocal += argumentType.getSize();
     }
+    firstLocal = nextLocal;
   }
 
   /**
@@ -93,14 +92,10 @@ public class LocalVariablesSorter extends MethodVisitor {
    * @param descriptor the method's descriptor (see {@link Type}).
    * @param methodVisitor the method visitor to which this adapter delegates calls.
    */
+  @Deprecated
   protected LocalVariablesSorter(
       final int api, final int access, final String descriptor, final IMethodVisitor methodVisitor) {
-    super(api, methodVisitor);
-    nextLocal = (Opcodes.ACC_STATIC & access) == 0 ? 1 : 0;
-    for (Type argumentType : Type.getArgumentTypes(descriptor)) {
-      nextLocal += argumentType.getSize();
-    }
-    firstLocal = nextLocal;
+    this(access, descriptor, methodVisitor);
   }
 
   @Override

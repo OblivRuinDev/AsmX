@@ -42,25 +42,13 @@ import org.objectweb.asm.*;
  * @author Eric Bruneton
  * @author OblivRuinDev
  */
-public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
+public class ClassNode extends SpecialNode implements IClassVisitor, Consumer<IClassVisitor> {
 
   /**
    * The class version. The minor version is stored in the 16 most significant bits, and the major
    * version in the 16 least significant bits.
    */
   public int version;
-
-  /**
-   * The class's access flags (see {@link org.objectweb.asm.Opcodes}). This field also indicates if
-   * the class is deprecated {@link Opcodes#ACC_DEPRECATED} or a record {@link Opcodes#ACC_RECORD}.
-   */
-  public int access;
-
-  /** The internal name of this class (see {@link org.objectweb.asm.Type#getInternalName()}). */
-  public String name;
-
-  /** The signature of this class. May be {@literal null}. */
-  public String signature;
 
   /**
    * The internal of name of the super class (see {@link org.objectweb.asm.Type#getInternalName()}).
@@ -108,21 +96,6 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
    * or class variable initializer).
    */
   public String outerMethodDesc;
-
-  /** The runtime visible annotations of this class. May be {@literal null}. */
-  public List<AnnotationNode> visibleAnnotations;
-
-  /** The runtime invisible annotations of this class. May be {@literal null}. */
-  public List<AnnotationNode> invisibleAnnotations;
-
-  /** The runtime visible type annotations of this class. May be {@literal null}. */
-  public List<TypeAnnotationNode> visibleTypeAnnotations;
-
-  /** The runtime invisible type annotations of this class. May be {@literal null}. */
-  public List<TypeAnnotationNode> invisibleTypeAnnotations;
-
-  /** The non standard attributes of this class. May be {@literal null}. */
-  public List<Attribute> attrs;
 
   /** The inner classes of this class. */
   public List<InnerClassNode> innerClasses;
@@ -191,9 +164,9 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
       final String superName,
       final String[] interfaces) {
     this.version = version;
-    this.access = access;
-    this.name = name;
-    this.signature = signature;
+    super.access = access;
+    super.name = name;
+    super.signature = signature;
     this.superName = superName;
     this.interfaces = Util.asArrayList(interfaces);
   }
@@ -205,7 +178,7 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
   }
 
   @Override
-  public IModuleVisitor visitModule(final String name, final int access, final String version) {
+  public ModuleNode visitModule(final String name, final int access, final String version) {
     module = new ModuleNode(name, access, version);
     return module;
   }
@@ -222,33 +195,6 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
     outerMethodDesc = descriptor;
   }
 
-  @Override
-  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
-    AnnotationNode annotation = new AnnotationNode(descriptor);
-    if (visible) {
-      visibleAnnotations = Util.add(visibleAnnotations, annotation);
-    } else {
-      invisibleAnnotations = Util.add(invisibleAnnotations, annotation);
-    }
-    return annotation;
-  }
-
-  @Override
-  public IAnnotationVisitor visitTypeAnnotation(
-      final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
-    TypeAnnotationNode typeAnnotation = new TypeAnnotationNode(typeRef, typePath, descriptor);
-    if (visible) {
-      visibleTypeAnnotations = Util.add(visibleTypeAnnotations, typeAnnotation);
-    } else {
-      invisibleTypeAnnotations = Util.add(invisibleTypeAnnotations, typeAnnotation);
-    }
-    return typeAnnotation;
-  }
-
-  @Override
-  public void visitAttribute(final Attribute attribute) {
-    attrs = Util.add(attrs, attribute);
-  }
 
   @Override
   public void visitNestMember(final String nestMember) {
@@ -268,7 +214,7 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
   }
 
   @Override
-  public IRecordComponentVisitor visitRecordComponent(
+  public RecordComponentNode visitRecordComponent(
       final String name, final String descriptor, final String signature) {
     RecordComponentNode recordComponent = new RecordComponentNode(name, descriptor, signature);
     recordComponents = Util.add(recordComponents, recordComponent);
@@ -276,7 +222,7 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
   }
 
   @Override
-  public IFieldVisitor visitField(
+  public FieldNode visitField(
       final int access,
       final String name,
       final String descriptor,
@@ -288,7 +234,7 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
   }
 
   @Override
-  public IMethodVisitor visitMethod(
+  public MethodNode visitMethod(
       final int access,
       final String name,
       final String descriptor,
@@ -332,10 +278,7 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
     if (module != null) {
       VersionChecker.module_(version);
     }
-    if (visibleTypeAnnotations != null && !visibleTypeAnnotations.isEmpty() ||
-            (invisibleTypeAnnotations != null && !invisibleTypeAnnotations.isEmpty())) {
-      VersionChecker.typeAnn(version);
-    }
+    super.checkSpecial(version);
     //todo: I think it is not necessary.
 
     // Check the annotations.
@@ -365,10 +308,10 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
 //      }
 //    }
     for (int i = fields.size() - 1; i >= 0; --i) {
-      fields.get(i).check(version);
+      fields.get(i).checkTypeAnn(version);
     }
     for (int i = methods.size() - 1; i >= 0; --i) {
-      methods.get(i).check(version);
+      methods.get(i).checkTypeAnn(version);
     }
   }
 
@@ -399,41 +342,11 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
     if (outerClass != null) {
       classVisitor.visitOuterClass(outerClass, outerMethod, outerMethodDesc);
     }
+
     // Visit the annotations.
-    if (visibleAnnotations != null) {
-      for (int i = 0, n = visibleAnnotations.size(); i < n; ++i) {
-        AnnotationNode annotation = visibleAnnotations.get(i);
-        annotation.accept(classVisitor.visitAnnotation(annotation.desc, true));
-      }
-    }
-    if (invisibleAnnotations != null) {
-      for (int i = 0, n = invisibleAnnotations.size(); i < n; ++i) {
-        AnnotationNode annotation = invisibleAnnotations.get(i);
-        annotation.accept(classVisitor.visitAnnotation(annotation.desc, false));
-      }
-    }
-    if (visibleTypeAnnotations != null) {
-      for (int i = 0, n = visibleTypeAnnotations.size(); i < n; ++i) {
-        TypeAnnotationNode typeAnnotation = visibleTypeAnnotations.get(i);
-        typeAnnotation.accept(
-            classVisitor.visitTypeAnnotation(
-                typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, true));
-      }
-    }
-    if (invisibleTypeAnnotations != null) {
-      for (int i = 0, n = invisibleTypeAnnotations.size(); i < n; ++i) {
-        TypeAnnotationNode typeAnnotation = invisibleTypeAnnotations.get(i);
-        typeAnnotation.accept(
-            classVisitor.visitTypeAnnotation(
-                typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, false));
-      }
-    }
     // Visit the non standard attributes.
-    if (attrs != null) {
-      for (int i = 0, n = attrs.size(); i < n; ++i) {
-        classVisitor.visitAttribute(attrs.get(i));
-      }
-    }
+    super.acceptSpecial(classVisitor);
+
     // Visit the nest members.
     if (nestMembers != null) {
       for (int i = 0, n = nestMembers.size(); i < n; ++i) {

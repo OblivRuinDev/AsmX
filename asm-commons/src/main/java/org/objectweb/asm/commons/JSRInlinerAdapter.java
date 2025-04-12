@@ -59,7 +59,7 @@ import org.objectweb.asm.tree.TryCatchBlockNode;
  * @author Niko Matsakis
  */
 // DontCheck(AbbreviationAsWordInName): can't be renamed (for backward binary compatibility).
-public class JSRInlinerAdapter extends MethodNode implements Opcodes {
+public class JSRInlinerAdapter extends MethodNode implements Opcodes {//todo
 
   /**
    * The instructions that belong to the main "subroutine". Bit i is set iff instruction at index i
@@ -81,9 +81,7 @@ public class JSRInlinerAdapter extends MethodNode implements Opcodes {
   final BitSet sharedSubroutineInsns = new BitSet();
 
   /**
-   * Constructs a new {@link JSRInlinerAdapter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #JSRInlinerAdapter(int, IMethodVisitor, int, String, String,
-   * String, String[])} version.
+   * Constructs a new {@link JSRInlinerAdapter}.
    *
    * @param methodVisitor the method visitor to send the resulting inlined method code to, or <code>
    *     null</code>.
@@ -93,7 +91,6 @@ public class JSRInlinerAdapter extends MethodNode implements Opcodes {
    * @param signature the method's signature. May be {@literal null}.
    * @param exceptions the internal names of the method's exception classes (see {@link
    *     org.objectweb.asm.Type#getInternalName()}). May be {@literal null}.
-   * @throws IllegalStateException if a subclass calls this constructor.
    */
   public JSRInlinerAdapter(
       final IMethodVisitor methodVisitor,
@@ -110,9 +107,6 @@ public class JSRInlinerAdapter extends MethodNode implements Opcodes {
         descriptor,
         signature,
         exceptions);
-    if (getClass() != JSRInlinerAdapter.class) {
-      throw new IllegalStateException();
-    }
   }
 
   /**

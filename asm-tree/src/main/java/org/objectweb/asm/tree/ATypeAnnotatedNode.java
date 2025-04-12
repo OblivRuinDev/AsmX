@@ -32,39 +32,53 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
-package org.objectweb.asm;
+package org.objectweb.asm.tree;
+
+import dev.oblivruin.asmx.VersionChecker;
+import org.objectweb.asm.ISpecialVisitor;
+
+import java.util.List;
 
 /**
- * A visitor to visit a record component. The methods of this class must be called in the following
- * order: ( {@code visitAnnotation} | {@code visitTypeAnnotation} | {@code visitAttribute} )* {@code
- * visitEnd}.
+ * A class used to simplify implementations.
  *
  * @author OblivRuinDev
  */
-public interface IRecordComponentVisitor extends IVisitor, ISpecialVisitor {
+public abstract class ATypeAnnotatedNode {
+    /**
+     * The runtime visible type annotations of this. May be {@literal null}.
+     */
+    public List<TypeAnnotationNode> visibleTypeAnnotations;
+    /**
+     * The runtime invisible type annotations of this. May be {@literal null}.
+     */
+    public List<TypeAnnotationNode> invisibleTypeAnnotations;
 
     /**
-     * Visits an annotation on a type in the record component signature.
+     * Makes the given visitor visit the annotations of this instruction.
      *
-     * @param typeRef    a reference to the annotated type. The sort of this type reference must be
-     *                   {@link TypeReference#CLASS_TYPE_PARAMETER}, {@link
-     *                   TypeReference#CLASS_TYPE_PARAMETER_BOUND} or {@link TypeReference#CLASS_EXTENDS}. See
-     *                   {@link TypeReference}.
-     * @param typePath   the path to the annotated type argument, wildcard bound, array element type, or
-     *                   static inner type within 'typeRef'. May be {@literal null} if the annotation targets
-     *                   'typeRef' as a whole.
-     * @param descriptor the class descriptor of the annotation class.
-     * @param visible    {@literal true} if the annotation is visible at runtime.
-     * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
-     * interested in visiting this annotation.
+     * @param visitor an annotable visitor.
      */
-    @Override
-    IAnnotationVisitor visitTypeAnnotation(
-            int typeRef, TypePath typePath, String descriptor, boolean visible);
+    public final void acceptTypeAnn(ISpecialVisitor visitor) {
+        if (visibleTypeAnnotations != null) {
+            for (TypeAnnotationNode typeAnnotation : visibleTypeAnnotations) {
+                typeAnnotation.accept(
+                        visitor.visitTypeAnnotation(
+                                typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, true));
+            }
+        }
+        if (invisibleTypeAnnotations != null) {
+            for (TypeAnnotationNode typeAnnotation : invisibleTypeAnnotations) {
+                typeAnnotation.accept(
+                        visitor.visitTypeAnnotation(
+                                typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, false));
+            }
+        }
+    }
 
-    /**
-     * Visits the end of the record component. This method, which is the last one to be called, is
-     * used to inform the visitor that everything have been visited.
-     */
-    void visitEnd();
+    public final void checkTypeAnn(int version) {
+        if (invisibleTypeAnnotations != null && !invisibleTypeAnnotations.isEmpty()) {
+            VersionChecker.typeAnn(version);
+        }
+    }
 }

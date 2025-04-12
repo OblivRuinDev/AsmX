@@ -64,7 +64,7 @@ class TraceClassVisitorTest extends AsmTest {
     assertEquals(new ClassFile(classFile), new ClassFile(classWriter.toByteArray()));
   }
 
-  /** Tests that ClassReader can accept a TraceClassVisitor without delegate. */
+  /** Tests that ClassReader can acceptTypeAnn a TraceClassVisitor without delegate. */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
   void testVisitMethods_noDelegate(final PrecompiledClass classParameter, final Api apiParameter) {
@@ -78,7 +78,7 @@ class TraceClassVisitorTest extends AsmTest {
   }
 
   /**
-   * Tests that ClassReader can accept a TraceAnnotationVisitor, TraceFieldVisitor,
+   * Tests that ClassReader can acceptTypeAnn a TraceAnnotationVisitor, TraceFieldVisitor,
    * TraceMethodVisitor or TraceModuleVisitor without delegate.
    */
   @ParameterizedTest

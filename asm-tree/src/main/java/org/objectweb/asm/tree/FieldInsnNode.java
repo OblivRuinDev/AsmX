@@ -90,7 +90,7 @@ public class FieldInsnNode extends AbstractInsnNode {
   @Override
   public void accept(final IMethodVisitor methodVisitor) {
     methodVisitor.visitFieldInsn(opcode, owner, name, desc);
-    acceptAnnotations(methodVisitor);
+    acceptTypeAnn(methodVisitor);
   }
 
   @Override

@@ -183,25 +183,23 @@ public class GeneratorAdapter extends LocalVariablesSorter {
   private final List<Type> localTypes = new ArrayList<>();
 
   /**
-   * Constructs a new {@link GeneratorAdapter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #GeneratorAdapter(int, IMethodVisitor, int, String, String)}
-   * version.
+   * Constructs a new {@link GeneratorAdapter}.
    *
    * @param methodVisitor the method visitor to which this adapter delegates calls.
    * @param access the method's access flags (see {@link Opcodes}).
    * @param name the method's name.
    * @param descriptor the method's descriptor (see {@link Type}).
-   * @throws IllegalStateException if a subclass calls this constructor.
    */
   public GeneratorAdapter(
       final IMethodVisitor methodVisitor,
       final int access,
       final String name,
       final String descriptor) {
-    this(/* latest api = */ Opcodes.V_DYNA, methodVisitor, access, name, descriptor);
-    if (getClass() != GeneratorAdapter.class) {
-      throw new IllegalStateException();
-    }
+    super(access, descriptor, methodVisitor);
+    this.access = access;
+    this.name = name;
+    this.returnType = Type.getReturnType(descriptor);
+    this.argumentTypes = Type.getArgumentTypes(descriptor);
   }
 
   /**
@@ -220,11 +218,7 @@ public class GeneratorAdapter extends LocalVariablesSorter {
       final int access,
       final String name,
       final String descriptor) {
-    super(api, access, descriptor, methodVisitor);
-    this.access = access;
-    this.name = name;
-    this.returnType = Type.getReturnType(descriptor);
-    this.argumentTypes = Type.getArgumentTypes(descriptor);
+
   }
 
   /**

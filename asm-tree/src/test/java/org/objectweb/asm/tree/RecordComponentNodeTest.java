@@ -46,7 +46,7 @@ class RecordComponentNodeTest extends AsmTest {
     RecordComponentNode componentNode = new RecordComponentNode("component", "I", null);
 
     assertEquals("component", componentNode.name);
-    assertEquals("I", componentNode.descriptor);
+    assertEquals("I", componentNode.desc);
   }
 
   @Test

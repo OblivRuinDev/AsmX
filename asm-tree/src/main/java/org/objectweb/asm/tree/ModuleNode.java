@@ -88,19 +88,14 @@ public class ModuleNode implements IModuleVisitor, Consumer<IClassVisitor> {//to
   public List<ModuleProvideNode> provides;
 
   /**
-   * Constructs a {@link ModuleNode}. <i>Subclasses must not use this constructor</i>. Instead, they
-   * must use the {@link #ModuleNode(String, int, String, List, List, List, List, List, List, String)}  ModuleNode} version.
+   * Constructs a {@link ModuleNode}.
    *
    * @param name the fully qualified name (using dots) of the module.
    * @param access the module access flags, among {@code ACC_OPEN}, {@code ACC_SYNTHETIC} and {@code
    *     ACC_MANDATED}.
    * @param version the module version, or {@literal null}.
-   * @throws IllegalStateException If a subclass calls this constructor.
    */
   public ModuleNode(final String name, final int access, final String version) {
-    if (getClass() != ModuleNode.class) {
-      throw new IllegalStateException();
-    }
     this.name = name;
     this.access = access;
     this.version = version;
@@ -242,10 +237,10 @@ public class ModuleNode implements IModuleVisitor, Consumer<IClassVisitor> {//to
   @Override
   public void accept(final IClassVisitor classVisitor) {
     final IModuleVisitor moduleVisitor = classVisitor.visitModule(name, access, version);
-    Consumer<Consumer<IModuleVisitor>> consumer = v -> v.accept(moduleVisitor);
     if (moduleVisitor == null) {
       return;
     }
+    Consumer<Consumer<IModuleVisitor>> consumer = v -> v.accept(moduleVisitor);
     if (mainClass != null) {
       moduleVisitor.visitMainClass(mainClass);
     }

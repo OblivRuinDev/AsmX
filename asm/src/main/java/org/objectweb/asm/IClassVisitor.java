@@ -43,7 +43,7 @@ package org.objectweb.asm;
  * {@code visitEnd}.
  * @author OblivRuinDev
  */
-public interface IClassVisitor extends IVisitor {
+public interface IClassVisitor extends IVisitor, ISpecialVisitor {
     /**
      * Visits the header of the class.
      *
@@ -122,16 +122,6 @@ public interface IClassVisitor extends IVisitor {
     void visitOuterClass(String owner, String name, String descriptor);
 
     /**
-     * Visits an annotation of the class.
-     *
-     * @param descriptor the class descriptor of the annotation class.
-     * @param visible {@literal true} if the annotation is visible at runtime.
-     * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
-     *     interested in visiting this annotation.
-     */
-    IAnnotationVisitor visitAnnotation(String descriptor, boolean visible);
-
-    /**
      * Visits an annotation on a type in the class signature.
      *
      * @param typeRef a reference to the annotated type. The sort of this type reference must be
@@ -146,15 +136,9 @@ public interface IClassVisitor extends IVisitor {
      * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
      *     interested in visiting this annotation.
      */
+    @Override
     IAnnotationVisitor visitTypeAnnotation(
             int typeRef, TypePath typePath, String descriptor, boolean visible);
-
-    /**
-     * Visits a non standard attribute of the class.
-     *
-     * @param attribute an attribute.
-     */
-    void visitAttribute(Attribute attribute);
 
     /**
      * Visits a member of the nest. A nest is a set of classes of the same package that share access

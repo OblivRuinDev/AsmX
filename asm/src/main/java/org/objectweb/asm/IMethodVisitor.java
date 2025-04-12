@@ -54,7 +54,7 @@ package org.objectweb.asm;
  *
  * @author OblivRuinDev
  */
-public interface IMethodVisitor extends IVisitor {
+public interface IMethodVisitor extends IVisitor, ISpecialVisitor {
     // -----------------------------------------------------------------------------------------------
     // Parameters, annotations and non standard attributes
     // -----------------------------------------------------------------------------------------------
@@ -79,16 +79,6 @@ public interface IMethodVisitor extends IVisitor {
     IAnnotationVisitor visitAnnotationDefault();
 
     /**
-     * Visits an annotation of this method.
-     *
-     * @param descriptor the class descriptor of the annotation class.
-     * @param visible    {@literal true} if the annotation is visible at runtime.
-     * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
-     * interested in visiting this annotation.
-     */
-    IAnnotationVisitor visitAnnotation(String descriptor, boolean visible);
-
-    /**
      * Visits an annotation on a type in the method signature.
      *
      * @param typeRef    a reference to the annotated type. The sort of this type reference must be
@@ -104,6 +94,7 @@ public interface IMethodVisitor extends IVisitor {
      * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
      * interested in visiting this annotation.
      */
+    @Override
     IAnnotationVisitor visitTypeAnnotation(
             int typeRef, TypePath typePath, String descriptor, boolean visible);
 
@@ -139,13 +130,6 @@ public interface IMethodVisitor extends IVisitor {
      */
     IAnnotationVisitor visitParameterAnnotation(
             int parameter, String descriptor, boolean visible);
-
-    /**
-     * Visits a non standard attribute of this method.
-     *
-     * @param attribute an attribute.
-     */
-    void visitAttribute(Attribute attribute);
 
     /**
      * Starts the visit of the method's code, if any (i.e. non abstract method).

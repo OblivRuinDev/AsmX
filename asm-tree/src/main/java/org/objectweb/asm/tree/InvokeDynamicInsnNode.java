@@ -84,7 +84,7 @@ public class InvokeDynamicInsnNode extends AbstractInsnNode {
   @Override
   public void accept(final IMethodVisitor methodVisitor) {
     methodVisitor.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
-    acceptAnnotations(methodVisitor);
+    this.acceptTypeAnn(methodVisitor);
   }
 
   @Override

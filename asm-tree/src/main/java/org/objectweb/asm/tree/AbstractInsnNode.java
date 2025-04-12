@@ -29,9 +29,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.tree;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.objectweb.asm.IMethodVisitor;
 
@@ -41,8 +39,9 @@ import org.objectweb.asm.IMethodVisitor;
  *
  * @author Eric Bruneton
  * @author OblivRuinDev
+ * @see InsnList
  */
-public abstract class AbstractInsnNode {
+public abstract class AbstractInsnNode extends ATypeAnnotatedNode {
 
   /** The type of {@link InsnNode} instructions. */
   public static final int INSN = 0;
@@ -98,19 +97,11 @@ public abstract class AbstractInsnNode {
    */
   protected int opcode;
 
-  /**
-   * The runtime visible type annotations of this instruction. This field is only used for real
-   * instructions (i.e. not for labels, frames, or line number nodes). This list is a list of {@link
+  /*
+    The runtime visible type annotations of this instruction. This field is only used for real
+    instructions (i.e. not for labels, frames, or line number nodes). This list is a list of {@link
    * TypeAnnotationNode} objects. May be {@literal null}.
    */
-  public List<TypeAnnotationNode> visibleTypeAnnotations;
-
-  /**
-   * The runtime invisible type annotations of this instruction. This field is only used for real
-   * instructions (i.e. not for labels, frames, or line number nodes). This list is a list of {@link
-   * TypeAnnotationNode} objects. May be {@literal null}.
-   */
-  public List<TypeAnnotationNode> invisibleTypeAnnotations;
 
   /** The previous instruction in the list to which this instruction belongs. */
   AbstractInsnNode previousInsn = null;
@@ -118,12 +109,15 @@ public abstract class AbstractInsnNode {
   /** The next instruction in the list to which this instruction belongs. */
   AbstractInsnNode nextInsn = null;
 
-  /**
-   * The index of this instruction in the list to which it belongs. The value of this field is
-   * correct only when {@link InsnList#cache} is not null. A value of -1 indicates that this
-   * instruction does not belong to any {@link InsnList}.
-   */
+  // -----------------------------------------------------------------------------------------------
+  // InsnList Position Info
+  // -----------------------------------------------------------------------------------------------
+
+  AbstractInsnNode link = null;
+
   int index = -1;
+
+  int offset = 0;
 
   /**
    * Constructs a new {@link AbstractInsnNode}.
@@ -178,26 +172,125 @@ public abstract class AbstractInsnNode {
    */
   public abstract void accept(IMethodVisitor methodVisitor);
 
+  final void accept0(IMethodVisitor visitor) {
+    if (link == null) {
+      accept(visitor);
+    } else if (offset < 0) {//This is an array element
+      link.accept0(visitor);
+      this.accept(visitor);
+    } else {//This is a linked element and the link isn't null
+      this.accept(visitor);
+      link.accept0(visitor);
+    }
+  }
+
+  /**
+   * A unsafe offset getter.
+   *
+   * @param offset Suggest {@code >= 0}
+   * @return Most of the time it's not null.<p>
+   *         Return null if just reach offset but {@code node} is null.
+   * @throws NullPointerException if {@code node.link == null}
+   * @throws IllegalArgumentException if {@code offset < 0}
+   */
+  public final AbstractInsnNode getOffset0(int offset) {
+    if (offset < 0 && offset != this.offset) {
+      throw new IllegalArgumentException();
+    }
+    AbstractInsnNode node = this;
+    while (offset > 0) {
+      offset--;
+      node = node.link;
+    }
+    return node;
+  }
+
+  /**
+   * A safe offset getter. Don't throw any Exception.
+   * @return the node in target offset, maybe null
+   */
+  public final AbstractInsnNode getOffset(int offset) {
+    if (offset < 0 && offset != this.offset) {
+      return null;
+    }
+    AbstractInsnNode node = this;
+    while (offset > 0) {
+      offset--;
+      if (node == null) {
+        return null;
+      }
+      node = node.link;
+    }
+    return node;
+  }
+
+  public final void updateOffset(int number) {
+    this.offset += number;
+    AbstractInsnNode node = link;
+    while (node != null) {
+      node.offset += number;
+      node = node.link;
+    }
+  }
+
+  final void addIndex(int extra) {
+    this.index += extra;
+    if (this.link != null) {
+      this.link.addIndex(extra);
+    }
+  }
+
+  public final void link(AbstractInsnNode target) {
+    if (link == null) {
+      link = target;
+    } else {
+      link.link(target);
+    }
+  }
+
+  public final void makeOffset() {
+    int depth = 0;
+    AbstractInsnNode node = link;
+    while (node != null) {
+      node.offset = ++depth;
+      node = node.link;
+    }
+    this.offset = -depth;
+  }
+
+  public static AbstractInsnNode makeLink(AbstractInsnNode[] array) {
+    int length = array.length;
+    AbstractInsnNode node = array[0];
+    node.offset = -length;
+    for (int index = 1; index < length; index++) {
+      (node = (node.link = array[index])).offset = index;
+    }
+    return array[0];
+  }
+
+  public static AbstractInsnNode makeLink(Collection<AbstractInsnNode> collection) {
+    Iterator<AbstractInsnNode> iterator = collection.iterator();
+    if (iterator.hasNext()) {
+      AbstractInsnNode node = iterator.next();
+      AbstractInsnNode ret = node;
+      int depth = 0;
+      while (iterator.hasNext()) {
+        (node = (node.link = iterator.next())).offset = ++depth;
+      }
+      ret.offset = -depth;
+      return ret;
+    }
+    return null;
+  }
+
   /**
    * Makes the given visitor visit the annotations of this instruction.
    *
    * @param methodVisitor a method visitor.
    */
+  @Deprecated(forRemoval = true)
   protected final void acceptAnnotations(final IMethodVisitor methodVisitor) {
-    if (visibleTypeAnnotations != null) {
-        for (TypeAnnotationNode typeAnnotation : visibleTypeAnnotations) {
-            typeAnnotation.accept(
-                    methodVisitor.visitInsnAnnotation(
-                            typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, true));
-        }
-    }
-    if (invisibleTypeAnnotations != null) {
-        for (TypeAnnotationNode typeAnnotation : invisibleTypeAnnotations) {
-            typeAnnotation.accept(
-                    methodVisitor.visitInsnAnnotation(
-                            typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, false));
-        }
-    }
+    super.acceptTypeAnn(methodVisitor);
   }
 
   /**
@@ -208,17 +301,6 @@ public abstract class AbstractInsnNode {
    *     InsnList}.
    */
   public abstract AbstractInsnNode clone(Map<LabelNode, LabelNode> clonedLabels);
-
-  /**
-   * Returns the clone of the given label.
-   *
-   * @param label a label.
-   * @param clonedLabels a map from LabelNodes to cloned LabelNodes.
-   * @return the clone of the given label.
-   */
-  static LabelNode clone(final LabelNode label, final Map<LabelNode, LabelNode> clonedLabels) {
-    return clonedLabels.get(label);
-  }
 
   /**
    * Returns the clones of the given labels.
@@ -246,23 +328,13 @@ public abstract class AbstractInsnNode {
     if (insnNode.visibleTypeAnnotations != null) {
       this.visibleTypeAnnotations = new ArrayList<>();
       for (int i = 0, n = insnNode.visibleTypeAnnotations.size(); i < n; ++i) {
-        TypeAnnotationNode sourceAnnotation = insnNode.visibleTypeAnnotations.get(i);
-        TypeAnnotationNode cloneAnnotation =
-            new TypeAnnotationNode(
-                sourceAnnotation.typeRef, sourceAnnotation.typePath, sourceAnnotation.desc);
-        sourceAnnotation.accept(cloneAnnotation);
-        this.visibleTypeAnnotations.add(cloneAnnotation);
+        this.visibleTypeAnnotations.add(insnNode.visibleTypeAnnotations.get(i).clone());
       }
     }
     if (insnNode.invisibleTypeAnnotations != null) {
       this.invisibleTypeAnnotations = new ArrayList<>();
       for (int i = 0, n = insnNode.invisibleTypeAnnotations.size(); i < n; ++i) {
-        TypeAnnotationNode sourceAnnotation = insnNode.invisibleTypeAnnotations.get(i);
-        TypeAnnotationNode cloneAnnotation =
-            new TypeAnnotationNode(
-                sourceAnnotation.typeRef, sourceAnnotation.typePath, sourceAnnotation.desc);
-        sourceAnnotation.accept(cloneAnnotation);
-        this.invisibleTypeAnnotations.add(cloneAnnotation);
+        this.invisibleTypeAnnotations.add(insnNode.invisibleTypeAnnotations.get(i).clone());
       }
     }
     return this;

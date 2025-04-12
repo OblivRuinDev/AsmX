@@ -67,7 +67,7 @@ public class IincInsnNode extends AbstractInsnNode {
   @Override
   public void accept(final IMethodVisitor methodVisitor) {
     methodVisitor.visitIincInsn(var, incr);
-    acceptAnnotations(methodVisitor);
+    this.acceptTypeAnn(methodVisitor);
   }
 
   @Override

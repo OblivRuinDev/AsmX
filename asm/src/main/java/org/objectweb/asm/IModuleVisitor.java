@@ -5,8 +5,8 @@
 //      All rights reserved.
 //
 // Modifications and structural adaptations copyright:
-//      ASMX: A modifications of ASM
-//      Copyright (c) 2025 OblivRuinDev(ASMX is just a modified branch of ASM and has nothing else to do with it)
+//      ASMX: A modifications of ASM(ASMX is just a modified branch of ASM and has nothing else to do with it)
+//      Copyright (c) 2025 OblivRuinDev
 //      All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
