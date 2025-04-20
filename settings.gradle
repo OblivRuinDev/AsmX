@@ -36,5 +36,6 @@ include(
   'asm-tree',
   'asm-util',
   'benchmarks',
-  'tools:retrofitter')
-
+  'tools:retrofitter',
+  'asmx'
+)
