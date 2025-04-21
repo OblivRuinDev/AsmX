@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -56,18 +70,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.ModuleVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+
+import org.objectweb.asm.*;
 
 /**
  * A tool to transform classes in order to make them compatible with Java 1.5, and to check that
@@ -78,7 +85,7 @@ import org.objectweb.asm.Type;
  * @author Eric Bruneton
  * @author Eugene Kuleshov
  */
-public final class Retrofitter {
+public final class Retrofitter implements BiConsumer<Path, Object> {
 
   /** The name of the module-info file. */
   private static final String MODULE_INFO = "module-info.class";
@@ -213,7 +220,7 @@ public final class Retrofitter {
     for (ClassReader reader : readers) {
       HashSet<String> privateMembers = new HashSet<>();
       reader.accept(
-          new ClassVisitor(/* latest api =*/ Opcodes.ASM9) {
+          new ClassVisitor() {
             @Override
             public void visit(
                 final int version,
@@ -257,7 +264,7 @@ public final class Retrofitter {
     // Verify that there is no access to a private member of another class.
     for (ClassReader reader : readers) {
       reader.accept(
-          new ClassVisitor(/* latest api =*/ Opcodes.ASM9) {
+          new ClassVisitor() {
             /** The internal name of the visited class. */
             String className;
 
@@ -283,7 +290,7 @@ public final class Retrofitter {
                 final String signature,
                 final String[] exceptions) {
               currentMethodName = name + descriptor;
-              return new MethodVisitor(/* latest api =*/ Opcodes.ASM9) {
+              return new MethodVisitor() {
 
                 private void checkAccess(
                     final String owner, final String name, final String descriptor) {
@@ -347,7 +354,7 @@ public final class Retrofitter {
     if (moduleNames.size() != 1) {
       throw new IllegalArgumentException("Module name can't be infered from classes");
     }
-    ModuleVisitor moduleVisitor =
+    IModuleVisitor moduleVisitor =
         classWriter.visitModule(moduleNames.get(0).replace('/', '.'), Opcodes.ACC_OPEN, version);
 
     for (String importName : imports) {
@@ -417,6 +424,23 @@ public final class Retrofitter {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public void accept(Path path, Object obj) {
+      try {
+          if (obj instanceof String) {
+            retrofit(path, (String) obj);
+          } else {
+            Object[] array = (Object[]) obj;
+            verify(path, (String) array[0], (List<String>) array[1], (List<String>) array[2]);
+          }
+      } catch (IOException e) {
+          throw new RuntimeException(e);
+      } catch (Exception ex) {
+        throw new RuntimeException("Exception while invoke!\nDetails: Args2 is " + obj.toString(), ex);
+      }
+  }
+
   /** A ClassVisitor that retrofits classes to 1.5 version. */
   final class ClassRetrofitter extends ClassVisitor {
     /** The internal name of the visited class. */
@@ -425,8 +449,8 @@ public final class Retrofitter {
     /** An id used to generate the name of the synthetic string concatenation methods. */
     int concatMethodId;
 
-    public ClassRetrofitter(final ClassVisitor classVisitor) {
-      super(/* latest api =*/ Opcodes.ASM9, classVisitor);
+    public ClassRetrofitter(final IClassVisitor classVisitor) {
+      super(classVisitor);
     }
 
     @Override
@@ -454,7 +478,7 @@ public final class Retrofitter {
     }
 
     @Override
-    public FieldVisitor visitField(
+    public IFieldVisitor visitField(
         final int access,
         final String name,
         final String descriptor,
@@ -473,7 +497,7 @@ public final class Retrofitter {
         final String[] exceptions) {
       addPackageReferences(Type.getType(descriptor), /* export= */ false);
       return new MethodVisitor(
-          api, super.visitMethod(access, name, descriptor, signature, exceptions)) {
+          super.visitMethod(access, name, descriptor, signature, exceptions)) {
 
         @Override
         public void visitParameter(final String name, final int access) {
@@ -656,7 +680,7 @@ public final class Retrofitter {
       // We also want to make sure we don't use Java 6, 7 or 8 classfile
       // features (invokedynamic), but this can't be done in the same way.
       // Instead, we use manual checks below.
-      super(Opcodes.ASM4, null);
+      super(null);
     }
 
     @Override
@@ -681,9 +705,9 @@ public final class Retrofitter {
         final String signature,
         final String[] exceptions) {
       currentMethodName = name + descriptor;
-      MethodVisitor methodVisitor =
+      IMethodVisitor methodVisitor =
           super.visitMethod(access, name, descriptor, signature, exceptions);
-      return new MethodVisitor(Opcodes.ASM4, methodVisitor) {
+      return new MethodVisitor(methodVisitor) {
         @Override
         public void visitFieldInsn(
             final int opcode, final String owner, final String name, final String descriptor) {
