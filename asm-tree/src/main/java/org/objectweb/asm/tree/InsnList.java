@@ -29,6 +29,8 @@ package org.objectweb.asm.tree;
 
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
+
+import org.objectweb.asm.IMethodVisitor;
 import org.objectweb.asm.MethodVisitor;
 
 /**
@@ -138,7 +140,7 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    *
    * @param methodVisitor the method visitor that must visit the instructions.
    */
-  public void accept(final MethodVisitor methodVisitor) {
+  public void accept(final IMethodVisitor methodVisitor) {
     AbstractInsnNode currentInsn = firstInsn;
     while (currentInsn != null) {
       currentInsn.accept(methodVisitor);

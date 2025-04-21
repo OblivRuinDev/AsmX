@@ -34,7 +34,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
-import static org.objectweb.asm.Opcodes.V_DYNA;
+import static org.objectweb.asm.Opcodes.V_BYPASS;
 
 /**
  * An abstract class to simplify Visitor Framework implementations.
@@ -48,12 +48,31 @@ public abstract class VerObj {
      */
     public final int ver;
 
+    /**
+     * Construct this with a Java ClassFile Version.<br>
+     * Platform ClassFile Version checking if {@code ver != 0}
+     * @param ver a ClassFile Version or {@link Opcodes}'s ClassFile Version field
+     *            which name started with {@code V},<br>
+     *            0 or {@link Opcodes#V_BYPASS} means don't check
+     * @throws IllegalArgumentException if {@code ver} is an invalid ClassFile Version
+     *                                  and not equal to 0
+     */
     protected VerObj(int ver) {
-        Constants.checkClassVer(ver);
+        checkClassVer(ver);
         this.ver = ver;
     }
 
+    /**
+     * Construct this without any ClassFile Version checking on later visits<br>
+     * Calling this is equivalent to calling {@link #VerObj(int 0)}
+     */
     protected VerObj() {
-        this.ver = V_DYNA;
+        this.ver = V_BYPASS;
+    }
+
+    public static void checkClassVer(int version) {
+        if (version != 0 && (version < 46 || version > 69)) {
+            throw new IllegalArgumentException("Unsupported ClassFile version " + version);
+        }
     }
 }

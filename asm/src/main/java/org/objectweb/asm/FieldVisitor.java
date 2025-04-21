@@ -1,9 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
-// Modifications (c) 2025 OblivRuinDev
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
 //
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -40,37 +52,27 @@ import dev.oblivruin.asmx.VersionChecker;
  * @author OblivRuinDev
  */
 public abstract class FieldVisitor extends DelegateVisitor<IFieldVisitor> implements IFieldVisitor {
-
+  /** @see DelegateVisitor#DelegateVisitor() */
   protected FieldVisitor() {
     super();
   }
 
-  /**
-   * Constructs a new {@link FieldVisitor}.
-   *
-   * @param ver the ASM API version implemented by this visitor. Must be one of the {@code
-   *     ASM}<i>x</i> values in {@link Opcodes}.
-   */
+  /** @see DelegateVisitor#DelegateVisitor(int) */
   protected FieldVisitor(final int ver) {
     super(ver);
   }
 
-  /**
-   * Constructs a new {@link FieldVisitor}.
-   *
-   * @param ver the ASM API version implemented by this visitor. Must be one of the {@code
-   *     ASM}<i>x</i> values in {@link Opcodes}.
-   * @param fieldVisitor the field visitor to which this visitor must delegate method calls. May be
-   *     null.
-   */
+  /** @see DelegateVisitor#DelegateVisitor(int, IVisitor) */
   protected FieldVisitor(final int ver, final IFieldVisitor fieldVisitor) {
     super(ver, fieldVisitor);
   }
 
+  /** @see DelegateVisitor#DelegateVisitor(IVisitor) */
   protected FieldVisitor(IFieldVisitor visitor) {
     super(visitor);
   }
 
+  /** @see DelegateVisitor#DelegateVisitor() */
   @Override
   public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     if (parent != null) {
@@ -79,6 +81,7 @@ public abstract class FieldVisitor extends DelegateVisitor<IFieldVisitor> implem
     return null;
   }
 
+  /** @see DelegateVisitor#DelegateVisitor() */
   @Override
   public IAnnotationVisitor visitTypeAnnotation(
           final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
@@ -89,6 +92,7 @@ public abstract class FieldVisitor extends DelegateVisitor<IFieldVisitor> implem
     return null;
   }
 
+  /** @see DelegateVisitor#DelegateVisitor() */
   @Override
   public void visitAttribute(final Attribute attribute) {
     if (parent != null) {
@@ -96,6 +100,7 @@ public abstract class FieldVisitor extends DelegateVisitor<IFieldVisitor> implem
     }
   }
 
+  /** @see DelegateVisitor#DelegateVisitor() */
   @Override
   public void visitEnd() {
     if (parent != null) {

@@ -1,9 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
-// Modifications (c) 2025 OblivRuinDev
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
 //
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -40,32 +52,22 @@ package org.objectweb.asm;
  */
 public abstract class RecordComponentVisitor extends DelegateVisitor<IRecordComponentVisitor> implements IRecordComponentVisitor {
 
+  /** @see DelegateVisitor#DelegateVisitor() */
   protected RecordComponentVisitor() {
     super();
   }
 
-  /**
-   * Constructs a new {@link RecordComponentVisitor}.
-   *
-   * @param ver the ASM API version implemented by this visitor. Must be one of {@link Opcodes#ASM8}
-   *     or {@link Opcodes#ASM9}.
-   */
+  /** @see DelegateVisitor#DelegateVisitor(int) */
   protected RecordComponentVisitor(final int ver) {
     super(ver);
   }
 
-  /**
-   * Constructs a new {@link RecordComponentVisitor}.
-   *
-   * @param ver the ASM API version implemented by this visitor. Must be {@link Opcodes#ASM8}.
-   * @param recordComponentVisitor the record component visitor to which this visitor must delegate
-   *     method calls. May be null.
-   */
-  protected RecordComponentVisitor(
-          final int ver, final IRecordComponentVisitor recordComponentVisitor) {
+  /** @see DelegateVisitor#DelegateVisitor(int, IVisitor) */
+  protected RecordComponentVisitor(final int ver, final IRecordComponentVisitor recordComponentVisitor) {
     super(ver, recordComponentVisitor);
   }
 
+  /** @see DelegateVisitor#DelegateVisitor(IVisitor) */
   protected RecordComponentVisitor(IRecordComponentVisitor visitor) {
     super(visitor);
   }

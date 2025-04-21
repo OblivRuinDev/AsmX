@@ -1,9 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
-// Modifications (c) 2025 OblivRuinDev
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
 //
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -39,6 +51,7 @@ import org.objectweb.asm.Opcodes;
  *     4.7.9.1</a>
  * @author Thomas Hallgren
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class SignatureWriter extends SignatureVisitor {
 
@@ -96,29 +109,29 @@ public class SignatureWriter extends SignatureVisitor {
   }
 
   @Override
-  public SignatureVisitor visitClassBound() {
+  public SignatureWriter visitClassBound() {
     return this;
   }
 
   @Override
-  public SignatureVisitor visitInterfaceBound() {
+  public SignatureWriter visitInterfaceBound() {
     stringBuilder.append(':');
     return this;
   }
 
   @Override
-  public SignatureVisitor visitSuperclass() {
+  public SignatureWriter visitSuperclass() {
     endFormals();
     return this;
   }
 
   @Override
-  public SignatureVisitor visitInterface() {
+  public SignatureWriter visitInterface() {
     return this;
   }
 
   @Override
-  public SignatureVisitor visitParameterType() {
+  public SignatureWriter visitParameterType() {
     endFormals();
     if (!hasParameters) {
       hasParameters = true;
@@ -128,7 +141,7 @@ public class SignatureWriter extends SignatureVisitor {
   }
 
   @Override
-  public SignatureVisitor visitReturnType() {
+  public SignatureWriter visitReturnType() {
     endFormals();
     if (!hasParameters) {
       stringBuilder.append('(');
@@ -138,7 +151,7 @@ public class SignatureWriter extends SignatureVisitor {
   }
 
   @Override
-  public SignatureVisitor visitExceptionType() {
+  public SignatureWriter visitExceptionType() {
     stringBuilder.append('^');
     return this;
   }
@@ -156,7 +169,7 @@ public class SignatureWriter extends SignatureVisitor {
   }
 
   @Override
-  public SignatureVisitor visitArrayType() {
+  public SignatureWriter visitArrayType() {
     stringBuilder.append('[');
     return this;
   }
@@ -193,7 +206,7 @@ public class SignatureWriter extends SignatureVisitor {
   }
 
   @Override
-  public SignatureVisitor visitTypeArgument(final char wildcard) {
+  public SignatureWriter visitTypeArgument(final char wildcard) {
     // If the top of the stack is 'false', this means we are visiting the first type argument of the
     // currently visited type. We therefore need to append a '<', and to replace the top stack
     // element with 'true' (meaning that the current type does have type arguments).

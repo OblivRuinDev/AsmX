@@ -1,9 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
-// Modifications (c) 2025 OblivRuinDev
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
 //
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -55,32 +67,22 @@ import static org.objectweb.asm.Opcodes.*;
  * @author OblivRuinDev
  */
 public abstract class MethodVisitor extends DelegateVisitor<IMethodVisitor> implements IMethodVisitor {
+  /** @see DelegateVisitor#DelegateVisitor() */
   protected MethodVisitor() {
     super();
   }
 
-  /**
-   * Constructs a new {@link MethodVisitor}.
-   *
-   * @param ver the ASM API version implemented by this visitor. Must be one of the {@code
-   *     ASM}<i>x</i> values in {@link Opcodes}.
-   */
+  /** @see DelegateVisitor#DelegateVisitor(int) */
   protected MethodVisitor(final int ver) {
     super(ver);
   }
 
-  /**
-   * Constructs a new {@link MethodVisitor}.
-   *
-   * @param ver the ASM API version implemented by this visitor. Must be one of the {@code
-   *     ASM}<i>x</i> values in {@link Opcodes}.
-   * @param methodVisitor the method visitor to which this visitor must delegate method calls. May
-   *     be null.
-   */
+  /** @see DelegateVisitor#DelegateVisitor(int, IVisitor) */
   protected MethodVisitor(final int ver, final IMethodVisitor methodVisitor) {
     super(ver, methodVisitor);
   }
 
+  /** @see DelegateVisitor#DelegateVisitor(IVisitor) */
   protected MethodVisitor(IMethodVisitor visitor) {
     super(visitor);
   }

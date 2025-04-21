@@ -1,9 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
-// Modifications (c) 2025 OblivRuinDev
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
 //
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -287,6 +299,7 @@ public class ClassWriter implements IClassVisitor {
   // Implementation of the IClassVisitor interface class
   // -----------------------------------------------------------------------------------------------
 
+  /** {@inheritDoc} */
   @Override
   public final void visit(
       final int version,
@@ -314,6 +327,7 @@ public class ClassWriter implements IClassVisitor {
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void visitSource(final String file, final String debug) {
     if (file != null) {
@@ -324,6 +338,7 @@ public class ClassWriter implements IClassVisitor {
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public final IModuleVisitor visitModule(
       final String name, final int access, final String version) {
@@ -335,11 +350,13 @@ public class ClassWriter implements IClassVisitor {
             version == null ? 0 : symbolTable.addConstantUtf8(version));
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void visitNestHost(final String nestHost) {
     nestHostClassIndex = symbolTable.addConstantClass(nestHost).index;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void visitOuterClass(
       final String owner, final String name, final String descriptor) {
@@ -349,6 +366,7 @@ public class ClassWriter implements IClassVisitor {
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public final IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     if (visible) {
@@ -360,6 +378,7 @@ public class ClassWriter implements IClassVisitor {
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public final IAnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
@@ -374,6 +393,7 @@ public class ClassWriter implements IClassVisitor {
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void visitAttribute(final Attribute attribute) {
     // Store the attributes in the <i>reverse</i> order of their visit by this method.
@@ -381,6 +401,7 @@ public class ClassWriter implements IClassVisitor {
     firstAttribute = attribute;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void visitNestMember(final String nestMember) {
     if (nestMemberClasses == null) {
@@ -390,6 +411,7 @@ public class ClassWriter implements IClassVisitor {
     nestMemberClasses.putShort(symbolTable.addConstantClass(nestMember).index);
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void visitPermittedSubclass(final String permittedSubclass) {
     if (permittedSubclasses == null) {
@@ -399,6 +421,7 @@ public class ClassWriter implements IClassVisitor {
     permittedSubclasses.putShort(symbolTable.addConstantClass(permittedSubclass).index);
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void visitInnerClass(
       final String name, final String outerName, final String innerName, final int access) {
@@ -424,6 +447,7 @@ public class ClassWriter implements IClassVisitor {
     // and throw an exception if there is a difference?
   }
 
+  /** {@inheritDoc} */
   @Override
   public final IRecordComponentVisitor visitRecordComponent(
       final String name, final String descriptor, final String signature) {
@@ -437,6 +461,7 @@ public class ClassWriter implements IClassVisitor {
     return lastRecordComponent = recordComponentWriter;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final IFieldVisitor visitField(
       final int access,
@@ -454,6 +479,7 @@ public class ClassWriter implements IClassVisitor {
     return lastField = fieldWriter;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final IMethodVisitor visitMethod(
       final int access,
@@ -471,6 +497,7 @@ public class ClassWriter implements IClassVisitor {
     return lastMethod = methodWriter;
   }
 
+  /** {@inheritDoc} */
   @Override
   public final void visitEnd() {
     // Nothing to do.

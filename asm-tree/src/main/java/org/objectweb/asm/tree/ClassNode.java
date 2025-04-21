@@ -1,9 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
-// Modifications (c) 2025 OblivRuinDev
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
 //
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -205,7 +217,7 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
   }
 
   @Override
-  public IModuleVisitor visitModule(final String name, final int access, final String version) {
+  public ModuleNode visitModule(final String name, final int access, final String version) {
     module = new ModuleNode(name, access, version);
     return module;
   }
@@ -223,7 +235,7 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
   }
 
   @Override
-  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public AnnotationNode visitAnnotation(final String descriptor, final boolean visible) {
     AnnotationNode annotation = new AnnotationNode(descriptor);
     if (visible) {
       visibleAnnotations = Util.add(visibleAnnotations, annotation);
@@ -234,7 +246,7 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
   }
 
   @Override
-  public IAnnotationVisitor visitTypeAnnotation(
+  public TypeAnnotationNode visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     TypeAnnotationNode typeAnnotation = new TypeAnnotationNode(typeRef, typePath, descriptor);
     if (visible) {
@@ -268,7 +280,7 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
   }
 
   @Override
-  public IRecordComponentVisitor visitRecordComponent(
+  public RecordComponentNode visitRecordComponent(
       final String name, final String descriptor, final String signature) {
     RecordComponentNode recordComponent = new RecordComponentNode(name, descriptor, signature);
     recordComponents = Util.add(recordComponents, recordComponent);
@@ -276,7 +288,7 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
   }
 
   @Override
-  public IFieldVisitor visitField(
+  public FieldNode visitField(
       final int access,
       final String name,
       final String descriptor,
@@ -288,7 +300,7 @@ public class ClassNode implements IClassVisitor, Consumer<IClassVisitor> {
   }
 
   @Override
-  public IMethodVisitor visitMethod(
+  public MethodNode visitMethod(
       final int access,
       final String name,
       final String descriptor,

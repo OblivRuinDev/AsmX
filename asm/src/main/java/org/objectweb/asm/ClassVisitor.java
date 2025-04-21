@@ -1,9 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
-// Modifications (c) 2025 OblivRuinDev
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
 //
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -29,6 +41,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
+import dev.oblivruin.asmx.ClassVersionException;
 import dev.oblivruin.asmx.VersionChecker;
 
 /**
@@ -43,36 +56,27 @@ import dev.oblivruin.asmx.VersionChecker;
  * @author OblivRuinDev
  */
 public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implements IClassVisitor {
+  /** @see DelegateVisitor#DelegateVisitor() */
   protected ClassVisitor() {
       super();
   }
 
-  /**
-   * Constructs a new {@link ClassVisitor}.
-   *
-   * @param ver the ASM API version implemented by this visitor. Must be one of the {@code
-   *     ASM}<i>x</i> values in {@link Opcodes}.
-   */
+  /** @see DelegateVisitor#DelegateVisitor(int) */
   protected ClassVisitor(final int ver) {
     super(ver);
   }
 
-  /**
-   * Constructs a new {@link ClassVisitor}.
-   *
-   * @param ver the ASM API version implemented by this visitor. Must be one of the {@code
-   *     ASM}<i>x</i> values in {@link Opcodes}.
-   * @param classVisitor the class visitor to which this visitor must delegate method calls. May be
-   *     null.
-   */
+  /** @see DelegateVisitor#DelegateVisitor(int, IVisitor) */
   protected ClassVisitor(final int ver, final IClassVisitor classVisitor) {
     super(ver, classVisitor);
   }
 
+  /** @see DelegateVisitor#DelegateVisitor(IVisitor) */
   protected ClassVisitor(IClassVisitor visitor) {
     super(visitor);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void visit(
           final int version,
@@ -92,6 +96,7 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public void visitSource(final String source, final String debug) {
     if (parent != null) {
@@ -99,6 +104,7 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public IModuleVisitor visitModule(final String name, final int access, final String version) {
     VersionChecker.module_(ver);
@@ -108,6 +114,7 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
     return null;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void visitNestHost(final String nestHost) {
     VersionChecker.nest(ver);
@@ -116,6 +123,7 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public void visitOuterClass(final String owner, final String name, final String descriptor) {
     if (parent != null) {
@@ -123,6 +131,7 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     if (parent != null) {
@@ -131,6 +140,7 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
     return null;
   }
 
+  /** {@inheritDoc} */
   @Override
   public IAnnotationVisitor visitTypeAnnotation(
           final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
@@ -141,6 +151,7 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
     return null;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void visitAttribute(final Attribute attribute) {
     if (parent != null) {
@@ -148,6 +159,7 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public void visitNestMember(final String nestMember) {
     VersionChecker.nest(ver);
@@ -156,6 +168,7 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public void visitPermittedSubclass(final String permittedSubclass) {
     VersionChecker.permit(ver);
@@ -164,6 +177,7 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public void visitInnerClass(
           final String name, final String outerName, final String innerName, final int access) {
@@ -172,6 +186,7 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public IRecordComponentVisitor visitRecordComponent(
           final String name, final String descriptor, final String signature) {
@@ -182,6 +197,7 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
     return null;
   }
 
+  /** {@inheritDoc} */
   @Override
   public IFieldVisitor visitField(
           final int access,
@@ -195,6 +211,7 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
     return null;
   }
 
+  /** {@inheritDoc} */
   @Override
   public IMethodVisitor visitMethod(
           final int access,
@@ -208,6 +225,7 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
     return null;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void visitEnd() {
     if (parent != null) {

@@ -1,4 +1,4 @@
-// ASMX: A modification of ASM(ASMX is just a modified branch of ASM and has nothing else to do with it)
+// ASMX: Extended bytecode manipulation toolkit based on ASM
 // Copyright (c) 2025 OblivRuinDev
 //
 // Redistribution and use in source and binary forms, with or without
@@ -31,8 +31,18 @@ package dev.oblivruin.asmx;
  * @author OblivRuinDev
  */
 public class ClassVersionException extends RuntimeException {
+    /**
+     * Construct this with details.
+     * @param message the detail message.
+     */
     public ClassVersionException(String message) {
         super(message);
     }
-    public ClassVersionException() {}
+
+    /**
+     * Construct this.
+     */
+    public ClassVersionException() {
+        super();
+    }
 }

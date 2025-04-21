@@ -1,4 +1,4 @@
-// ASMX: A modification of ASM
+// ASMX: Extended bytecode manipulation toolkit based on ASM
 // Copyright (c) 2025 OblivRuinDev
 //
 // Redistribution and use in source and binary forms, with or without

@@ -35,7 +35,7 @@
 package org.objectweb.asm;
 
 /**
- * An abstract class to simplify the implementation of parent delegation visitors.
+ * An abstract class to simplify the implementation of Parent Delegation Visitors.
  *
  * @param <T> The type of the delegate visitor
  *
@@ -47,21 +47,43 @@ public abstract class DelegateVisitor<T extends IVisitor> extends VerObj {
      */
     public final T parent;
 
+    /**
+     * Construct this without any ClassFile Version checking on later visits
+     *
+     * @see #DelegateVisitor(int, IVisitor)
+     * @see VerObj#VerObj()
+     */
     protected DelegateVisitor(T parent) {
         super();
         this.parent = parent;
     }
 
+    /**
+     * Construct this without any ClassFile Version checking on later visits
+     *
+     * @see #DelegateVisitor(int, IVisitor)
+     * @see VerObj#VerObj()
+     */
     protected DelegateVisitor() {
         super();
         this.parent = null;
     }
-
+    /**
+     * Construct this.<br>
+     * Platform ClassFile Version checking if {@code ver != 0}
+     * @param parent might be {@code null}
+     * @param ver a ClassFile Version or {@link Opcodes}'s ClassFile Version field which name started with {@code V},<br>
+     *            0 or {@link Opcodes#V_BYPASS} means don't check
+     * @see VerObj#VerObj(int)
+     */
     protected DelegateVisitor(int ver, T parent) {
         super(ver);
         this.parent = parent;
     }
 
+    /**
+     * @see #DelegateVisitor(int, IVisitor)
+     */
     protected DelegateVisitor(int ver) {
         super(ver);
         this.parent = null;

@@ -1,9 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
-// Modifications (c) 2025 OblivRuinDev
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
 //
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -231,7 +243,7 @@ public class MethodNode implements IMethodVisitor {
   }
 
   @Override
-  public IAnnotationVisitor visitAnnotationDefault() {
+  public AnnotationNode visitAnnotationDefault() {
     return new AnnotationNode(
         new ArrayList<>(0) {
           @Override
@@ -243,7 +255,7 @@ public class MethodNode implements IMethodVisitor {
   }
 
   @Override
-  public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+  public AnnotationNode visitAnnotation(final String descriptor, final boolean visible) {
     AnnotationNode annotation = new AnnotationNode(descriptor);
     if (visible) {
       visibleAnnotations = Util.add(visibleAnnotations, annotation);
@@ -254,7 +266,7 @@ public class MethodNode implements IMethodVisitor {
   }
 
   @Override
-  public IAnnotationVisitor visitTypeAnnotation(
+  public TypeAnnotationNode visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     TypeAnnotationNode typeAnnotation = new TypeAnnotationNode(typeRef, typePath, descriptor);
     if (visible) {
@@ -276,7 +288,7 @@ public class MethodNode implements IMethodVisitor {
 
   @Override
   @SuppressWarnings("unchecked")
-  public IAnnotationVisitor visitParameterAnnotation(
+  public AnnotationNode visitParameterAnnotation(
       final int parameter, final String descriptor, final boolean visible) {
     AnnotationNode annotation = new AnnotationNode(descriptor);
     if (visible) {
@@ -408,7 +420,7 @@ public class MethodNode implements IMethodVisitor {
   }
 
   @Override
-  public IAnnotationVisitor visitInsnAnnotation(
+  public TypeAnnotationNode visitInsnAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     // Find the last real instruction, i.e. the instruction targeted by this annotation.
     AbstractInsnNode currentInsn = instructions.getLast();
@@ -436,7 +448,7 @@ public class MethodNode implements IMethodVisitor {
   }
 
   @Override
-  public IAnnotationVisitor visitTryCatchAnnotation(
+  public TypeAnnotationNode visitTryCatchAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     TryCatchBlockNode tryCatchBlock = tryCatchBlocks.get((typeRef & 0x00FFFF00) >> 8);
     TypeAnnotationNode typeAnnotation = new TypeAnnotationNode(typeRef, typePath, descriptor);
@@ -465,7 +477,7 @@ public class MethodNode implements IMethodVisitor {
   }
 
   @Override
-  public IAnnotationVisitor visitLocalVariableAnnotation(
+  public LocalVariableAnnotationNode visitLocalVariableAnnotation(
       final int typeRef,
       final TypePath typePath,
       final Label[] start,

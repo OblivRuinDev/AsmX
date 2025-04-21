@@ -1,9 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
-// Modifications (c) 2025 OblivRuinDev
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
 //
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -42,7 +54,7 @@ import java.util.regex.Pattern;
  * @author Eric Bruneton
  * @author OblivRuinDev
  */
-public final class Constants {
+final class Constants {
 
   // The ClassFile attribute names, in the order they are defined in
   // https://docs.oracle.com/javase/specs/jvms/se11/html/jvms-4.html#jvms-4.7-300.
@@ -190,11 +202,6 @@ public final class Constants {
     String internalName = callerClass.getName().replace('.', '/');
     if (!isWhitelisted(internalName)) {
       checkIsPreview(callerClass.getClassLoader().getResourceAsStream(internalName + ".class"));
-    }
-  }
-  public static void checkClassVer(int version) throws IllegalArgumentException {
-    if (version != 0 && (version < 46 || version > 69)) {
-      throw new IllegalArgumentException("Unsupported ClassFile version " + version);
     }
   }
 
