@@ -110,9 +110,7 @@ public class AnalyzerAdapter extends MethodVisitor {
   private String owner;
 
   /**
-   * Constructs a new {@link AnalyzerAdapter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #AnalyzerAdapter(int, String, int, String, String,
-   * IMethodVisitor)} version.
+   * Constructs a new {@link AnalyzerAdapter}.
    *
    * @param owner the owner's class name.
    * @param access the method's access flags (see {@link Opcodes}).
@@ -120,7 +118,6 @@ public class AnalyzerAdapter extends MethodVisitor {
    * @param descriptor the method's descriptor (see {@link Type}).
    * @param methodVisitor the method visitor to which this adapter delegates calls. May be {@literal
    *     null}.
-   * @throws IllegalStateException If a subclass calls this constructor.
    */
   public AnalyzerAdapter(
       final String owner,
@@ -128,32 +125,7 @@ public class AnalyzerAdapter extends MethodVisitor {
       final String name,
       final String descriptor,
       final IMethodVisitor methodVisitor) {
-    this(/* latest api = */ Opcodes.V_DYNA, owner, access, name, descriptor, methodVisitor);
-    if (getClass() != AnalyzerAdapter.class) {
-      throw new IllegalStateException();
-    }
-  }
-
-  /**
-   * Constructs a new {@link AnalyzerAdapter}.
-   *
-   * @param api the ASM API version implemented by this visitor. Must be one of the {@code
-   *     ASM}<i>x</i> values in {@link Opcodes}.
-   * @param owner the owner's class name.
-   * @param access the method's access flags (see {@link Opcodes}).
-   * @param name the method's name.
-   * @param descriptor the method's descriptor (see {@link Type}).
-   * @param methodVisitor the method visitor to which this adapter delegates calls. May be {@literal
-   *     null}.
-   */
-  protected AnalyzerAdapter(
-      final int api,
-      final String owner,
-      final int access,
-      final String name,
-      final String descriptor,
-      final IMethodVisitor methodVisitor) {
-    super(api, methodVisitor);
+    super(methodVisitor);
     this.owner = owner;
     locals = new ArrayList<>();
     stack = new ArrayList<>();
@@ -197,6 +169,29 @@ public class AnalyzerAdapter extends MethodVisitor {
       }
     }
     maxLocals = locals.size();
+  }
+
+  /**
+   * Constructs a new {@link AnalyzerAdapter}.
+   *
+   * @param api the ASM API version implemented by this visitor. Must be one of the {@code
+   *     ASM}<i>x</i> values in {@link Opcodes}.
+   * @param owner the owner's class name.
+   * @param access the method's access flags (see {@link Opcodes}).
+   * @param name the method's name.
+   * @param descriptor the method's descriptor (see {@link Type}).
+   * @param methodVisitor the method visitor to which this adapter delegates calls. May be {@literal
+   *     null}.
+   */
+  @Deprecated
+  protected AnalyzerAdapter(
+      final int api,
+      final String owner,
+      final int access,
+      final String name,
+      final String descriptor,
+      final IMethodVisitor methodVisitor) {
+    this(owner, access, name, descriptor, methodVisitor);
   }
 
   @Override

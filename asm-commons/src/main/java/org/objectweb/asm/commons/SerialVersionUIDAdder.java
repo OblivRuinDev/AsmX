@@ -61,7 +61,7 @@ import org.objectweb.asm.*;
  *   ClassWriter classWriter = new ClassWriter(...);
  *   ClassVisitor svuidAdder = new SerialVersionUIDAdder(classWriter);
  *   ClassVisitor classVisitor = new MyClassAdapter(svuidAdder);
- *   new ClassReader(orginalClass).accept(classVisitor, 0);
+ *   new ClassReader(orginalClass).acceptTypeAnn(classVisitor, 0);
  * </pre>
  *
  * <p>The SVUID algorithm can be found at <a href=

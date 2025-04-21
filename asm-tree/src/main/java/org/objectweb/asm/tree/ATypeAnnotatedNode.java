@@ -1,0 +1,84 @@
+// Original code derived from ASM framework (https://asm.ow2.io/)
+// Original copyright notice:
+//      ASM: a very small and fast Java bytecode manipulation framework
+//      Copyright (c) 2000-2011 INRIA, France Telecom
+//      All rights reserved.
+//
+// Modifications and structural adaptations copyright:
+//      ASMX: A modifications of ASM(ASMX is just a modified branch of ASM and has nothing else to do with it)
+//      Copyright (c) 2025 OblivRuinDev
+//      All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+// 1. Redistributions of source code must retain the above copyright
+// notice, this list of conditions and the following disclaimer.
+// 2. Redistributions in binary form must reproduce the above copyright
+// notice, this list of conditions and the following disclaimer in the
+// documentation and/or other materials provided with the distribution.
+// 3. Neither the name of the copyright holders nor the names of its
+// contributors may be used to endorse or promote products derived from
+// this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE.
+package org.objectweb.asm.tree;
+
+import dev.oblivruin.asmx.VersionChecker;
+import org.objectweb.asm.ISpecialVisitor;
+
+import java.util.List;
+
+/**
+ * A class used to simplify implementations.
+ *
+ * @author OblivRuinDev
+ */
+public abstract class ATypeAnnotatedNode {
+    /**
+     * The runtime visible type annotations of this. May be {@literal null}.
+     */
+    public List<TypeAnnotationNode> visibleTypeAnnotations;
+    /**
+     * The runtime invisible type annotations of this. May be {@literal null}.
+     */
+    public List<TypeAnnotationNode> invisibleTypeAnnotations;
+
+    /**
+     * Makes the given visitor visit the annotations of this instruction.
+     *
+     * @param visitor an annotable visitor.
+     */
+    public final void acceptTypeAnn(ISpecialVisitor visitor) {
+        if (visibleTypeAnnotations != null) {
+            for (TypeAnnotationNode typeAnnotation : visibleTypeAnnotations) {
+                typeAnnotation.accept(
+                        visitor.visitTypeAnnotation(
+                                typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, true));
+            }
+        }
+        if (invisibleTypeAnnotations != null) {
+            for (TypeAnnotationNode typeAnnotation : invisibleTypeAnnotations) {
+                typeAnnotation.accept(
+                        visitor.visitTypeAnnotation(
+                                typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, false));
+            }
+        }
+    }
+
+    public final void checkTypeAnn(int version) {
+        if (invisibleTypeAnnotations != null && !invisibleTypeAnnotations.isEmpty()) {
+            VersionChecker.typeAnn(version);
+        }
+    }
+}

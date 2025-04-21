@@ -48,16 +48,7 @@ package org.objectweb.asm;
  *
  * @author OblivRuinDev
  */
-public interface IFieldVisitor extends IVisitor {
-    /**
-     * Visits an annotation of the field.
-     *
-     * @param descriptor the class descriptor of the annotation class.
-     * @param visible    {@literal true} if the annotation is visible at runtime.
-     * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
-     * interested in visiting this annotation.
-     */
-    IAnnotationVisitor visitAnnotation(String descriptor, boolean visible);
+public interface IFieldVisitor extends IVisitor, ISpecialVisitor {
 
     /**
      * Visits an annotation on the type of the field.
@@ -72,15 +63,9 @@ public interface IFieldVisitor extends IVisitor {
      * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
      * interested in visiting this annotation.
      */
+    @Override
     IAnnotationVisitor visitTypeAnnotation(
             int typeRef, TypePath typePath, String descriptor, boolean visible);
-
-    /**
-     * Visits a non standard attribute of the field.
-     *
-     * @param attribute an attribute.
-     */
-    void visitAttribute(Attribute attribute);
 
     /**
      * Visits the end of the field. This method, which is the last one to be called, is used to inform

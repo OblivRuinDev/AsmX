@@ -1,21 +1,14 @@
-// ---------------------------------------------------------------------
-// ORIGINAL WORK:
-// ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
-// All rights reserved.
+// Original code derived from ASM framework (https://asm.ow2.io/)
+// Original copyright notice:
+//      ASM: a very small and fast Java bytecode manipulation framework
+//      Copyright (c) 2000-2011 INRIA, France Telecom
+//      All rights reserved.
 //
-// Distributed under the BSD-3-Clause License
-// ---------------------------------------------------------------------
-
-// ---------------------------------------------------------------------
-// MODIFIED WORK and structural adaptations:
-// ASMX: Extended bytecode manipulation toolkit based on ASM
-// Copyright (c) 2025 OblivRuinDev
-// Modifications: See git commits for details
+// Modifications and structural adaptations copyright:
+//      ASMX: A modifications of ASM(ASMX is just a modified branch of ASM and has nothing else to do with it)
+//      Copyright (c) 2025 OblivRuinDev
+//      All rights reserved.
 //
-// Distributed under the BSD-3-Clause License (inherits original terms)
-// ---------------------------------------------------------------------
-
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -42,21 +35,28 @@
 package org.objectweb.asm;
 
 /**
- * A visitor to visit a record component. The methods of this class must be called in the following
- * order: ( {@code visitAnnotation} | {@code visitTypeAnnotation} | {@code visitAttribute} )* {@code
- * visitEnd}.
+ * A special interface for asm tree API.
+ *
+ * @see org.objectweb.asm.tree.ATypeAnnotatedNode
+ * @see org.objectweb.asm.tree.SpecialNode
  *
  * @author OblivRuinDev
  */
-public interface IRecordComponentVisitor extends IVisitor, ISpecialVisitor {
+public interface ISpecialVisitor extends IVisitor {
+    /**
+     * Visits an annotation.
+     *
+     * @param descriptor the class descriptor of the annotation class.
+     * @param visible    {@literal true} if the annotation is visible at runtime.
+     * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
+     * interested in visiting this annotation.
+     */
+    IAnnotationVisitor visitAnnotation(String descriptor, boolean visible);
 
     /**
-     * Visits an annotation on a type in the record component signature.
+     * Visits an annotation on the type.
      *
-     * @param typeRef    a reference to the annotated type. The sort of this type reference must be
-     *                   {@link TypeReference#CLASS_TYPE_PARAMETER}, {@link
-     *                   TypeReference#CLASS_TYPE_PARAMETER_BOUND} or {@link TypeReference#CLASS_EXTENDS}. See
-     *                   {@link TypeReference}.
+     * @param typeRef    See {@link TypeReference}.
      * @param typePath   the path to the annotated type argument, wildcard bound, array element type, or
      *                   static inner type within 'typeRef'. May be {@literal null} if the annotation targets
      *                   'typeRef' as a whole.
@@ -65,13 +65,12 @@ public interface IRecordComponentVisitor extends IVisitor, ISpecialVisitor {
      * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
      * interested in visiting this annotation.
      */
-    @Override
-    IAnnotationVisitor visitTypeAnnotation(
-            int typeRef, TypePath typePath, String descriptor, boolean visible);
+    IAnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible);
 
     /**
-     * Visits the end of the record component. This method, which is the last one to be called, is
-     * used to inform the visitor that everything have been visited.
+     * Visits a non standard attribute of this.
+     *
+     * @param attribute an attribute.
      */
-    void visitEnd();
+    void visitAttribute(Attribute attribute);
 }

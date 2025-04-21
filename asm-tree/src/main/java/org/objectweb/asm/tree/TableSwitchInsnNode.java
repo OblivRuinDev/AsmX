@@ -97,12 +97,12 @@ public class TableSwitchInsnNode extends AbstractInsnNode {
       labelsArray[i] = this.labels.get(i).getLabel();
     }
     methodVisitor.visitTableSwitchInsn(min, max, dflt.getLabel(), labelsArray);
-    acceptAnnotations(methodVisitor);
+    this.acceptTypeAnn(methodVisitor);
   }
 
   @Override
   public AbstractInsnNode clone(final Map<LabelNode, LabelNode> clonedLabels) {
-    return new TableSwitchInsnNode(min, max, clone(dflt, clonedLabels), clone(labels, clonedLabels))
+      return new TableSwitchInsnNode(min, max, clonedLabels.get(dflt), clone(labels, clonedLabels))
         .cloneAnnotations(this);
   }
 }

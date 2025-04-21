@@ -50,7 +50,7 @@ import org.objectweb.asm.TypePath;
  * @author Eric Bruneton
  * @author OblivRuinDev
  */
-public class TypeAnnotationNode extends AnnotationNode {
+public class TypeAnnotationNode extends AnnotationNode implements Cloneable {
 
   /** A reference to the annotated type. See {@link org.objectweb.asm.TypeReference}. */
   public int typeRef;
@@ -93,5 +93,13 @@ public class TypeAnnotationNode extends AnnotationNode {
   public TypeAnnotationNode(
       final int api, final int typeRef, final TypePath typePath, final String descriptor) {
     this(typeRef, typePath, descriptor);
+  }
+
+  @SuppressWarnings("MethodDoesntCallSuperMethod")
+  @Override
+  public TypeAnnotationNode clone() {
+    TypeAnnotationNode clone = new TypeAnnotationNode(typeRef, typePath, desc);
+    accept(clone);
+    return clone;
   }
 }

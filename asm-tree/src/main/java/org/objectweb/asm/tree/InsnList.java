@@ -27,26 +27,30 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.tree;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 import org.objectweb.asm.IMethodVisitor;
-import org.objectweb.asm.MethodVisitor;
 
 /**
  * A doubly linked list of {@link AbstractInsnNode} objects. <i>This implementation is not thread
  * safe</i>.
+ *
+ * @author OblivRuinDev
+ * @see AbstractInsnNode
  */
 public class InsnList implements Iterable<AbstractInsnNode> {
 
   /** The number of instructions in this list. */
-  private int size;
+  int size;
 
   /** The first instruction in this list. May be {@literal null}. */
-  private AbstractInsnNode firstInsn;
+  AbstractInsnNode firstInsn;
 
   /** The last instruction in this list. May be {@literal null}. */
-  private AbstractInsnNode lastInsn;
+  AbstractInsnNode lastInsn;
 
   /**
    * A cache of the instructions of this list. This cache is used to improve the performance of the

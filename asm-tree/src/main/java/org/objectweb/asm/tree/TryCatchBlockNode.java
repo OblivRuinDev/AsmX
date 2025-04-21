@@ -41,8 +41,6 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.tree;
 
-import java.util.List;
-
 import org.objectweb.asm.IMethodVisitor;
 
 /**
@@ -50,7 +48,7 @@ import org.objectweb.asm.IMethodVisitor;
  *
  * @author Eric Bruneton
  */
-public class TryCatchBlockNode {
+public class TryCatchBlockNode extends ATypeAnnotatedNode {
 
   /** The beginning of the exception handler's scope (inclusive). */
   public LabelNode start;
@@ -67,13 +65,7 @@ public class TryCatchBlockNode {
    */
   public String type;
 
-  /** The runtime visible type annotations on the exception handler type. May be {@literal null}. */
-  public List<TypeAnnotationNode> visibleTypeAnnotations;
-
-  /**
-   * The runtime invisible type annotations on the exception handler type. May be {@literal null}.
-   */
-  public List<TypeAnnotationNode> invisibleTypeAnnotations;
+  /* The type annotations on the exception handler type. May be {@literal null}. */
 
   /**
    * Constructs a new {@link TryCatchBlockNode}.
@@ -122,21 +114,6 @@ public class TryCatchBlockNode {
   public void accept(final IMethodVisitor methodVisitor) {
     methodVisitor.visitTryCatchBlock(
         start.getLabel(), end.getLabel(), handler == null ? null : handler.getLabel(), type);
-    if (visibleTypeAnnotations != null) {
-      for (int i = 0, n = visibleTypeAnnotations.size(); i < n; ++i) {
-        TypeAnnotationNode typeAnnotation = visibleTypeAnnotations.get(i);
-        typeAnnotation.accept(
-            methodVisitor.visitTryCatchAnnotation(
-                typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, true));
-      }
-    }
-    if (invisibleTypeAnnotations != null) {
-      for (int i = 0, n = invisibleTypeAnnotations.size(); i < n; ++i) {
-        TypeAnnotationNode typeAnnotation = invisibleTypeAnnotations.get(i);
-        typeAnnotation.accept(
-            methodVisitor.visitTryCatchAnnotation(
-                typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, false));
-      }
-    }
+    super.acceptTypeAnn(methodVisitor);
   }
 }

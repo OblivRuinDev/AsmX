@@ -75,7 +75,7 @@ import org.objectweb.asm.tree.analysis.SimpleVerifier;
  * ClassReader classReader = new ClassReader(inputStream);
  * ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS);
  * ClassVisitor classVisitor = new <b>MyClassAdapter</b>(new CheckClassAdapter(classWriter, true));
- * classReader.accept(classVisitor, 0);
+ * classReader.acceptTypeAnn(classVisitor, 0);
  *
  * StringWriter stringWriter = new StringWriter();
  * PrintWriter printWriter = new PrintWriter(stringWriter);
