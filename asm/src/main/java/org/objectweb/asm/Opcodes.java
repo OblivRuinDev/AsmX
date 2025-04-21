@@ -66,7 +66,7 @@ public interface Opcodes {
      */
     @Deprecated int ASM10_EXPERIMENTAL = 1 << 24 | 10 << 16 | 0 << 8;
 
-    // Java ClassFile versions (the minor version is stored in the 16 most significant bits, and the
+    // AsmX Java ClassFile Versions (the minor version is stored in the 16 most significant bits, and the
     // major version in the 16 least significant bits).
     /**
      * @deprecated It was too old and might cause some problems, and we decided to abandon it.

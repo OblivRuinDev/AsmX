@@ -9,7 +9,8 @@
 
 ## 📖 Overview
 
-**ASMX** is an extended derivative of the [ASM](https://asm.ow2.io/) Java bytecode manipulation framework, designed to address legacy code issues and enhance development flexibility. Key improvements include:
+**ASMX** is an extended bytecode manipulation toolkit based on [ASM](https://asm.ow2.io/) Java bytecode manipulation framework,
+designed to address legacy code issues and enhance development flexibility. Key improvements include:
 
 - 🛠️ **Legacy Version Compatibility**: Resolve historical version constraints
 - 🧹 **Code Simplification**: Remove redundant version checks
@@ -18,13 +19,16 @@
 Unfortunately, this will break some of the API structure,
 but we're still working hard to keep the majority of the API available and add more developer friendly APIs.
 
+For more API breaking changes, please see [changes.md](changes.md)<br>
+For actual changes, please see [Compare me](https://github.com/OblivRuinDev/AsmX/compare/upstream...dev)
+
 > ⚠️ **Note**: ASMX is **not** an official ASM branch. See [Legal Disclaimer](#-legal-disclaimer).
 
 ---
 
 ## 🔗 Origin Code References
 
-| Source          | Link                                                                                   |
+| Source          | Link                                                                                  |
 |-----------------|---------------------------------------------------------------------------------------|
 | Official ASM    | [OW2 GitLab](https://gitlab.ow2.org/asm/asm)                                          |
 | GitHub Sync     | [Unofficial Sync Fork](https://github.com/OblivRuinDev/AsmX/tree/upstream)            |
