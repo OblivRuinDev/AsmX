@@ -43,6 +43,7 @@ package org.objectweb.asm.tree;
 
 import java.util.function.Consumer;
 
+import dev.oblivruin.asm.VersionChecker;
 import org.objectweb.asm.*;
 
 /**

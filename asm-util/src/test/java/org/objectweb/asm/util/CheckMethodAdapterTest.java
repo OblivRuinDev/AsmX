@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -43,6 +57,7 @@ import org.objectweb.asm.test.AsmTest;
  * Unit tests for {@link CheckMethodAdapter}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 class CheckMethodAdapterTest extends AsmTest implements Opcodes {
 
@@ -195,8 +210,7 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
   void testVisitFrame_illegalPrimitiveType() {
     checkMethodAdapter.visitCode();
     checkMethodAdapter.visitInsn(NOP);
-    Integer invalidFrameValue =
-        new Integer(0); // NOPMD(IntegerInstantiation): needed to build an invalid value.
+    Integer invalidFrameValue = 0; // NOPMD(IntegerInstantiation): needed to build an invalid value.
 
     Executable visitFrame =
         () -> checkMethodAdapter.visitFrame(F_FULL, 1, new Object[] {invalidFrameValue}, 0, null);
@@ -587,7 +601,7 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
 
   @Test
   void testVisitLdcInsn_v11_illegalOperandType() {
-    checkMethodAdapter.version = Opcodes.V1_1;
+    checkMethodAdapter.version = Opcodes.V_BYPASS;
     checkMethodAdapter.visitCode();
 
     Executable visitLdcInsn = () -> checkMethodAdapter.visitLdcInsn(new Object());
@@ -598,7 +612,7 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
 
   @Test
   void testVisitLdcInsn_v11_primitiveDescriptor() {
-    checkMethodAdapter.version = Opcodes.V1_1;
+    checkMethodAdapter.version = Opcodes.V_BYPASS;
     checkMethodAdapter.visitCode();
 
     Executable visitLdcInsn = () -> checkMethodAdapter.visitLdcInsn(Type.getType("I"));
@@ -609,7 +623,7 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
 
   @Test
   void testVisitLdcInsn_v11_illegalConstantClass() {
-    checkMethodAdapter.version = Opcodes.V1_1;
+    checkMethodAdapter.version = Opcodes.V_BYPASS;
     checkMethodAdapter.visitCode();
 
     Executable visitLdcInsn = () -> checkMethodAdapter.visitLdcInsn(Type.getObjectType("I"));
@@ -620,7 +634,7 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
 
   @Test
   void testVisitLdcInsn_v11_methodDescriptor() {
-    checkMethodAdapter.version = Opcodes.V1_1;
+    checkMethodAdapter.version = Opcodes.V_BYPASS;
     checkMethodAdapter.visitCode();
 
     Executable visitLdcInsn = () -> checkMethodAdapter.visitLdcInsn(Type.getMethodType("()V"));
@@ -631,7 +645,7 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
 
   @Test
   void testVisitLdcInsn_v11_handle() {
-    checkMethodAdapter.version = Opcodes.V1_1;
+    checkMethodAdapter.version = Opcodes.V_BYPASS;
     checkMethodAdapter.visitCode();
 
     Executable visitLdcInsn =
@@ -689,7 +703,7 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
         () -> checkMethodAdapter.visitTableSwitchInsn(1, 0, new Label(), new Label[0]);
 
     Exception exception = assertThrows(IllegalArgumentException.class, visitTableSwitchInsn);
-    assertEquals("Max = 0 must be greater than or equal to min = 1", exception.getMessage());
+    assertEquals("Max = 0 must be greater than or equals to min = 1", exception.getMessage());
   }
 
   @Test

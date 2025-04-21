@@ -55,19 +55,13 @@ public class CheckRecordComponentAdapter extends RecordComponentVisitor {
   private boolean visitEndCalled;
 
   /**
-   * Constructs a new {@link CheckRecordComponentAdapter}. <i>Subclasses must not use this
-   * constructor</i>. Instead, they must use the {@link #CheckRecordComponentAdapter(int,
-   * IRecordComponentVisitor)} version.
+   * Constructs a new {@link CheckRecordComponentAdapter}.
    *
    * @param recordComponentVisitor the record component visitor to which this adapter must delegate
    *     calls.
-   * @throws IllegalStateException If a subclass calls this constructor.
    */
   public CheckRecordComponentAdapter(final IRecordComponentVisitor recordComponentVisitor) {
-    this(/* latest api =*/ Opcodes.V_DYNA, recordComponentVisitor);
-    if (getClass() != CheckRecordComponentAdapter.class) {
-      throw new IllegalStateException();
-    }
+    super(recordComponentVisitor);
   }
 
   /**

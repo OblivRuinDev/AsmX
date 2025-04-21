@@ -88,6 +88,7 @@ import org.objectweb.asm.*;
  *
  * @author Eric Bruneton
  * @author Eugene Kuleshov
+ * @author OblivRuinDev
  */
 public final class TraceClassVisitor extends ClassVisitor {
 
@@ -126,7 +127,7 @@ public final class TraceClassVisitor extends ClassVisitor {
    */
   public TraceClassVisitor(
           final IClassVisitor classVisitor, final Printer printer, final PrintWriter printWriter) {
-    super(/* latest api = */ Opcodes.V_DYNA, classVisitor);
+    super(classVisitor);
     this.printWriter = printWriter;
     this.p = printer;
   }

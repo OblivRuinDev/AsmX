@@ -69,9 +69,10 @@ import org.objectweb.asm.tree.TryCatchBlockNode;
  * referenced subroutines.
  *
  * @author Niko Matsakis
+ * @author OblivRuinDev
  */
 // DontCheck(AbbreviationAsWordInName): can't be renamed (for backward binary compatibility).
-public class JSRInlinerAdapter extends MethodNode implements Opcodes {//todo
+public class JSRInlinerAdapter extends MethodNode implements Opcodes {
 
   /**
    * The instructions that belong to the main "subroutine". Bit i is set iff instruction at index i
@@ -85,6 +86,7 @@ public class JSRInlinerAdapter extends MethodNode implements Opcodes {//todo
    * belongs to this subroutine.
    */
   private final Map<LabelNode, BitSet> subroutinesInsns = new HashMap<>();
+  final IMethodVisitor mv;
 
   /**
    * The instructions that belong to more that one subroutine. Bit i is set iff instruction at index
@@ -111,14 +113,8 @@ public class JSRInlinerAdapter extends MethodNode implements Opcodes {//todo
       final String descriptor,
       final String signature,
       final String[] exceptions) {
-    this(
-        /* latest api = */ V_DYNA,
-        methodVisitor,
-        access,
-        name,
-        descriptor,
-        signature,
-        exceptions);
+    super(access, name, descriptor, signature, exceptions);
+    this.mv = methodVisitor;
   }
 
   /**
@@ -144,8 +140,7 @@ public class JSRInlinerAdapter extends MethodNode implements Opcodes {//todo
       final String descriptor,
       final String signature,
       final String[] exceptions) {
-    super(api, access, name, descriptor, signature, exceptions);
-    this.mv = methodVisitor;
+    this(methodVisitor, access, name, descriptor, signature, exceptions);
   }
 
   @Override

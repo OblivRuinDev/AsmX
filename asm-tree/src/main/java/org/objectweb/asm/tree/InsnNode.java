@@ -49,6 +49,7 @@ import org.objectweb.asm.IMethodVisitor;
  * A node that represents a zero operand instruction.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class InsnNode extends AbstractInsnNode {
 

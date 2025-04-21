@@ -48,6 +48,7 @@ import org.objectweb.asm.*;
  * A {@link MethodVisitor} that remaps types with a {@link Remapper}.
  *
  * @author Eugene Kuleshov
+ * @author OblivRuinDev
  */
 public class MethodRemapper extends MethodVisitor {
 
@@ -62,7 +63,8 @@ public class MethodRemapper extends MethodVisitor {
    * @param remapper the remapper to use to remap the types in the visited method.
    */
   public MethodRemapper(final IMethodVisitor methodVisitor, final Remapper remapper) {
-    this(/* latest api = */ Opcodes.V_DYNA, methodVisitor, remapper);
+    super(methodVisitor);
+    this.remapper = remapper;
   }
 
   /**
@@ -83,7 +85,7 @@ public class MethodRemapper extends MethodVisitor {
   public IAnnotationVisitor visitAnnotationDefault() {
     IAnnotationVisitor annotationVisitor = super.visitAnnotationDefault();
     return annotationVisitor == null
-        ? annotationVisitor
+        ? null
         : createAnnotationRemapper(/* descriptor= */ null, annotationVisitor);
   }
 
@@ -92,7 +94,7 @@ public class MethodRemapper extends MethodVisitor {
     IAnnotationVisitor annotationVisitor =
         super.visitAnnotation(remapper.mapDesc(descriptor), visible);
     return annotationVisitor == null
-        ? annotationVisitor
+        ? null
         : createAnnotationRemapper(descriptor, annotationVisitor);
   }
 
@@ -102,7 +104,7 @@ public class MethodRemapper extends MethodVisitor {
     IAnnotationVisitor annotationVisitor =
         super.visitTypeAnnotation(typeRef, typePath, remapper.mapDesc(descriptor), visible);
     return annotationVisitor == null
-        ? annotationVisitor
+        ? null
         : createAnnotationRemapper(descriptor, annotationVisitor);
   }
 
@@ -112,7 +114,7 @@ public class MethodRemapper extends MethodVisitor {
     IAnnotationVisitor annotationVisitor =
         super.visitParameterAnnotation(parameter, remapper.mapDesc(descriptor), visible);
     return annotationVisitor == null
-        ? annotationVisitor
+        ? null
         : createAnnotationRemapper(descriptor, annotationVisitor);
   }
 
@@ -133,7 +135,7 @@ public class MethodRemapper extends MethodVisitor {
 
   private Object[] remapFrameTypes(final int numTypes, final Object[] frameTypes) {
     if (frameTypes == null) {
-      return frameTypes;
+      return null;
     }
     Object[] remappedFrameTypes = null;
     for (int i = 0; i < numTypes; ++i) {
@@ -212,7 +214,7 @@ public class MethodRemapper extends MethodVisitor {
     IAnnotationVisitor annotationVisitor =
         super.visitInsnAnnotation(typeRef, typePath, remapper.mapDesc(descriptor), visible);
     return annotationVisitor == null
-        ? annotationVisitor
+        ? null
         : createAnnotationRemapper(descriptor, annotationVisitor);
   }
 
@@ -262,7 +264,7 @@ public class MethodRemapper extends MethodVisitor {
         super.visitLocalVariableAnnotation(
             typeRef, typePath, start, end, index, remapper.mapDesc(descriptor), visible);
     return annotationVisitor == null
-        ? annotationVisitor
+        ? null
         : createAnnotationRemapper(descriptor, annotationVisitor);
   }
 

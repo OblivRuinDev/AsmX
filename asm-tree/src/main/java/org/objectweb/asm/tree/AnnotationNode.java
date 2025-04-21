@@ -43,6 +43,7 @@ package org.objectweb.asm.tree;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.objectweb.asm.IAnnotationVisitor;
@@ -235,5 +236,14 @@ public class AnnotationNode implements IAnnotationVisitor, Consumer<IAnnotationV
         annotationVisitor.visit(name, value);
       }
     }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return this == obj || (obj instanceof AnnotationNode && equals((AnnotationNode) obj));
+  }
+
+  public boolean equals(AnnotationNode node) {
+    return Objects.equals(desc, node.desc) && Objects.equals(values, node.values);
   }
 }

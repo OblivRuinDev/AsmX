@@ -50,6 +50,7 @@ import org.objectweb.asm.Opcodes;
  * A node that represents an IINC instruction.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class IincInsnNode extends AbstractInsnNode {
 

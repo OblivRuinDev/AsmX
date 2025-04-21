@@ -62,6 +62,7 @@ import org.objectweb.asm.signature.SignatureReader;
  * A {@link Printer} that prints a disassembled view of the classes it visits.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class Textifier extends Printer {
 
@@ -123,23 +124,15 @@ public class Textifier extends Printer {
   private int numAnnotationValues;
 
   /**
-   * Constructs a new {@link Textifier}. <i>Subclasses must not use this constructor</i>. Instead,
-   * they must use the {@link #Textifier(int)} version.
-   *
-   * @throws IllegalStateException If a subclass calls this constructor.
+   * Constructs a new {@link Textifier}.
    */
   public Textifier() {
-    this(/* latest api = */ Opcodes.V_DYNA);
-    if (getClass() != Textifier.class) {
-      throw new IllegalStateException();
-    }
+    this(Opcodes.V_BYPASS);
   }
 
   /**
    * Constructs a new {@link Textifier}.
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of the {@code
-   *     ASM}<i>x</i> values in {@link Opcodes}.
    */
   protected Textifier(final int api) {
     super(api);

@@ -148,7 +148,7 @@ public class ASMifier extends Printer {
    * @throws IllegalStateException If a subclass calls this constructor.
    */
   public ASMifier() {
-    this(/* latest api = */ Opcodes.V_DYNA, "classWriter", 0);
+    this(Opcodes.V_BYPASS, "classWriter", 0);
     if (getClass() != ASMifier.class) {
       throw new IllegalStateException();
     }

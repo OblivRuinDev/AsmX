@@ -43,6 +43,7 @@ package org.objectweb.asm.tree;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.objectweb.asm.IClassVisitor;
@@ -116,8 +117,7 @@ public class ModuleNode implements IModuleVisitor, Consumer<IClassVisitor> {//to
   /**
    * Constructs a {@link ModuleNode}.
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of {@link
-   *     Opcodes#ASM6}, {@link Opcodes#ASM7}, {@link Opcodes#ASM8} or {@link Opcodes#ASM9}.
+   * @param api 1
    * @param name the fully qualified name (using dots) of the module.
    * @param access the module access flags, among {@code ACC_OPEN}, {@code ACC_SYNTHETIC} and {@code
    *     ACC_MANDATED}.
@@ -274,5 +274,20 @@ public class ModuleNode implements IModuleVisitor, Consumer<IClassVisitor> {//to
     if (provides != null) {
       provides.forEach(consumer);
     }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof ModuleNode)) {
+      return false;
+    }
+    return equal((ModuleNode) obj);
+  }
+
+  public boolean equal(ModuleNode node) {
+    return Objects.equals(name, node.name);//todo
   }
 }

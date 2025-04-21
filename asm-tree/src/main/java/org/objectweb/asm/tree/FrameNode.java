@@ -57,10 +57,11 @@ import org.objectweb.asm.Opcodes;
  * stack map frame types must describe the values of the local variables and of the operand stack
  * elements <i>just before</i> <b>i</b> is executed. <br>
  * <br>
- * (*) this is mandatory only for classes whose version is greater than or equal to {@link
+ * (*) this is mandatory only for classes whose version is greater than or equals to {@link
  * Opcodes#V1_6}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class FrameNode extends AbstractInsnNode {
 

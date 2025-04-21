@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -47,7 +61,6 @@ public class AsmGenerator extends Generator {
           return version;
         }
       } catch (NoSuchFieldException e) {
-        continue;
       }
     }
     return "";
@@ -58,7 +71,7 @@ public class AsmGenerator extends Generator {
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 
     classWriter.visit(
-        Opcodes.V1_1, Opcodes.ACC_PUBLIC, "HelloWorld", null, "java/lang/Object", null);
+        Opcodes.V1_2, Opcodes.ACC_PUBLIC, "HelloWorld", null, "java/lang/Object", null);
     classWriter.visitSource("HelloWorld.java", null);
 
     IMethodVisitor methodVisitor =

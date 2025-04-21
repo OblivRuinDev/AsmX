@@ -47,6 +47,7 @@ import org.objectweb.asm.*;
  * A {@link FieldVisitor} that prints the fields it visits with a {@link Printer}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public final class TraceFieldVisitor extends FieldVisitor {
 
@@ -60,7 +61,8 @@ public final class TraceFieldVisitor extends FieldVisitor {
    * @param printer the printer to convert the visited field into text.
    */
   public TraceFieldVisitor(final Printer printer) {
-    this(null, printer);
+    super();
+    this.p = printer;
   }
 
   /**
@@ -70,7 +72,7 @@ public final class TraceFieldVisitor extends FieldVisitor {
    * @param printer the printer to convert the visited field into text.
    */
   public TraceFieldVisitor(final IFieldVisitor fieldVisitor, final Printer printer) {
-    super(/* latest api = */ Opcodes.V_DYNA, fieldVisitor);
+    super(fieldVisitor);
     this.p = printer;
   }
 

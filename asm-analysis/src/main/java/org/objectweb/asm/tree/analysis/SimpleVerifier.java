@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -38,6 +52,7 @@ import org.objectweb.asm.Type;
  *
  * @author Eric Bruneton
  * @author Bing Ran
+ * @author OblivRuinDev
  */
 public class SimpleVerifier extends BasicVerifier {
 
@@ -83,8 +98,7 @@ public class SimpleVerifier extends BasicVerifier {
 
   /**
    * Constructs a new {@link SimpleVerifier} to verify a specific class. This class will not be
-   * loaded into the JVM since it may be incorrect. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #SimpleVerifier(int, Type, Type, List, boolean)} version.
+   * loaded into the JVM since it may be incorrect.
    *
    * @param currentClass the type of the class to be verified.
    * @param currentSuperClass the type of the super class of the class to be verified.
@@ -98,14 +112,11 @@ public class SimpleVerifier extends BasicVerifier {
       final List<Type> currentClassInterfaces,
       final boolean isInterface) {
     this(
-        V_DYNA,
+        V_BYPASS,
         currentClass,
         currentSuperClass,
         currentClassInterfaces,
         isInterface);
-    if (getClass() != SimpleVerifier.class) {
-      throw new IllegalStateException();
-    }
   }
 
   /**
@@ -165,12 +176,8 @@ public class SimpleVerifier extends BasicVerifier {
     if (BasicValue.REFERENCE_VALUE.equals(value)) {
       if (isArray) {
         value = newValue(type.getElementType());
-        StringBuilder descriptor = new StringBuilder();
-        for (int i = 0; i < type.getDimensions(); ++i) {
-          descriptor.append('[');
-        }
-        descriptor.append(value.getType().getDescriptor());
-        value = new BasicValue(Type.getType(descriptor.toString()));
+        value = new BasicValue(Type.getType(
+                  "[".repeat(Math.max(0, type.getDimensions())) + value.getType().getDescriptor()));
       } else {
         value = new BasicValue(type);
       }

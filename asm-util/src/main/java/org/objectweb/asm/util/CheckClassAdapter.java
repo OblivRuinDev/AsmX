@@ -75,7 +75,7 @@ import org.objectweb.asm.tree.analysis.SimpleVerifier;
  * ClassReader classReader = new ClassReader(inputStream);
  * ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS);
  * ClassVisitor classVisitor = new <b>MyClassAdapter</b>(new CheckClassAdapter(classWriter, true));
- * classReader.acceptTypeAnn(classVisitor, 0);
+ * classReader.accept(classVisitor, 0);
  *
  * StringWriter stringWriter = new StringWriter();
  * PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -110,6 +110,7 @@ import org.objectweb.asm.tree.analysis.SimpleVerifier;
  * initialized and contains an int value.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class CheckClassAdapter extends ClassVisitor {
 
@@ -121,7 +122,7 @@ public class CheckClassAdapter extends ClassVisitor {
   private static final String ERROR_AT = ": error at index ";
 
   /** Whether the bytecode must be checked with a BasicVerifier. */
-  private boolean checkDataFlow;
+  private final boolean checkDataFlow;
 
   /** The class version number. */
   private int version;
@@ -151,7 +152,7 @@ public class CheckClassAdapter extends ClassVisitor {
   private boolean visitEndCalled;
 
   /** The index of the instruction designated by each visited label so far. */
-  private Map<Label, Integer> labelInsnIndices;
+  private final Map<Label, Integer> labelInsnIndices = new HashMap<>();
 
   // -----------------------------------------------------------------------------------------------
   // Constructors
@@ -168,18 +169,14 @@ public class CheckClassAdapter extends ClassVisitor {
   }
 
   /**
-   * Constructs a new {@link CheckClassAdapter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #CheckClassAdapter(int, IClassVisitor, boolean)} version.
+   * Constructs a new {@link CheckClassAdapter}.
    *
    * @param classVisitor the class visitor to which this adapter must delegate calls.
    * @param checkDataFlow whether to perform basic data flow checks.
-   * @throws IllegalStateException If a subclass calls this constructor.
    */
   public CheckClassAdapter(final IClassVisitor classVisitor, final boolean checkDataFlow) {
-    this(/* latest api = */ Opcodes.V_DYNA, classVisitor, checkDataFlow);
-    if (getClass() != CheckClassAdapter.class) {
-      throw new IllegalStateException();
-    }
+    super(classVisitor);
+    this.checkDataFlow = checkDataFlow;
   }
 
   /**
@@ -194,7 +191,6 @@ public class CheckClassAdapter extends ClassVisitor {
   protected CheckClassAdapter(
           final int api, final IClassVisitor classVisitor, final boolean checkDataFlow) {
     super(api, classVisitor);
-    this.labelInsnIndices = new HashMap<>();
     this.checkDataFlow = checkDataFlow;
   }
 
@@ -1003,6 +999,7 @@ public class CheckClassAdapter extends ClassVisitor {
    * @param logger where to log errors.
    * @throws IOException if the class cannot be found, or if an IO exception occurs.
    */
+  @SuppressWarnings("ConfusingMainMethod")
   static void main(final String[] args, final PrintWriter logger) throws IOException {
     if (args.length != 1) {
       logger.println(USAGE);
@@ -1050,7 +1047,7 @@ public class CheckClassAdapter extends ClassVisitor {
       final PrintWriter printWriter) {
     ClassNode classNode = new ClassNode();
     classReader.accept(
-        new CheckClassAdapter(/*latest*/ Opcodes.V_DYNA, classNode, false) {},
+        new CheckClassAdapter(classNode, false) {},
         ClassReader.SKIP_DEBUG);
 
     Type syperType = classNode.superName == null ? null : Type.getObjectType(classNode.superName);

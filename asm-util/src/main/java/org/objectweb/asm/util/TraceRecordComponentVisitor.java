@@ -60,7 +60,8 @@ public final class TraceRecordComponentVisitor extends RecordComponentVisitor {
    * @param printer the printer to convert the visited record component into text.
    */
   public TraceRecordComponentVisitor(final Printer printer) {
-    this(null, printer);
+    super();
+    this.printer = printer;
   }
 
   /**
@@ -72,7 +73,7 @@ public final class TraceRecordComponentVisitor extends RecordComponentVisitor {
    */
   public TraceRecordComponentVisitor(
           final IRecordComponentVisitor recordComponentVisitor, final Printer printer) {
-    super(/* latest api ='*/ Opcodes.V_DYNA, recordComponentVisitor);
+    super(recordComponentVisitor);
     this.printer = printer;
   }
 

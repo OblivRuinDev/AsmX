@@ -44,7 +44,7 @@ package org.objectweb.asm.tree;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.oblivruin.asmx.VersionChecker;
+import dev.oblivruin.asm.VersionChecker;
 import org.objectweb.asm.*;
 
 import static org.objectweb.asm.Opcodes.V11;
@@ -75,7 +75,7 @@ public class MethodNode extends SpecialNode implements IMethodVisitor {
 
   /**
    * The number of method parameters than can have runtime visible annotations. This number must be
-   * less or equal than the number of parameter types in the method descriptor (the default value 0
+   * less or equals than the number of parameter types in the method descriptor (the default value 0
    * indicates that all the parameters described in the method descriptor can have annotations). It
    * can be strictly less when a method has synthetic parameters and when these parameters are
    * ignored when computing parameter indices for the purpose of parameter annotations (see
@@ -91,7 +91,7 @@ public class MethodNode extends SpecialNode implements IMethodVisitor {
 
   /**
    * The number of method parameters than can have runtime invisible annotations. This number must
-   * be less or equal than the number of parameter types in the method descriptor (the default value
+   * be less or equals than the number of parameter types in the method descriptor (the default value
    * 0 indicates that all the parameters described in the method descriptor can have annotations).
    * It can be strictly less when a method has synthetic parameters and when these parameters are
    * ignored when computing parameter indices for the purpose of parameter annotations (see
@@ -126,7 +126,7 @@ public class MethodNode extends SpecialNode implements IMethodVisitor {
   /** The invisible local variable annotations of this method. May be {@literal null} */
   public List<LocalVariableAnnotationNode> invisibleLocalVariableAnnotations;
 
-  /** Whether the acceptTypeAnn method has been called on this object. */
+  /** Whether the accept method has been called on this object. */
   private boolean visited;
 
   /**

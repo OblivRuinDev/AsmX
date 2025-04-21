@@ -50,6 +50,7 @@ import org.objectweb.asm.IMethodVisitor;
  * another instruction.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class JumpInsnNode extends AbstractInsnNode {
 

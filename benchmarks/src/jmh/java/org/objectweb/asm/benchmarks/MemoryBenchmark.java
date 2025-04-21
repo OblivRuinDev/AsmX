@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -41,19 +55,13 @@ import org.openjdk.jmh.annotations.Warmup;
  * classes.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 @Fork(1)
 @Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @State(Scope.Thread)
 public class MemoryBenchmark extends AbstractBenchmark {
-
-  private Factory asm4dot0;
-  private Factory asm5dot0;
-  private Factory asm6dot0;
-  private Factory asm7dot0;
-  private Factory asm8dot0;
-  private Factory asm9dot0;
   private Factory asmCurrent;
 
   public MemoryBenchmark() {
@@ -68,116 +76,15 @@ public class MemoryBenchmark extends AbstractBenchmark {
    */
   @Setup
   public void prepare() throws Exception {
-    asm4dot0 = (Factory) new AsmBenchmarkFactory(AsmVersion.V4_0).newAsmBenchmark();
-    asm5dot0 = (Factory) new AsmBenchmarkFactory(AsmVersion.V5_0).newAsmBenchmark();
-    asm6dot0 = (Factory) new AsmBenchmarkFactory(AsmVersion.V6_0).newAsmBenchmark();
-    asm7dot0 = (Factory) new AsmBenchmarkFactory(AsmVersion.V7_0).newAsmBenchmark();
-    asm8dot0 = (Factory) new AsmBenchmarkFactory(AsmVersion.V8_0).newAsmBenchmark();
-    asm9dot0 = (Factory) new AsmBenchmarkFactory(AsmVersion.V9_0).newAsmBenchmark();
     asmCurrent = (Factory) new AsmBenchmarkFactory(AsmVersion.V_CURRENT).newAsmBenchmark();
 
-    // Check that the correct versions of ASM have been loaded.
-    if (!asm4dot0.getVersion().equals("ASM4")
-        || !asm5dot0.getVersion().equals("ASM5")
-        || !asm6dot0.getVersion().equals("ASM6")
-        || !asm7dot0.getVersion().equals("ASM7")
-        || !asm8dot0.getVersion().equals("ASM8")
-        || !asm9dot0.getVersion().equals("ASM9")
-        || !asmCurrent.getVersion().equals("ASM9")) {
-      throw new IllegalStateException();
-    }
-
     prepareClasses();
-  }
-
-  @Benchmark
-  public void newClass_asm4_0() {
-    for (byte[] classFile : classFiles) {
-      MemoryProfiler.keepReference(asm4dot0.newClass(classFile));
-    }
-  }
-
-  @Benchmark
-  public void newClass_asm5_0() {
-    for (byte[] classFile : classFiles) {
-      MemoryProfiler.keepReference(asm5dot0.newClass(classFile));
-    }
-  }
-
-  @Benchmark
-  public void newClass_asm6_0() {
-    for (byte[] classFile : classFiles) {
-      MemoryProfiler.keepReference(asm6dot0.newClass(classFile));
-    }
-  }
-
-  @Benchmark
-  public void newClass_asm7_0() {
-    for (byte[] classFile : classFiles) {
-      MemoryProfiler.keepReference(asm7dot0.newClass(classFile));
-    }
-  }
-
-  @Benchmark
-  public void newClass_asm8_0() {
-    for (byte[] classFile : classFiles) {
-      MemoryProfiler.keepReference(asm8dot0.newClass(classFile));
-    }
-  }
-
-  @Benchmark
-  public void newClass_asm9_0() {
-    for (byte[] classFile : classFiles) {
-      MemoryProfiler.keepReference(asm9dot0.newClass(classFile));
-    }
   }
 
   @Benchmark
   public void newClass_asmCurrent() {
     for (byte[] classFile : classFiles) {
       MemoryProfiler.keepReference(asmCurrent.newClass(classFile));
-    }
-  }
-
-  @Benchmark
-  public void newClassNode_asm4_0() {
-    for (byte[] classFile : classFiles) {
-      MemoryProfiler.keepReference(asm4dot0.newClassNode(classFile));
-    }
-  }
-
-  @Benchmark
-  public void newClassNode_asm5_0() {
-    for (byte[] classFile : classFiles) {
-      MemoryProfiler.keepReference(asm5dot0.newClassNode(classFile));
-    }
-  }
-
-  @Benchmark
-  public void newClassNode_asm6_0() {
-    for (byte[] classFile : classFiles) {
-      MemoryProfiler.keepReference(asm6dot0.newClassNode(classFile));
-    }
-  }
-
-  @Benchmark
-  public void newClassNode_asm7_0() {
-    for (byte[] classFile : classFiles) {
-      MemoryProfiler.keepReference(asm7dot0.newClassNode(classFile));
-    }
-  }
-
-  @Benchmark
-  public void newClassNode_asm8_0() {
-    for (byte[] classFile : classFiles) {
-      MemoryProfiler.keepReference(asm8dot0.newClassNode(classFile));
-    }
-  }
-
-  @Benchmark
-  public void newClassNode_asm9_0() {
-    for (byte[] classFile : classFiles) {
-      MemoryProfiler.keepReference(asm9dot0.newClassNode(classFile));
     }
   }
 

@@ -50,6 +50,7 @@ import org.objectweb.asm.Opcodes;
  * A {@link ModuleVisitor} that remaps types with a {@link Remapper}.
  *
  * @author Remi Forax
+ * @author OblivRuinDev
  */
 public class ModuleRemapper extends ModuleVisitor {
 
@@ -64,7 +65,8 @@ public class ModuleRemapper extends ModuleVisitor {
    * @param remapper the remapper to use to remap the types in the visited module.
    */
   public ModuleRemapper(final IModuleVisitor moduleVisitor, final Remapper remapper) {
-    this(/* latest api = */ Opcodes.V_DYNA, moduleVisitor, remapper);
+    super(moduleVisitor);
+    this.remapper = remapper;
   }
 
   /**

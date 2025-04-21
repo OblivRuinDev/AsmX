@@ -49,6 +49,7 @@ import org.objectweb.asm.signature.SignatureVisitor;
  * A {@link SignatureVisitor} that checks that its methods are properly used.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class CheckSignatureAdapter extends SignatureVisitor {
 
@@ -137,7 +138,7 @@ public class CheckSignatureAdapter extends SignatureVisitor {
    *     null}.
    */
   public CheckSignatureAdapter(final int type, final SignatureVisitor signatureVisitor) {
-    this(/* latest api = */ Opcodes.V_DYNA, type, signatureVisitor);
+    this(/* latest api = */ Opcodes.V_BYPASS, type, signatureVisitor);
   }
 
   /**
@@ -348,7 +349,7 @@ public class CheckSignatureAdapter extends SignatureVisitor {
   }
 
   private void checkClassName(final String name, final String message) {
-    if (name == null || name.length() == 0) {
+    if (name == null || name.isEmpty()) {
       throw new IllegalArgumentException(INVALID + message + " (must not be null or empty)");
     }
     for (int i = 0; i < name.length(); ++i) {
@@ -360,7 +361,7 @@ public class CheckSignatureAdapter extends SignatureVisitor {
   }
 
   private void checkIdentifier(final String name, final String message) {
-    if (name == null || name.length() == 0) {
+    if (name == null || name.isEmpty()) {
       throw new IllegalArgumentException(INVALID + message + " (must not be null or empty)");
     }
     for (int i = 0; i < name.length(); ++i) {

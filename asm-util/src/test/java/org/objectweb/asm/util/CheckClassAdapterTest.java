@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -50,6 +64,7 @@ import org.objectweb.asm.tree.analysis.AnalyzerException;
  * Unit tests for {@link CheckClassAdapter}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 class CheckClassAdapterTest extends AsmTest implements Opcodes {
 
@@ -68,7 +83,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
 
     Executable visit =
-        () -> checkClassAdapter.visit(V1_1, 1 << 20, "C", null, "java/lang/Object", null);
+        () -> checkClassAdapter.visit(V_BYPASS, 1 << 20, "C", null, "java/lang/Object", null);
 
     Exception exception = assertThrows(IllegalArgumentException.class, visit);
     assertEquals("Invalid access flags: 1048576", exception.getMessage());
@@ -78,7 +93,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   void testVisit_illegalClassName() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
 
-    Executable visit = () -> checkClassAdapter.visit(V1_1, 0, null, null, "java/lang/Object", null);
+    Executable visit = () -> checkClassAdapter.visit(V_BYPASS, 0, null, null, "java/lang/Object", null);
 
     Exception exception = assertThrows(IllegalArgumentException.class, visit);
     assertEquals("Illegal class name (null)", exception.getMessage());
@@ -113,7 +128,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
     Executable visit =
         () ->
             checkClassAdapter.visit(
-                V1_1, ACC_PUBLIC, "java/lang/Object", null, "java/lang/Object", null);
+                V_BYPASS, ACC_PUBLIC, "java/lang/Object", null, "java/lang/Object", null);
 
     Exception exception = assertThrows(IllegalArgumentException.class, visit);
     assertEquals("The super class name of the Object class must be 'null'", exception.getMessage());
@@ -126,7 +141,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
     Executable visit =
         () ->
             checkClassAdapter.visit(
-                V1_1, ACC_PUBLIC, "module-info", null, "java/lang/Object", null);
+                V_BYPASS, ACC_PUBLIC, "module-info", null, "java/lang/Object", null);
 
     Exception exception = assertThrows(IllegalArgumentException.class, visit);
     assertEquals(
@@ -137,7 +152,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   void testVisit_illegalInterfaceSuperClass() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
 
-    Executable visit = () -> checkClassAdapter.visit(V1_1, ACC_INTERFACE, "I", null, "C", null);
+    Executable visit = () -> checkClassAdapter.visit(V_BYPASS, ACC_INTERFACE, "I", null, "C", null);
 
     Exception exception = assertThrows(IllegalArgumentException.class, visit);
     assertEquals(
@@ -149,7 +164,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
 
     Executable visit =
-        () -> checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", "LC;I", "java/lang/Object", null);
+        () -> checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", "LC;I", "java/lang/Object", null);
 
     Exception exception = assertThrows(IllegalArgumentException.class, visit);
     assertEquals("LC;I: error at index 3", exception.getMessage());
@@ -162,7 +177,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
     Executable visit =
         () ->
             checkClassAdapter.visit(
-                V1_1, ACC_FINAL + ACC_ABSTRACT, "C", null, "java/lang/Object", null);
+                V_BYPASS, ACC_FINAL + ACC_ABSTRACT, "C", null, "java/lang/Object", null);
 
     Exception exception = assertThrows(IllegalArgumentException.class, visit);
     assertEquals("final and abstract are mutually exclusive: 1040", exception.getMessage());
@@ -171,10 +186,10 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisit_illegalMultipleCalls() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
 
     Executable visit =
-        () -> checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+        () -> checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
 
     Exception exception = assertThrows(IllegalStateException.class, visit);
     assertEquals("visit must be called only once", exception.getMessage());
@@ -183,7 +198,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitModule_illegalModuleName() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
 
     Executable visitModule = () -> checkClassAdapter.visitModule("pkg.invalid=name", 0, null);
 
@@ -196,7 +211,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitModule_illegalMultipleCalls() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
     checkClassAdapter.visitModule("module1", Opcodes.ACC_OPEN, null);
 
     Executable visitModule = () -> checkClassAdapter.visitModule("module2", 0, null);
@@ -218,7 +233,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitSource_afterEnd() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
     checkClassAdapter.visitEnd();
 
     Executable visitSource = () -> checkClassAdapter.visitSource(null, null);
@@ -230,7 +245,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitSource_illegalMultipleCalls() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
     checkClassAdapter.visitSource(null, null);
 
     Executable visitSource = () -> checkClassAdapter.visitSource(null, null);
@@ -242,7 +257,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitOuterClass_illegalOuterClassName() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
 
     Executable visitOuterClass = () -> checkClassAdapter.visitOuterClass(null, null, null);
 
@@ -253,7 +268,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitOuterClass_illegalMultipleCalls() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
     checkClassAdapter.visitOuterClass("name", null, null);
 
     Executable visitOuterClass = () -> checkClassAdapter.visitOuterClass(null, null, null);
@@ -265,7 +280,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testInnerClass_illegalInnerClassName() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
     checkClassAdapter.visitInnerClass("name", "outerName", "0validInnerName", 0);
 
     Executable visitInnerClass =
@@ -298,7 +313,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitField_illegalAccessFlagSet() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
 
     Executable visitField =
         () -> checkClassAdapter.visitField(ACC_PUBLIC + ACC_PRIVATE, "i", "I", null, null);
@@ -316,7 +331,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   void testVisitField_illegalFieldSignatures(
       final String invalidSignature, final String expectedMessage) {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
 
     Executable visitField =
         () -> checkClassAdapter.visitField(ACC_PUBLIC, "i", "I", invalidSignature, null);
@@ -328,7 +343,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitMethod_illegalAccessFlagSet() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
 
     Executable visitMethod =
         () -> checkClassAdapter.visitMethod(ACC_ABSTRACT | ACC_STRICT, "m", "()V", null, null);
@@ -352,7 +367,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitMethod_illegalSignature() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
 
     Executable visitMethod =
         () ->
@@ -366,7 +381,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitMethod_checkDataFlowByDefault() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
     IMethodVisitor methodVisitor =
         checkClassAdapter.visitMethod(ACC_PUBLIC, "m", "(I)I", null, null);
     methodVisitor.visitCode();
@@ -390,7 +405,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   void testVisitMethod_checkMaxStackAndLocalsIfClassWriterWithoutComputeMaxs() {
     IClassVisitor classWriter = new ClassWriter(0);
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(classWriter);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
     IMethodVisitor methodVisitor =
         checkClassAdapter.visitMethod(ACC_PUBLIC, "m", "(I)I", null, null);
     methodVisitor.visitCode();
@@ -410,7 +425,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitMethod_noDataFlowCheckIfDisabled() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null, /* checkDataFlow= */ false);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
     IMethodVisitor methodVisitor = checkClassAdapter.visitMethod(ACC_PUBLIC, "m", "()V", null, null);
     methodVisitor.visitCode();
     methodVisitor.visitVarInsn(ILOAD, 1);
@@ -426,7 +441,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitTypeAnnotation_illegalAnnotation1() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
 
     Executable visitTypeAnnotation =
         () -> checkClassAdapter.visitTypeAnnotation(0xFFFFFFFF, null, "LA;", true);
@@ -438,7 +453,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitTypeAnnotation_illegalAnnotation2() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
 
     Executable visitTypeAnnotation =
         () -> checkClassAdapter.visitTypeAnnotation(0x00FFFFFF, null, "LA;", true);
@@ -450,7 +465,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVisitAttribute_illegalAttribute() {
     CheckClassAdapter checkClassAdapter = new CheckClassAdapter(null);
-    checkClassAdapter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    checkClassAdapter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
 
     Executable visitAttribute = () -> checkClassAdapter.visitAttribute(null);
 
@@ -468,7 +483,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
-    IClassVisitor classVisitor = new CheckClassAdapter(apiParameter.value(), classWriter, true);
+      IClassVisitor classVisitor = new CheckClassAdapter(apiParameter.value, classWriter, true);
 
     Executable accept = () -> classReader.accept(classVisitor, attributes(), 0);
 
@@ -493,7 +508,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
     ClassWriter classWriter = new ClassWriter(0);
     IClassVisitor noOpClassVisitor =
         new ClassVisitor(/* latest */ Opcodes.ASM10_EXPERIMENTAL, classWriter) {};
-    IClassVisitor classVisitor = new CheckClassAdapter(apiParameter.value(), noOpClassVisitor, true);
+      IClassVisitor classVisitor = new CheckClassAdapter(apiParameter.value, noOpClassVisitor, true);
 
     Executable accept = () -> classReader.accept(classVisitor, attributes(), 0);
 
@@ -512,7 +527,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
       final PrecompiledClass classParameter, final Api apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
-    IClassVisitor classVisitor = new CheckClassAdapter(apiParameter.value(), null, true) {};
+      IClassVisitor classVisitor = new CheckClassAdapter(apiParameter.value, null, true) {};
 
     Executable accept = () -> classReader.accept(classVisitor, attributes(), 0);
 
@@ -525,9 +540,9 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
       final PrecompiledClass classParameter, final Api apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
-    IClassVisitor classVisitor =
+      IClassVisitor classVisitor =
         new CheckClassAdapter(
-            apiParameter.value(),
+                apiParameter.value,
             new ClassVisitor(/* latest */ Opcodes.ASM10_EXPERIMENTAL, null) {},
             true) {};
 
@@ -627,7 +642,7 @@ class CheckClassAdapterTest extends AsmTest implements Opcodes {
   @Test
   void testVerify_invalidClass() {
     ClassWriter classWriter = new ClassWriter(0);
-    classWriter.visit(V1_1, ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    classWriter.visit(V_BYPASS, ACC_PUBLIC, "C", null, "java/lang/Object", null);
     IMethodVisitor methodVisitor = classWriter.visitMethod(ACC_PUBLIC, "m", "()V", null, null);
     methodVisitor.visitCode();
     methodVisitor.visitVarInsn(ALOAD, 0);

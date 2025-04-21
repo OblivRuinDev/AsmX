@@ -155,7 +155,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
     assertNotNull(classReader.getInterfaces());
     AtomicInteger classVersion = new AtomicInteger(0);
     classReader.accept(
-        new ClassVisitor(apiParameter.value()) {
+        new ClassVisitor(apiParameter.value) {
           @Override
           public void visit(
               final int version,
@@ -168,7 +168,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
           }
         },
         0);
-    assertTrue((classVersion.get() & 0xFFFF) >= (Opcodes.V1_1 & 0xFFFF));
+    assertTrue((classVersion.get() & 0xFFFF) >= (Opcodes.V1_2));
   }
 
   /**
@@ -265,7 +265,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAccept_emptyVisitor(final PrecompiledClass classParameter, final Api apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
-    IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value());
+    IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value);
 
     Executable accept = () -> classReader.accept(classVisitor, 0);
 
@@ -283,7 +283,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   void testAccept_emptyVisitor_skipDebug(
       final PrecompiledClass classParameter, final Api apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
-    IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value());
+    IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value);
 
     Executable accept = () -> classReader.accept(classVisitor, ClassReader.SKIP_DEBUG);
 
@@ -309,7 +309,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   void testAccept_emptyVisitor_expandFrames(
       final PrecompiledClass classParameter, final Api apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
-    IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value());
+    IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value);
 
     Executable accept = () -> classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
 
@@ -327,7 +327,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   void testAccept_emptyVisitor_skipFrames(
       final PrecompiledClass classParameter, final Api apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
-    IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value());
+    IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value);
 
     Executable accept = () -> classReader.accept(classVisitor, ClassReader.SKIP_FRAMES);
 
@@ -345,7 +345,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   void testAccept_emptyVisitor_skipCode(
       final PrecompiledClass classParameter, final Api apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
-    IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value());
+    IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value);
 
     Executable accept = () -> classReader.accept(classVisitor, ClassReader.SKIP_CODE);
 
@@ -372,7 +372,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
       final PrecompiledClass classParameter, final Api apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     IClassVisitor classVisitor =
-        new EmptyClassVisitor(apiParameter.value()) {
+        new EmptyClassVisitor(apiParameter.value) {
           @Override
           public void visit(
               final int version,
@@ -441,8 +441,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
     ClassReader classReader = new ClassReader(invalidClass.getBytes());
 
     Executable accept =
-        () -> classReader.accept(new EmptyClassVisitor()//todo: ----/* latest */ Opcodes.ASM10_EXPERIMENTAL)
-                , 0);
+        () -> classReader.accept(new EmptyClassVisitor(), 0);
 
     if (invalidClass == InvalidClass.INVALID_CONSTANT_POOL_INDEX
         || invalidClass == InvalidClass.INVALID_CONSTANT_POOL_REFERENCE
@@ -460,7 +459,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAccept_defaultVisitor(final PrecompiledClass classParameter, final Api apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
-    IClassVisitor classVisitor = new ClassVisitor(apiParameter.value()) {};
+    IClassVisitor classVisitor = new ClassVisitor(apiParameter.value) {};
 
     Executable accept = () -> classReader.accept(classVisitor, 0);
 
@@ -473,11 +472,11 @@ class ClassReaderTest extends AsmTest implements Opcodes {
             || classParameter == PrecompiledClass.JDK11_ALL_STRUCTURES_NESTED;
     boolean hasModules = classParameter == PrecompiledClass.JDK9_MODULE;
     boolean hasTypeAnnotations = classParameter == PrecompiledClass.JDK8_ALL_STRUCTURES;
-    if ((hasPermittedSubclasses && apiParameter.value() < V_DYNA)
-        || (hasRecord && apiParameter.value() < ASM8)
-        || (hasNestHostOrMembers && apiParameter.value() < ASM7)
-        || (hasModules && apiParameter.value() < ASM6)
-        || (hasTypeAnnotations && apiParameter.value() < ASM5)) {
+    if ((hasPermittedSubclasses && apiParameter.value < V15)
+        || (hasRecord && apiParameter.value < V14)
+        || (hasNestHostOrMembers && apiParameter.value < V11)
+        || (hasModules && apiParameter.value < V9)
+        || (hasTypeAnnotations && apiParameter.value < V1_8)) {
       Exception exception = assertThrows(UnsupportedOperationException.class, accept);
       assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
     } else {
@@ -494,7 +493,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
       final PrecompiledClass classParameter, final Api apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     IClassVisitor classVisitor =
-        new EmptyClassVisitor(apiParameter.value()) {
+        new EmptyClassVisitor(apiParameter.value) {
 
           @Override
           public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {

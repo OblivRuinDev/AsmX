@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -31,7 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.objectweb.asm.commons.MethodNodeBuilder.toText;
 
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -49,6 +62,7 @@ import org.objectweb.asm.util.TraceMethodVisitor;
  * Unit tests for {@link InstructionAdapter}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 class InstructionAdapterTest extends AsmTest {
 
@@ -142,13 +156,13 @@ class InstructionAdapterTest extends AsmTest {
 
     instructionAdapter.visitLdcInsn(Boolean.FALSE);
     instructionAdapter.visitLdcInsn(Boolean.TRUE);
-    instructionAdapter.visitLdcInsn(Byte.valueOf((byte) 2));
-    instructionAdapter.visitLdcInsn(Character.valueOf('3'));
-    instructionAdapter.visitLdcInsn(Short.valueOf((short) 4));
-    instructionAdapter.visitLdcInsn(Integer.valueOf(5));
-    instructionAdapter.visitLdcInsn(Long.valueOf(6));
-    instructionAdapter.visitLdcInsn(Float.valueOf(7.0f));
-    instructionAdapter.visitLdcInsn(Double.valueOf(8.0));
+    instructionAdapter.visitLdcInsn((byte) 2);
+    instructionAdapter.visitLdcInsn('3');
+    instructionAdapter.visitLdcInsn((short) 4);
+    instructionAdapter.visitLdcInsn(5);
+    instructionAdapter.visitLdcInsn(6L);
+    instructionAdapter.visitLdcInsn(7.0f);
+    instructionAdapter.visitLdcInsn(8.0);
     instructionAdapter.visitLdcInsn("9");
     instructionAdapter.visitLdcInsn(Type.getObjectType("pkg/Class"));
     instructionAdapter.visitLdcInsn(
@@ -172,20 +186,9 @@ class InstructionAdapterTest extends AsmTest {
     assertThrows(IllegalArgumentException.class, visitLdcInsn);
   }
 
-//  @Test
-//  @SuppressWarnings("deprecation")
-//  void testDeprecatedInvokeSpecial() {
-//    MethodNode methodNode = new MethodNode();
-//    InstructionAdapter instructionAdapter = new InstructionAdapter(methodNode);
-//
-//    instructionAdapter.invokespecial("pkg/Class", "name", "()V");
-//
-//    assertTrue(toText(methodNode).trim().startsWith("INVOKESPECIAL pkg/Class.name ()V"));
-//  }
-
   @Test
   void testInvokeSpecial_unsupportedOperation() {
-    InstructionAdapter instructionAdapter = new InstructionAdapter(Opcodes.ASM4, null);
+    InstructionAdapter instructionAdapter = new InstructionAdapter(Opcodes.V1_7, null);
 
     Executable invokeSpecial =
         () -> instructionAdapter.invokespecial("pkg/Class", "name", "()V", /* isInterface= */ true);
@@ -195,7 +198,7 @@ class InstructionAdapterTest extends AsmTest {
 
   @Test
   void testInvokeVirtual_unsupportedOperation() {
-    InstructionAdapter instructionAdapter = new InstructionAdapter(Opcodes.ASM4, null);
+    InstructionAdapter instructionAdapter = new InstructionAdapter(Opcodes.V1_7, null);
 
     Executable invokeVirtual =
         () -> instructionAdapter.invokevirtual("pkg/Class", "name", "()V", /* isInterface= */ true);
@@ -204,19 +207,8 @@ class InstructionAdapterTest extends AsmTest {
   }
 
   @Test
-  @SuppressWarnings("deprecation")
-  void testDeprecatedInvokeStatic() {
-    MethodNode methodNode = new MethodNode();
-    InstructionAdapter instructionAdapter = new InstructionAdapter(methodNode);
-
-    instructionAdapter.invokestatic("pkg/Class", "name", "()V");
-
-    assertTrue(toText(methodNode).trim().startsWith("INVOKESTATIC pkg/Class.name ()V"));
-  }
-
-  @Test
   void testInvokeStatic_unsupportedOperation() {
-    InstructionAdapter instructionAdapter = new InstructionAdapter(Opcodes.ASM4, null);
+    InstructionAdapter instructionAdapter = new InstructionAdapter(Opcodes.V1_7, null);
 
     Executable invokeStatic =
         () -> instructionAdapter.invokestatic("pkg/Class", "name", "()V", /* isInterface= */ true);
@@ -233,7 +225,7 @@ class InstructionAdapterTest extends AsmTest {
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
     IClassVisitor instructionClassAdapter =
-        new InstructionClassAdapter(apiParameter.value(), classWriter);
+        new InstructionClassAdapter(apiParameter.value, classWriter);
 
     Executable accept = () -> classReader.accept(instructionClassAdapter, attributes(), 0);
 

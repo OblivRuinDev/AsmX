@@ -84,7 +84,9 @@ import org.objectweb.asm.*;
  *
  * @author Eric Bruneton
  * @author Eugene Kuleshov
+ * @author OblivRuinDev
  */
+@SuppressWarnings("unused")
 public final class Retrofitter implements BiConsumer<Path, Object> {
 
   /** The name of the module-info file. */
@@ -436,8 +438,8 @@ public final class Retrofitter implements BiConsumer<Path, Object> {
           }
       } catch (IOException e) {
           throw new RuntimeException(e);
-      } catch (Exception ex) {
-        throw new RuntimeException("Exception while invoke!\nDetails: Args2 is " + obj.toString(), ex);
+      } catch (Exception e) {
+          throw new IllegalArgumentException("Exception while invoking  retrofit(Path, String)  or  verify(Path, String, List<String>, List<String>)\nThe second argument must be String or Object[]{String, List<String>, List<String>}\nActural 2nd argument is " + obj.toString(), e);
       }
   }
 
@@ -496,9 +498,8 @@ public final class Retrofitter implements BiConsumer<Path, Object> {
         final String signature,
         final String[] exceptions) {
       addPackageReferences(Type.getType(descriptor), /* export= */ false);
-      return new MethodVisitor(
-          super.visitMethod(access, name, descriptor, signature, exceptions)) {
-
+        return new MethodVisitor(
+                super.visitMethod(access, name, descriptor, signature, exceptions)) {
         @Override
         public void visitParameter(final String name, final int access) {
           // Javac 21 generates a Parameter attribute for the synthetic/mandated parameters.
@@ -705,9 +706,7 @@ public final class Retrofitter implements BiConsumer<Path, Object> {
         final String signature,
         final String[] exceptions) {
       currentMethodName = name + descriptor;
-      IMethodVisitor methodVisitor =
-          super.visitMethod(access, name, descriptor, signature, exceptions);
-      return new MethodVisitor(methodVisitor) {
+        return new MethodVisitor(super.visitMethod(access, name, descriptor, signature, exceptions)) {
         @Override
         public void visitFieldInsn(
             final int opcode, final String owner, final String name, final String descriptor) {

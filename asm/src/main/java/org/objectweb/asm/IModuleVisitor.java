@@ -42,9 +42,32 @@
 package org.objectweb.asm;
 
 /**
- * An interface visitor to visit a Java module. The methods of this class must be called in the following
- * order: ( {@code visitMainClass} | ( {@code visitPackage} | {@code visitRequire} | {@code
- * visitExport} | {@code visitOpen} | {@code visitUse} | {@code visitProvide} )* ) {@code visitEnd}.
+ * An interface visitor to visit a Java module.<br>
+ * The methods of this class must be called in the following table order:
+ *
+ * <table class="striped" style="text-align:left">
+ * <caption style="display:none">Visit Order</caption>
+ * <thead><tr><th scope="col">Method</th>
+ *            <th scope="col">Optional</th></tr></thead>
+ * <tbody>
+ * <tr><th scope="row">{@link #visitMainClass}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitPackage}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitRequire}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitExport}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitOpen}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitUse}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitProvide}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitEnd}</th>
+ *     <td>False</td></tr>
+ * </tbody>
+ * </table>
  *
  * @author OblivRuinDev
  */

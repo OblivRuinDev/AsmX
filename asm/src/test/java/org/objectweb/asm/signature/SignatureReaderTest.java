@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -52,7 +66,7 @@ class SignatureReaderTest extends AsmTest {
   void testAccept_validClassOrMethodSignature(final String signature) {
     SignatureReader signatureReader = new SignatureReader(signature);
     SignatureVisitor signatureVisitor =
-        new SignatureVisitor() {};//todo: ----/* latest */ Opcodes.ASM10_EXPERIMENTAL) {};
+        new SignatureVisitor() {};
 
     Executable acceptVisitor = () -> signatureReader.accept(signatureVisitor);
 
@@ -64,7 +78,7 @@ class SignatureReaderTest extends AsmTest {
   void testAccept_validFieldSignature(final String signature) {
     SignatureReader signatureReader = new SignatureReader(signature);
     SignatureVisitor signatureVisitor =
-        new SignatureVisitor() {};//todo: ----/* latest */ Opcodes.ASM10_EXPERIMENTAL) {};
+        new SignatureVisitor() {};
 
     Executable acceptVisitor = () -> signatureReader.acceptType(signatureVisitor);
 
@@ -76,7 +90,7 @@ class SignatureReaderTest extends AsmTest {
     String invalidSignature = "-";
     SignatureReader signatureReader = new SignatureReader(invalidSignature);
     SignatureVisitor signatureVisitor =
-        new SignatureVisitor(){};//todo: ---/* latest */ Opcodes.ASM10_EXPERIMENTAL) {};
+        new SignatureVisitor(){};
 
     Executable acceptVisitor = () -> signatureReader.accept(signatureVisitor);
 

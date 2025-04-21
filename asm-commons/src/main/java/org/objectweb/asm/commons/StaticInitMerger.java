@@ -49,6 +49,7 @@ import org.objectweb.asm.*;
  * methods.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class StaticInitMerger extends ClassVisitor {
 
@@ -73,7 +74,8 @@ public class StaticInitMerger extends ClassVisitor {
    *     null.
    */
   public StaticInitMerger(final String prefix, final IClassVisitor classVisitor) {
-    this(/* latest api = */ Opcodes.V_DYNA, prefix, classVisitor);
+    super(classVisitor);
+    this.renamedClinitMethodPrefix = prefix;
   }
 
   /**
@@ -109,20 +111,19 @@ public class StaticInitMerger extends ClassVisitor {
       final String descriptor,
       final String signature,
       final String[] exceptions) {
-    IMethodVisitor methodVisitor;
     if ("<clinit>".equals(name)) {
       int newAccess = Opcodes.ACC_PRIVATE + Opcodes.ACC_STATIC;
       String newName = renamedClinitMethodPrefix + numClinitMethods++;
-      methodVisitor = super.visitMethod(newAccess, newName, descriptor, signature, exceptions);
+      IMethodVisitor methodVisitor = super.visitMethod(newAccess, newName, descriptor, signature, exceptions);
 
       if (mergedClinitVisitor == null) {
         mergedClinitVisitor = super.visitMethod(newAccess, name, descriptor, null, null);
       }
       mergedClinitVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, owner, newName, descriptor, false);
+      return methodVisitor;
     } else {
-      methodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions);
+      return super.visitMethod(access, name, descriptor, signature, exceptions);
     }
-    return methodVisitor;
   }
 
   @Override

@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -46,6 +60,7 @@ import org.objectweb.asm.test.ClassFile;
  * Unit tests for {@link AnalyzerAdapter}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 class AnalyzerAdapterTest extends AsmTest {
 
@@ -93,7 +108,7 @@ class AnalyzerAdapterTest extends AsmTest {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
-    IClassVisitor classAnalyzerAdapter = new ClassAnalyzerAdapter(apiParameter.value(), classWriter);
+    IClassVisitor classAnalyzerAdapter = new ClassAnalyzerAdapter(apiParameter.value, classWriter);
 
     Executable accept = () -> classReader.accept(classAnalyzerAdapter, ClassReader.EXPAND_FRAMES);
 
@@ -175,7 +190,7 @@ class AnalyzerAdapterTest extends AsmTest {
     private boolean hasOriginalFrame;
 
     AnalyzedFramesInserter(final IMethodVisitor methodVisitor) {
-      super(/* latest */ Opcodes.ASM10_EXPERIMENTAL, methodVisitor);
+      super(methodVisitor);
     }
 
     void setAnalyzerAdapter(final AnalyzerAdapter analyzerAdapter) {

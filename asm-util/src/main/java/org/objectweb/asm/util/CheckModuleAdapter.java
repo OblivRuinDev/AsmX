@@ -51,6 +51,7 @@ import org.objectweb.asm.Opcodes;
  * A {@link ModuleVisitor} that checks that its methods are properly used.
  *
  * @author Remi Forax
+ * @author OblivRuinDev
  */
 public class CheckModuleAdapter extends ModuleVisitor {
   /** Whether the visited module is open. */
@@ -78,19 +79,15 @@ public class CheckModuleAdapter extends ModuleVisitor {
   private boolean visitEndCalled;
 
   /**
-   * Constructs a new {@link CheckModuleAdapter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #CheckModuleAdapter(int, IModuleVisitor, boolean)} version.
+   * Constructs a new {@link CheckModuleAdapter}.
    *
    * @param moduleVisitor the module visitor to which this adapter must delegate calls.
    * @param isOpen whether the visited module is open. Open modules have their {@link
    *     Opcodes#ACC_OPEN} access flag set in {@link org.objectweb.asm.ClassVisitor#visitModule}.
-   * @throws IllegalStateException If a subclass calls this constructor.
    */
   public CheckModuleAdapter(final IModuleVisitor moduleVisitor, final boolean isOpen) {
-    this(/* latest api = */ Opcodes.V_DYNA, moduleVisitor, isOpen);
-    if (getClass() != CheckModuleAdapter.class) {
-      throw new IllegalStateException();
-    }
+    super(moduleVisitor);
+    this.isOpen = isOpen;
   }
 
   /**

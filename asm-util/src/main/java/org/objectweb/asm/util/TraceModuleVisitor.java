@@ -49,6 +49,7 @@ import org.objectweb.asm.Opcodes;
  * A {@link ModuleVisitor} that prints the fields it visits with a {@link Printer}.
  *
  * @author Remi Forax
+ * @author OblivRuinDev
  */
 public final class TraceModuleVisitor extends ModuleVisitor {
 
@@ -62,7 +63,8 @@ public final class TraceModuleVisitor extends ModuleVisitor {
    * @param printer the printer to convert the visited module into text.
    */
   public TraceModuleVisitor(final Printer printer) {
-    this(null, printer);
+    super();
+    this.p = printer;
   }
 
   /**
@@ -72,7 +74,7 @@ public final class TraceModuleVisitor extends ModuleVisitor {
    * @param printer the printer to convert the visited module into text.
    */
   public TraceModuleVisitor(final IModuleVisitor moduleVisitor, final Printer printer) {
-    super(/* latest api = */ Opcodes.V_DYNA, moduleVisitor);
+    super(moduleVisitor);
     this.p = printer;
   }
 

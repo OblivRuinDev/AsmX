@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -30,6 +44,7 @@ package org.objectweb.asm.tree.analysis;
 import java.util.List;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.VerObj;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.TryCatchBlockNode;
 
@@ -42,23 +57,15 @@ import org.objectweb.asm.tree.TryCatchBlockNode;
  *
  * @param <V> type of the Value used for the analysis.
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
-public abstract class Interpreter<V extends Value> {
+public abstract class Interpreter<V extends Value> extends VerObj {
+  public Interpreter(int ver) {
+    super(ver);
+  }
 
-  /**
-   * The ASM API version supported by this interpreter. The value of this field must be one of the
-   * {@code ASM}<i>x</i> values in {@link Opcodes}.
-   */
-  protected final int api;
-
-  /**
-   * Constructs a new {@link Interpreter}.
-   *
-   * @param api the ASM API version supported by this interpreter. Must be one of the {@code
-   *     ASM}<i>x</i> values in {@link Opcodes}.
-   */
-  protected Interpreter(final int api) {
-    this.api = api;
+  public Interpreter() {
+    super();
   }
 
   /**
@@ -168,7 +175,7 @@ public abstract class Interpreter<V extends Value> {
    * @param insn the bytecode instruction to be interpreted.
    * @param value the value that must be moved by the instruction.
    * @return the result of the interpretation of the given instruction. The returned value must be
-   *     {@code equal} to the given value.
+   *     {@code equals} to the given value.
    * @throws AnalyzerException if an error occurred during the interpretation.
    */
   public abstract V copyOperation(AbstractInsnNode insn, V value) throws AnalyzerException;

@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -42,6 +56,7 @@ import org.junit.jupiter.params.provider.Arguments;
  * Unit tests for {@link AsmTest}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 class AsmTestTest extends AsmTest {
 
@@ -50,21 +65,21 @@ class AsmTestTest extends AsmTest {
     assertEquals("jdk3.AllInstructions", PrecompiledClass.JDK3_ALL_INSTRUCTIONS.getName());
     assertEquals("jdk8/AllInstructions", PrecompiledClass.JDK8_ALL_INSTRUCTIONS.getInternalName());
     assertEquals("module-info", PrecompiledClass.JDK9_MODULE.getInternalName());
-    assertFalse(PrecompiledClass.JDK3_ALL_INSTRUCTIONS.isMoreRecentThan(Api.ASM4));
-    assertTrue(PrecompiledClass.JDK8_ALL_INSTRUCTIONS.isMoreRecentThan(Api.ASM4));
-    assertFalse(PrecompiledClass.JDK8_ALL_INSTRUCTIONS.isMoreRecentThan(Api.ASM5));
-    assertTrue(PrecompiledClass.JDK9_MODULE.isMoreRecentThan(Api.ASM5));
-    assertFalse(PrecompiledClass.JDK9_MODULE.isMoreRecentThan(Api.ASM6));
-    assertTrue(PrecompiledClass.JDK11_ALL_INSTRUCTIONS.isMoreRecentThan(Api.ASM6));
-    assertFalse(PrecompiledClass.JDK11_ALL_INSTRUCTIONS.isMoreRecentThan(Api.ASM7));
+    assertFalse(PrecompiledClass.JDK3_ALL_INSTRUCTIONS.isMoreRecentThan(Api.V1_3));
+    assertTrue(PrecompiledClass.JDK8_ALL_INSTRUCTIONS.isMoreRecentThan(Api.V1_7));
+    assertFalse(PrecompiledClass.JDK8_ALL_INSTRUCTIONS.isMoreRecentThan(Api.V1_8));
+    assertTrue(PrecompiledClass.JDK9_MODULE.isMoreRecentThan(Api.V1_8));
+    assertFalse(PrecompiledClass.JDK9_MODULE.isMoreRecentThan(Api.V9));
+    assertTrue(PrecompiledClass.JDK11_ALL_INSTRUCTIONS.isMoreRecentThan(Api.V10));
+    assertFalse(PrecompiledClass.JDK11_ALL_INSTRUCTIONS.isMoreRecentThan(Api.V11));
     assertNotNull(PrecompiledClass.JDK11_ALL_INSTRUCTIONS.getBytes());
     assertEquals("jdk11.AllInstructions", PrecompiledClass.JDK11_ALL_INSTRUCTIONS.toString());
-    assertTrue(PrecompiledClass.JDK14_ALL_STRUCTURES_RECORD.isMoreRecentThan(Api.ASM7));
-    assertFalse(PrecompiledClass.JDK14_ALL_STRUCTURES_RECORD.isMoreRecentThan(Api.ASM8));
-    assertTrue(PrecompiledClass.JDK14_ALL_STRUCTURES_EMPTY_RECORD.isMoreRecentThan(Api.ASM7));
-    assertFalse(PrecompiledClass.JDK14_ALL_STRUCTURES_EMPTY_RECORD.isMoreRecentThan(Api.ASM8));
-    assertTrue(PrecompiledClass.JDK15_ALL_STRUCTURES.isMoreRecentThan(Api.ASM8));
-    assertFalse(PrecompiledClass.JDK15_ALL_STRUCTURES.isMoreRecentThan(Api.ASM9));
+    assertTrue(PrecompiledClass.JDK14_ALL_STRUCTURES_RECORD.isMoreRecentThan(Api.V13));
+    assertFalse(PrecompiledClass.JDK14_ALL_STRUCTURES_RECORD.isMoreRecentThan(Api.V14));
+    assertTrue(PrecompiledClass.JDK14_ALL_STRUCTURES_EMPTY_RECORD.isMoreRecentThan(Api.V13));
+    assertFalse(PrecompiledClass.JDK14_ALL_STRUCTURES_EMPTY_RECORD.isMoreRecentThan(Api.V14));
+    assertTrue(PrecompiledClass.JDK15_ALL_STRUCTURES.isMoreRecentThan(Api.V14));
+    assertFalse(PrecompiledClass.JDK15_ALL_STRUCTURES.isMoreRecentThan(Api.V15));
   }
 
   @Test
@@ -73,14 +88,6 @@ class AsmTestTest extends AsmTest {
 
     assertNotNull(invalidBytecodeOffset.getBytes());
     assertEquals("invalid.InvalidBytecodeOffset", invalidBytecodeOffset.toString());
-  }
-
-  @Test
-  void testApi_allMethods() {
-    Api asm7 = Api.ASM7;
-
-    assertEquals(0x70000, asm7.value());
-    assertEquals("ASM7", asm7.toString());
   }
 
   @Test
@@ -103,7 +110,7 @@ class AsmTestTest extends AsmTest {
         Set.of(PrecompiledClass.values()),
         allArguments.stream().map(arg -> arg.get()[0]).collect(Collectors.toSet()));
     assertEquals(
-        Set.of(Api.ASM9),
+        Set.of(Api.V17),//todo
         allArguments.stream().map(arg -> arg.get()[1]).collect(Collectors.toSet()));
   }
 }

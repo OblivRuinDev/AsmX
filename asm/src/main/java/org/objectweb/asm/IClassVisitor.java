@@ -42,12 +42,47 @@
 package org.objectweb.asm;
 
 /**
- * An interface visitor to visit a Java class. The methods of this class must be called in the following order:
- * {@code visit} [ {@code visitSource} ] [ {@code visitModule} ][ {@code visitNestHost} ][ {@code
- * visitOuterClass} ] ( {@code visitAnnotation} | {@code visitTypeAnnotation} | {@code
- * visitAttribute} )* ( {@code visitNestMember} | [ {@code * visitPermittedSubclass} ] | {@code
- * visitInnerClass} | {@code visitRecordComponent} | {@code visitField} | {@code visitMethod} )*
- * {@code visitEnd}.
+ * An interface visitor to visit a Java class.<br>
+ * The methods of this class must be called in the following table order:
+ *
+ * <table class="striped" style="text-align:left">
+ * <caption style="display:none">Visit Order</caption>
+ * <thead><tr><th scope="col">Method</th>
+ *            <th scope="col">Optional</th></tr></thead>
+ * <tbody>
+ * <tr><th scope="row">{@link #visit}</th>
+ *     <td>False</td></tr>
+ * <tr><th scope="row">{@link #visitSource}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitModule}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitNestHost}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitOuterClass}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitAnnotation}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitTypeAnnotation}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitAttribute}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitNestMember}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitPermittedSubclass}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitInnerClass}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitRecordComponent}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitField}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitMethod}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitEnd}</th>
+ *     <td>False</td></tr>
+ * </tbody>
+ * </table>
+ *
  * @author OblivRuinDev
  */
 public interface IClassVisitor extends IVisitor, ISpecialVisitor {
@@ -90,8 +125,8 @@ public interface IClassVisitor extends IVisitor, ISpecialVisitor {
      * Visit the module corresponding to the class.
      *
      * @param name the fully qualified name (using dots) of the module.
-     * @param access the module access flags, among {@code ACC_OPEN}, {@code ACC_SYNTHETIC} and {@code
-     *     ACC_MANDATED}.
+     * @param access the module access flags, among {@link Opcodes#ACC_OPEN}, {@link Opcodes#ACC_SYNTHETIC}
+     *              and {@link Opcodes#ACC_MANDATED}.
      * @param version the module version, or {@literal null}.
      * @return a visitor to visit the module values, or {@literal null} if this visitor is not
      *     interested in visiting this module.
@@ -128,24 +163,29 @@ public interface IClassVisitor extends IVisitor, ISpecialVisitor {
      */
     void visitOuterClass(String owner, String name, String descriptor);
 
+    /** {@inheritDoc} */
+    @Override
+    IAnnotationVisitor visitAnnotation(String descriptor, boolean visible);
+
     /**
      * Visits an annotation on a type in the class signature.
      *
      * @param typeRef a reference to the annotated type. The sort of this type reference must be
      *     {@link TypeReference#CLASS_TYPE_PARAMETER}, {@link
-     *     TypeReference#CLASS_TYPE_PARAMETER_BOUND} or {@link TypeReference#CLASS_EXTENDS}. See
-     *     {@link TypeReference}.
-     * @param typePath the path to the annotated type argument, wildcard bound, array element type, or
-     *     static inner type within 'typeRef'. May be {@literal null} if the annotation targets
-     *     'typeRef' as a whole.
-     * @param descriptor the class descriptor of the annotation class.
-     * @param visible {@literal true} if the annotation is visible at runtime.
-     * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
-     *     interested in visiting this annotation.
+     *     TypeReference#CLASS_TYPE_PARAMETER_BOUND} or {@link TypeReference#CLASS_EXTENDS}.
+     *                   {@inheritDoc}
+     * @param typePath   {@inheritDoc}
+     * @param descriptor {@inheritDoc}
+     * @param visible    {@inheritDoc}
+     * @return           {@inheritDoc}
      */
     @Override
     IAnnotationVisitor visitTypeAnnotation(
             int typeRef, TypePath typePath, String descriptor, boolean visible);
+
+    /** {@inheritDoc} */
+    @Override
+    void visitAttribute(Attribute attribute);
 
     /**
      * Visits a member of the nest. A nest is a set of classes of the same package that share access

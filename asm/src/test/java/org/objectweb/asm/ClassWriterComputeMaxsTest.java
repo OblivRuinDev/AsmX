@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -46,6 +60,7 @@ import org.objectweb.asm.test.ClassFile;
  * ClassWriter unit tests for COMPUTE_MAXS option with JSR instructions.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 class ClassWriterComputeMaxsTest {
 
@@ -959,7 +974,7 @@ class ClassWriterComputeMaxsTest {
     AtomicReference<MethodInfo> methodInfo = new AtomicReference<>();
     ClassReader classReader = new ClassReader(classFile);
     classReader.accept(
-        new ClassVisitor(Opcodes.ASM5) {
+        new ClassVisitor() {
           @Override
           public IMethodVisitor visitMethod(
               final int access,
@@ -968,7 +983,7 @@ class ClassWriterComputeMaxsTest {
               final String signature,
               final String[] exceptions) {
             if (name.equals("m")) {
-              return new MethodVisitor(Opcodes.ASM5) {
+              return new MethodVisitor() {
                 @Override
                 public void visitMaxs(final int maxStack, final int maxLocals) {
                   methodInfo.set(new MethodInfo(maxStack, maxLocals));
@@ -1015,7 +1030,7 @@ class ClassWriterComputeMaxsTest {
     private final Label start;
 
     TestCaseBuilder() {
-      this(Opcodes.V1_1);
+      this(Opcodes.V_BYPASS);
     }
 
     TestCaseBuilder(final int classVersion) {

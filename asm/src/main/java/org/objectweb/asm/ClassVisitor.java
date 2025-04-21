@@ -41,8 +41,8 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
-import dev.oblivruin.asmx.ClassVersionException;
-import dev.oblivruin.asmx.VersionChecker;
+import dev.oblivruin.asm.ClassVersionException;
+import dev.oblivruin.asm.VersionChecker;
 
 /**
  * A visitor to visit a Java class. The methods of this class must be called in the following order:

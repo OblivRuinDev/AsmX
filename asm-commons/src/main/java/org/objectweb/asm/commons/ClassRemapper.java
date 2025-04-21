@@ -64,6 +64,7 @@ import org.objectweb.asm.*;
  * </ul>
  *
  * @author Eugene Kuleshov
+ * @author OblivRuinDev
  */
 public class ClassRemapper extends ClassVisitor {
 
@@ -74,14 +75,14 @@ public class ClassRemapper extends ClassVisitor {
   protected String className;
 
   /**
-   * Constructs a new {@link ClassRemapper}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #ClassRemapper(int, IClassVisitor,Remapper)} version.
+   * Constructs a new {@link ClassRemapper}.
    *
    * @param classVisitor the class visitor this remapper must delegate to.
    * @param remapper the remapper to use to remap the types in the visited class.
    */
   public ClassRemapper(final IClassVisitor classVisitor, final Remapper remapper) {
-    this(/* latest api = */ Opcodes.V_DYNA, classVisitor, remapper);
+    super(classVisitor);
+    this.remapper = remapper;
   }
 
   /**

@@ -70,8 +70,7 @@ public class RecordComponentRemapper extends RecordComponentVisitor {
   /**
    * Constructs a new {@link RecordComponentRemapper}.
    *
-   * @param api the ASM API version supported by this remapper. Must be one of {@link
-   *     org.objectweb.asm.Opcodes#ASM8} or {@link org.objectweb.asm.Opcodes#ASM9}.
+   * @param api -//todo
    * @param recordComponentVisitor the record component visitor this remapper must delegate to.
    * @param remapper the remapper to use to remap the types in the visited record component.
    */
@@ -109,7 +108,7 @@ public class RecordComponentRemapper extends RecordComponentVisitor {
    * @deprecated use {@link #createAnnotationRemapper(String, IAnnotationVisitor)} instead.
    */
   @Deprecated
-  protected IAnnotationVisitor createAnnotationRemapper(final IAnnotationVisitor annotationVisitor) {
+  protected AnnotationRemapper createAnnotationRemapper(final IAnnotationVisitor annotationVisitor) {
     return new AnnotationRemapper(ver, /* descriptor= */ null, annotationVisitor, remapper);
   }
 

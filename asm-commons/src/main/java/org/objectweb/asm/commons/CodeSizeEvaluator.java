@@ -47,6 +47,7 @@ import org.objectweb.asm.*;
  * A {@link MethodVisitor} that approximates the size of the methods it visits.
  *
  * @author Eugene Kuleshov
+ * @author OblivRuinDev
  */
 public class CodeSizeEvaluator extends MethodVisitor implements Opcodes {
 
@@ -57,7 +58,7 @@ public class CodeSizeEvaluator extends MethodVisitor implements Opcodes {
   private int maxSize;
 
   public CodeSizeEvaluator(final IMethodVisitor methodVisitor) {
-    this(/* latest api = */ V_DYNA, methodVisitor);
+    super(methodVisitor);
   }
 
   protected CodeSizeEvaluator(final int api, final IMethodVisitor methodVisitor) {

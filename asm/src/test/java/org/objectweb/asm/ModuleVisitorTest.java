@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -39,28 +53,29 @@ import org.junit.jupiter.api.function.Executable;
  * Unit tests for {@link ModuleVisitor}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 class ModuleVisitorTest {
 
   @Test
   void testConstructor_validApi() {
-    Executable constructor = () -> new ModuleVisitor(Opcodes.ASM4) {};
+    Executable constructor = () -> new ModuleVisitor(Opcodes.V9) {};
 
     assertDoesNotThrow(constructor);
   }
 
   @Test
   void testConstructor_invalidApi() {
-    Executable constructor = () -> new ModuleVisitor(0) {};
+    Executable constructor = () -> new ModuleVisitor(-1) {};
 
     Exception exception = assertThrows(IllegalArgumentException.class, constructor);
-    assertEquals("Unsupported api 0", exception.getMessage());
+    assertEquals("Unsupported ClassFile version -1", exception.getMessage());
   }
 
   @Test
   void testGetDelegate() {
-    IModuleVisitor delegate = new ModuleVisitor(Opcodes.ASM4) {};
-    ModuleVisitor visitor = new ModuleVisitor(Opcodes.ASM4, delegate) {};
+    ModuleVisitor delegate = new ModuleVisitor() {};
+    ModuleVisitor visitor = new ModuleVisitor(delegate) {};
 
     assertSame(delegate, visitor.getDelegate());
   }

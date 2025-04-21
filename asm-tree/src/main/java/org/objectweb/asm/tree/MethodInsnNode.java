@@ -51,6 +51,7 @@ import org.objectweb.asm.Opcodes;
  * a method.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class MethodInsnNode extends AbstractInsnNode {
 

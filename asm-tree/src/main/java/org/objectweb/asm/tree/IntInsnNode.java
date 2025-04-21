@@ -49,6 +49,7 @@ import org.objectweb.asm.IMethodVisitor;
  * A node that represents an instruction with a single int operand.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class IntInsnNode extends AbstractInsnNode {
 

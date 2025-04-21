@@ -42,9 +42,26 @@
 package org.objectweb.asm;
 
 /**
- * An interface visitor to visit a Java annotation. The methods of this class must be called in the following
- * order: ( {@code visit} | {@code visitEnum} | {@code visitAnnotation} | {@code visitArray} )*
- * {@code visitEnd}.
+ * An interface visitor to visit a Java annotation.<br>
+ * The methods of this class must be called in the following table order:
+ *
+ * <table class="striped" style="text-align:left">
+ * <caption style="display:none">Visit Order</caption>
+ * <thead><tr><th scope="col">Method</th>
+ *            <th scope="col">Optional</th></tr></thead>
+ * <tbody>
+ * <tr><th scope="row">{@link #visit}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitEnum}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitAnnotation}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitArray}</th>
+ *     <td>True</td></tr>
+ * <tr><th scope="row">{@link #visitEnd}</th>
+ *     <td>False</td></tr>
+ * </tbody>
+ * </table>
  *
  * @author OblivRuinDev
  */

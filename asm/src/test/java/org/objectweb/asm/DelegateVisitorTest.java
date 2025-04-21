@@ -8,7 +8,7 @@
 // ---------------------------------------------------------------------
 
 // ---------------------------------------------------------------------
-// MODIFIED WORK:
+// MODIFIED WORK and structural adaptations:
 // ASMX: Extended bytecode manipulation toolkit based on ASM
 // Copyright (c) 2025 OblivRuinDev
 // Modifications: See git commits for details
@@ -20,13 +20,13 @@
 // modification, are permitted provided that the following conditions
 // are met:
 // 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
+// notice, this list of conditions and the following disclaimer.
 // 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
+// notice, this list of conditions and the following disclaimer in the
+// documentation and/or other materials provided with the distribution.
 // 3. Neither the name of the copyright holders nor the names of its
-//    contributors may be used to endorse or promote products derived from
-//    this software without specific prior written permission.
+// contributors may be used to endorse or promote products derived from
+// this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -41,42 +41,40 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
- * Unit tests for {@link RecordComponentVisitor}.
+ * Unit tests for {@link DelegateVisitor}.
  *
- * @author Eric Bruneton
  * @author OblivRuinDev
  */
-class RecordComponentVisitorTest {
+public class DelegateVisitorTest {
+    @Test
+    void testConstructor_validApi() {
+        Executable constructor = () -> new DelegateVisitor<>(Opcodes.V11) {};
 
-  @Test
-  void testConstructor_validApi() {
-    Executable constructor = () -> new RecordComponentVisitor(Opcodes.V15) {};
+        assertDoesNotThrow(constructor);
+    }
 
-    assertDoesNotThrow(constructor);
-  }
+    @Test
+    void testConstructor_invalidApi() {
+        Executable constructor = () -> new DelegateVisitor<>(-1) {};
 
-  @Test
-  void testConstructor_invalidApi() {
-    Executable constructor = () -> new RecordComponentVisitor(-1) {};
+        Exception exception = assertThrows(IllegalArgumentException.class, constructor);
+        assertEquals("Unsupported ClassFile version -1", exception.getMessage());
+    }
 
-    Exception exception = assertThrows(IllegalArgumentException.class, constructor);
-    assertEquals("Unsupported ClassFile version -1", exception.getMessage());
-  }
+    @Test
+    void testGetDelegate() {
+        IVisitorTest delegate = new IVisitorTest();
+        DelegateVisitor<IVisitorTest> visitor = new DelegateVisitor<>(delegate) {};
 
-  @Test
-  void testGetDelegate() {
-    RecordComponentVisitor delegate = new RecordComponentVisitor() {};
-    RecordComponentVisitor visitor = new RecordComponentVisitor(delegate) {};
+        assertSame(delegate, visitor.getDelegate());
+    }
 
-    assertSame(delegate, visitor.getDelegate());
-  }
+    public static final class IVisitorTest implements IVisitor{}
 }

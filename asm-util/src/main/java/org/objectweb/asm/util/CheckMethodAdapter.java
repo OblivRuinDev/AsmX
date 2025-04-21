@@ -70,6 +70,7 @@ import org.objectweb.asm.tree.analysis.BasicVerifier;
  * any other constructor is used.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class CheckMethodAdapter extends MethodVisitor {
 
@@ -362,20 +363,14 @@ public class CheckMethodAdapter extends MethodVisitor {
   /**
    * Constructs a new {@link CheckMethodAdapter} object. This method adapter will not perform any
    * data flow check (see {@link #CheckMethodAdapter(int,String,String, IMethodVisitor,Map)}).
-   * <i>Subclasses must not use this constructor</i>. Instead, they must use the {@link
-   * #CheckMethodAdapter(int, IMethodVisitor, Map)} version.
    *
    * @param methodVisitor the method visitor to which this adapter must delegate calls.
    * @param labelInsnIndices the index of the instruction designated by each visited label so far
    *     (in other methods). This map is updated with the labels from the visited method.
-   * @throws IllegalStateException If a subclass calls this constructor.
    */
   public CheckMethodAdapter(
           final IMethodVisitor methodVisitor, final Map<Label, Integer> labelInsnIndices) {
-    this(/* latest api = */ Opcodes.V_DYNA, methodVisitor, labelInsnIndices);
-    if (getClass() != CheckMethodAdapter.class) {
-      throw new IllegalStateException();
-    }
+    this(Opcodes.V_BYPASS, methodVisitor, labelInsnIndices);
   }
 
   /**
@@ -418,11 +413,7 @@ public class CheckMethodAdapter extends MethodVisitor {
       final String descriptor,
       final IMethodVisitor methodVisitor,
       final Map<Label, Integer> labelInsnIndices) {
-    this(
-        /* latest api = */ Opcodes.V_DYNA, access, name, descriptor, methodVisitor, labelInsnIndices);
-    if (getClass() != CheckMethodAdapter.class) {
-      throw new IllegalStateException();
-    }
+    this(Opcodes.V_BYPASS, access, name, descriptor, methodVisitor, labelInsnIndices);
   }
 
   /**
@@ -448,7 +439,7 @@ public class CheckMethodAdapter extends MethodVisitor {
       final Map<Label, Integer> labelInsnIndices) {
     this(
         api,
-        new MethodNode(api, access, name, descriptor, null, null) {
+        new MethodNode(access, name, descriptor, null, null) {
           @Override
           public void visitEnd() {
             int originalMaxLocals = maxLocals;
@@ -830,7 +821,7 @@ public class CheckMethodAdapter extends MethodVisitor {
     checkVisitMaxsNotCalled();
     if (max < min) {
       throw new IllegalArgumentException(
-          "Max = " + max + " must be greater than or equal to min = " + min);
+          "Max = " + max + " must be greater than or equals to min = " + min);
     }
     checkLabel(dflt, /* checkVisited= */ false, "default label");
     if (labels == null || labels.length != max - min + 1) {
@@ -1100,7 +1091,7 @@ public class CheckMethodAdapter extends MethodVisitor {
   }
 
   /**
-   * Checks that the method to visit the given opcode is equal to the given method.
+   * Checks that the method to visit the given opcode is equals to the given method.
    *
    * @param opcode the opcode to be checked.
    * @param method the expected visit method.

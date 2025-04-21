@@ -49,6 +49,7 @@ package org.objectweb.asm;
  *     4.6</a>
  * @author Eric Bruneton
  * @author Eugene Kuleshov
+ * @author OblivRuinDev
  */
 final class MethodWriter implements IMethodVisitor {
 

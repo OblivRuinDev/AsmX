@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -48,6 +62,7 @@ import org.junit.jupiter.api.function.Executable;
  * Unit tests for {@link Constants}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 class ConstantsTest {
 
@@ -162,11 +177,9 @@ class ConstantsTest {
     Set<Integer> opcodeValues =
         opcodes.stream().map(ConstantsTest::getIntValue).collect(Collectors.toSet());
 
-    assertEquals(opcodes.size(), opcodeValues.size());
+    assertEquals(opcodes.size(), opcodeValues.size() + 1);//V_DYNA
     for (int opcode : opcodeValues) {
       assertEquals(0, opcode & ~0xFF);
-      //assertEquals(0, opcode & Opcodes.SOURCE_MASK);
-      //todo: undo
     }
   }
 
@@ -181,6 +194,7 @@ class ConstantsTest {
     assertTrue(Constants.isWhitelisted("org/objectweb/asm/util/CheckClassAdapter"));
   }
 
+  @SuppressWarnings("DataFlowIssue")
   @Test
   void testCheckIsPreview_nullStream() {
     Executable checkIsPreview = () -> Constants.checkIsPreview(null);
@@ -225,14 +239,6 @@ class ConstantsTest {
 
   private static ConstantType getType(final Field field) {
     switch (field.getName()) {
-      case "ASM4":
-      case "ASM5":
-      case "ASM6":
-      case "ASM7":
-      case "ASM8":
-      case "ASM9":
-      case "ASM10_EXPERIMENTAL":
-        return ConstantType.ASM_VERSION;
       case "V_PREVIEW":
       case "V1_1":
       case "V1_2":
@@ -259,6 +265,8 @@ class ConstantsTest {
       case "V23":
       case "V24":
       case "V25":
+      case "V_DYNA":
+      case "V_BYPASS":
         return ConstantType.CLASS_VERSION;
       case "ACC_PUBLIC":
       case "ACC_PRIVATE":
@@ -549,10 +557,7 @@ class ConstantsTest {
       case "WIDE_JUMP_OPCODE_DELTA":
       case "ASM_OPCODE_DELTA":
       case "ASM_IFNULL_OPCODE_DELTA":
-      //case "SOURCE_DEPRECATED":
-      //case "SOURCE_MASK":
-      //  return ConstantType.OTHER;
-      // todo:
+        return ConstantType.OTHER;
       default:
         throw new IllegalArgumentException("Unknown constant " + field.getName());
     }

@@ -47,6 +47,7 @@ import org.objectweb.asm.*;
  * A {@link FieldVisitor} that checks that its methods are properly used.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class CheckFieldAdapter extends FieldVisitor {
 
@@ -54,17 +55,12 @@ public class CheckFieldAdapter extends FieldVisitor {
   private boolean visitEndCalled;
 
   /**
-   * Constructs a new {@link CheckFieldAdapter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #CheckFieldAdapter(int, IFieldVisitor)} version.
+   * Constructs a new {@link CheckFieldAdapter}.
    *
    * @param fieldVisitor the field visitor to which this adapter must delegate calls.
-   * @throws IllegalStateException If a subclass calls this constructor.
    */
   public CheckFieldAdapter(final IFieldVisitor fieldVisitor) {
-    this(/* latest api = */ Opcodes.V_DYNA, fieldVisitor);
-    if (getClass() != CheckFieldAdapter.class) {
-      throw new IllegalStateException();
-    }
+    super(fieldVisitor);
   }
 
   /**

@@ -53,6 +53,7 @@ import org.objectweb.asm.*;
  * @author Chris Nokleberg
  * @author Eugene Kuleshov
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class LocalVariablesSorter extends MethodVisitor {
 
@@ -87,12 +88,7 @@ public class LocalVariablesSorter extends MethodVisitor {
    */
   public LocalVariablesSorter(
       final int access, final String descriptor, final IMethodVisitor methodVisitor) {
-    super(methodVisitor);
-    nextLocal = (Opcodes.ACC_STATIC & access) == 0 ? 1 : 0;
-    for (Type argumentType : Type.getArgumentTypes(descriptor)) {
-      nextLocal += argumentType.getSize();
-    }
-    firstLocal = nextLocal;
+    this(Opcodes.V_BYPASS, access, descriptor, methodVisitor);
   }
 
   /**
@@ -104,10 +100,14 @@ public class LocalVariablesSorter extends MethodVisitor {
    * @param descriptor the method's descriptor (see {@link Type}).
    * @param methodVisitor the method visitor to which this adapter delegates calls.
    */
-  @Deprecated
   protected LocalVariablesSorter(
       final int api, final int access, final String descriptor, final IMethodVisitor methodVisitor) {
-    this(access, descriptor, methodVisitor);
+    super(api, methodVisitor);
+    nextLocal = (Opcodes.ACC_STATIC & access) == 0 ? 1 : 0;
+    for (Type argumentType : Type.getArgumentTypes(descriptor)) {
+      nextLocal += argumentType.getSize();
+    }
+    firstLocal = nextLocal;
   }
 
   @Override

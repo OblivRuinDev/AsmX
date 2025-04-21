@@ -49,6 +49,7 @@ import org.objectweb.asm.*;
  * A node that represents an LDC instruction.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class LdcInsnNode extends AbstractInsnNode {
 

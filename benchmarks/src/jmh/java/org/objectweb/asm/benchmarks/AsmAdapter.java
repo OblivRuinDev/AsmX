@@ -48,20 +48,17 @@ import org.objectweb.asm.tree.ClassNode;
  * An {@link Adapter} implemented with the ASM library.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class AsmAdapter extends Adapter {
 
-  private int asmApi;
-
-  @Override
+    @Override
   public String getVersion() {
     for (int i = 9; i >= 4; --i) {
       try {
         String version = "ASM" + i;
-        if (Opcodes.class.getField(version) != null) {
-          asmApi = Opcodes.class.getField(version).getInt(null);
-          return version;
-        }
+        int asmApi = Opcodes.class.getField(version).getInt(null);
+        return version;
       } catch (NoSuchFieldException ignored) {
       } catch (IllegalAccessException e) {
         throw new AssertionError(e);
@@ -131,8 +128,7 @@ public class AsmAdapter extends Adapter {
 
     int count;
 
-    IAnnotationVisitor annotationVisitor =
-        new IAnnotationVisitor() {
+    IAnnotationVisitor annotationVisitor = new IAnnotationVisitor() {
 
           @Override
           public void visit(final String name, final Object value) {
@@ -159,7 +155,7 @@ public class AsmAdapter extends Adapter {
           @Override
           public void visitEnd() {
           }
-        };
+    };
 
     public CountingVisitor() {}
 
@@ -212,16 +208,13 @@ public class AsmAdapter extends Adapter {
     }
 
     @Override
-    public void visitAttribute(Attribute attribute) {
-    }
+    public void visitAttribute(Attribute attribute) {}
 
     @Override
-    public void visitNestMember(String nestMember) {
-    }
+    public void visitNestMember(String nestMember) {}
 
     @Override
-    public void visitPermittedSubclass(String permittedSubclass) {
-    }
+    public void visitPermittedSubclass(String permittedSubclass) {}
 
     @Override
     public void visitInnerClass(
@@ -261,12 +254,10 @@ public class AsmAdapter extends Adapter {
         }
 
         @Override
-        public void visitAttribute(Attribute attribute) {
-        }
+        public void visitAttribute(Attribute attribute) {}
 
         @Override
-        public void visitEnd() {
-        }
+        public void visitEnd() {}
       };
     }
 
@@ -319,12 +310,10 @@ public class AsmAdapter extends Adapter {
         }
 
         @Override
-        public void visitAttribute(Attribute attribute) {
-        }
+        public void visitAttribute(Attribute attribute) {}
 
         @Override
-        public void visitCode() {
-        }
+        public void visitCode() {}
 
         @Override
         public void visitFrame(
@@ -479,14 +468,11 @@ public class AsmAdapter extends Adapter {
         }
 
         @Override
-        public void visitEnd() {
-        }
+        public void visitEnd() {}
       };
     }
 
     @Override
-    public void visitEnd() {
-
-    }
+    public void visitEnd() {}
   }
 }

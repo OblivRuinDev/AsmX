@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -39,28 +53,29 @@ import org.junit.jupiter.api.function.Executable;
  * Unit tests for {@link FieldVisitor}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 class FieldVisitorTest {
 
   @Test
   void testConstructor_validApi() {
-    Executable constructor = () -> new FieldVisitor() {};//Opcodes.ASM4) {};
+    Executable constructor = () -> new FieldVisitor(Opcodes.V11) {};
 
     assertDoesNotThrow(constructor);
   }
 
   @Test
   void testConstructor_invalidApi() {
-    Executable constructor = () -> new FieldVisitor(0) {};
+    Executable constructor = () -> new FieldVisitor(-1) {};
 
     Exception exception = assertThrows(IllegalArgumentException.class, constructor);
-    assertEquals("Unsupported api 0", exception.getMessage());
+    assertEquals("Unsupported ClassFile version -1", exception.getMessage());
   }
 
   @Test
   void testGetDelegate() {
-    IFieldVisitor delegate = new FieldVisitor(){};//Opcodes.ASM4) {};
-    FieldVisitor visitor = new FieldVisitor(){};//Opcodes.ASM4, delegate) {};
+    IFieldVisitor delegate = new FieldVisitor(){};
+    FieldVisitor visitor = new FieldVisitor(delegate){};
 
     assertSame(delegate, visitor.getDelegate());
   }

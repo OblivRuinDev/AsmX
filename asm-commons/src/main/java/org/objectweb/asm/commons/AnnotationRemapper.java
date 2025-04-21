@@ -50,6 +50,7 @@ import org.objectweb.asm.Opcodes;
  * An {@link AnnotationVisitor} that remaps types with a {@link Remapper}.
  *
  * @author Eugene Kuleshov
+ * @author OblivRuinDev
  */
 public class AnnotationRemapper extends AnnotationVisitor {
 
@@ -57,7 +58,7 @@ public class AnnotationRemapper extends AnnotationVisitor {
    * The descriptor of the visited annotation. May be {@literal null}, for instance for
    * AnnotationDefault.
    */
-  protected final String descriptor;
+  public final String descriptor;
 
   /** The remapper used to remap the types in the visited annotation. */
   protected final Remapper remapper;
@@ -86,7 +87,7 @@ public class AnnotationRemapper extends AnnotationVisitor {
    */
   public AnnotationRemapper(
           final String descriptor, final IAnnotationVisitor annotationVisitor, final Remapper remapper) {
-    this(/* latest api = */ Opcodes.V_DYNA, descriptor, annotationVisitor, remapper);
+    this(Opcodes.V_BYPASS, descriptor, annotationVisitor, remapper);
   }
 
   /**
@@ -186,7 +187,7 @@ public class AnnotationRemapper extends AnnotationVisitor {
   }
 
   /**
-   * Returns either this object, or the given one. If the given object is equal to the object
+   * Returns either this object, or the given one. If the given object is equals to the object
    * returned by the default implementation of the deprecated createAnnotationRemapper method,
    * meaning that this method has not been overridden (or only in minor ways, for instance to add
    * logging), then we can return this object instead, supposed to have been created by the new

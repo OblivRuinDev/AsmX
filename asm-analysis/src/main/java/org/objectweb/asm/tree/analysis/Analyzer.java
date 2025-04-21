@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -27,10 +41,8 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.tree.analysis;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -97,7 +109,7 @@ public class Analyzer<V extends Value> implements Opcodes {
    * @param method the method to be analyzed. The maxStack and maxLocals fields must have correct
    *     values.
    * @return the symbolic state of the execution stack frame at each bytecode instruction of the
-   *     method. The size of the returned array is equal to the number of instructions (and labels)
+   *     method. The size of the returned array is equals to the number of instructions (and labels)
    *     of the method. A given frame is {@literal null} if and only if the corresponding
    *     instruction cannot be reached (dead code).
    * @throws AnalyzerException if a problem occurs during the analysis.
@@ -302,7 +314,7 @@ public class Analyzer<V extends Value> implements Opcodes {
    *     Type#getInternalName()}).
    * @param method the method to be analyzed.
    * @return the symbolic state of the execution stack frame at each bytecode instruction of the
-   *     method. The size of the returned array is equal to the number of instructions (and labels)
+   *     method. The size of the returned array is equals to the number of instructions (and labels)
    *     of the method. A given frame is {@literal null} if and only if the corresponding
    *     instruction cannot be reached (dead code).
    * @throws AnalyzerException if a problem occurs during the analysis.
@@ -525,7 +537,7 @@ public class Analyzer<V extends Value> implements Opcodes {
    * Returns the symbolic execution stack frame for each instruction of the last analyzed method.
    *
    * @return the symbolic state of the execution stack frame at each bytecode instruction of the
-   *     method. The size of the returned array is equal to the number of instructions (and labels)
+   *     method. The size of the returned array is equals to the number of instructions (and labels)
    *     of the method. A given frame is {@literal null} if the corresponding instruction cannot be
    *     reached, or if an error occurred during the analysis of the method.
    */

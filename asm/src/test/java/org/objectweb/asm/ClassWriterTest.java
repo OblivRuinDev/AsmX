@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -61,6 +75,7 @@ import org.objectweb.asm.test.ClassFile;
  * Unit tests for {@link ClassWriter}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 class ClassWriterTest extends AsmTest {
 
@@ -688,7 +703,7 @@ class ClassWriterTest extends AsmTest {
     // JDK8 don't have ones). This is not true in general (the valid frames for a given method are
     // not unique), but this should be the case with our precompiled classes (except
     // jdk3.SubOptimalMaxStackAndLocals, which has non optimal max values on purpose).
-    if (classParameter.isMoreRecentThan(Api.ASM4)
+    if (classParameter.isMoreRecentThan(Api.V1_8)//todo:?
         && classParameter != PrecompiledClass.JDK3_SUB_OPTIMAL_MAX_STACK_AND_LOCALS) {
       assertEquals(new ClassFile(classFile), new ClassFile(newClassFile));
     }
@@ -711,7 +726,7 @@ class ClassWriterTest extends AsmTest {
     assumeTrue(hasJsrOrRetInstructions(classParameter));
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
-    IClassVisitor classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 
     Executable accept = () -> classReader.accept(classWriter, attributes(), 0);
 
@@ -739,7 +754,7 @@ class ClassWriterTest extends AsmTest {
     // JDK8 don't have ones). This is not true in general (the valid frames for a given method are
     // not unique), but this should be the case with our precompiled classes (except
     // jdk3.SubOptimalMaxStackAndLocals, which has non optimal max values on purpose).
-    if (classParameter.isMoreRecentThan(Api.ASM4)
+    if (classParameter.isMoreRecentThan(Api.V1_8)//todo:?
         && classParameter != PrecompiledClass.JDK3_SUB_OPTIMAL_MAX_STACK_AND_LOCALS) {
       assertEquals(new ClassFile(classFile), new ClassFile(newClassFile));
     }
@@ -764,7 +779,7 @@ class ClassWriterTest extends AsmTest {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-    IClassVisitor classVisitor = new DeadCodeInserter(apiParameter.value(), classWriter);
+      DeadCodeInserter classVisitor = new DeadCodeInserter(apiParameter.value, classWriter);
     classReader.accept(classVisitor, attributes(), ClassReader.SKIP_FRAMES);
 
     byte[] newClassFile = classWriter.toByteArray();
@@ -791,13 +806,13 @@ class ClassWriterTest extends AsmTest {
         classFile.length > Short.MAX_VALUE || classParameter.isMoreRecentThan(apiParameter));
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriterWithoutGetCommonSuperClass();
-    ForwardJumpNopInserter forwardJumpNopInserter =
-        new ForwardJumpNopInserter(apiParameter.value(), classWriter);
+      ForwardJumpNopInserter forwardJumpNopInserter =
+        new ForwardJumpNopInserter(apiParameter.value, classWriter);
     classReader.accept(forwardJumpNopInserter, attributes(), 0);
     if (!forwardJumpNopInserter.transformed) {
       classWriter = new ClassWriterWithoutGetCommonSuperClass();
-      classReader.accept(
-          new WideForwardJumpInserter(apiParameter.value(), classWriter), attributes(), 0);
+        classReader.accept(
+          new WideForwardJumpInserter(apiParameter.value, classWriter), attributes(), 0);
     }
 
     byte[] transformedClass = classWriter.toByteArray();
@@ -825,7 +840,7 @@ class ClassWriterTest extends AsmTest {
 
   private static ClassWriter newEmptyClassWriter() {
     ClassWriter classWriter = new ClassWriter(0);
-    classWriter.visit(Opcodes.V1_1, Opcodes.ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    classWriter.visit(Opcodes.V_BYPASS, Opcodes.ACC_PUBLIC, "C", null, "java/lang/Object", null);
     return classWriter;
   }
 

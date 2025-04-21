@@ -50,6 +50,7 @@ import org.objectweb.asm.Opcodes;
  * A node that represents an invokedynamic instruction.
  *
  * @author Remi Forax
+ * @author OblivRuinDev
  */
 public class InvokeDynamicInsnNode extends AbstractInsnNode {
 

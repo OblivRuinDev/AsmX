@@ -90,10 +90,10 @@ class ASMifierTest extends AsmTest {
     byte[] classFile = classParameter.getBytes();
     assumeTrue(classFile.length < Short.MAX_VALUE);
     StringWriter output = new StringWriter();
-    TraceClassVisitor asmifier =
+      TraceClassVisitor asmifier =
         new TraceClassVisitor(
             null,
-            new ASMifier(apiParameter.value(), "classWriter", 0) {},
+            new ASMifier(apiParameter.value, "classWriter", 0) {},
             new PrintWriter(output, true));
 
     new ClassReader(classFile)

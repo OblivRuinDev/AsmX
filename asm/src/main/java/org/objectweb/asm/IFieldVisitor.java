@@ -50,22 +50,27 @@ package org.objectweb.asm;
  */
 public interface IFieldVisitor extends IVisitor, ISpecialVisitor {
 
+    /** {@inheritDoc} */
+    @Override
+    IAnnotationVisitor visitAnnotation(String descriptor, boolean visible);
+
     /**
      * Visits an annotation on the type of the field.
      *
      * @param typeRef    a reference to the annotated type. The sort of this type reference must be
-     *                   {@link TypeReference#FIELD}. See {@link TypeReference}.
-     * @param typePath   the path to the annotated type argument, wildcard bound, array element type, or
-     *                   static inner type within 'typeRef'. May be {@literal null} if the annotation targets
-     *                   'typeRef' as a whole.
-     * @param descriptor the class descriptor of the annotation class.
-     * @param visible    {@literal true} if the annotation is visible at runtime.
-     * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
-     * interested in visiting this annotation.
+     *                   {@link TypeReference#FIELD}. {@inheritDoc}
+     * @param typePath   {@inheritDoc}
+     * @param descriptor {@inheritDoc}
+     * @param visible    {@inheritDoc}
+     * @return           {@inheritDoc}
      */
     @Override
     IAnnotationVisitor visitTypeAnnotation(
             int typeRef, TypePath typePath, String descriptor, boolean visible);
+
+    /** {@inheritDoc} */
+    @Override
+    void visitAttribute(Attribute attribute);
 
     /**
      * Visits the end of the field. This method, which is the last one to be called, is used to inform

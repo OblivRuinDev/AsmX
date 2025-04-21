@@ -61,7 +61,8 @@ public final class TraceMethodVisitor extends MethodVisitor {
    * @param printer the printer to convert the visited method into text.
    */
   public TraceMethodVisitor(final Printer printer) {
-    this(null, printer);
+    super();
+    this.p = printer;
   }
 
   /**
@@ -71,7 +72,7 @@ public final class TraceMethodVisitor extends MethodVisitor {
    * @param printer the printer to convert the visited method into text.
    */
   public TraceMethodVisitor(final IMethodVisitor methodVisitor, final Printer printer) {
-    super(/* latest api = */ Opcodes.V_DYNA, methodVisitor);
+    super(methodVisitor);
     this.p = printer;
   }
 

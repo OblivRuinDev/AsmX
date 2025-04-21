@@ -50,6 +50,7 @@ import org.objectweb.asm.IMethodVisitor;
  * order to be inserted in an instruction list.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class LineNumberNode extends AbstractInsnNode {
 

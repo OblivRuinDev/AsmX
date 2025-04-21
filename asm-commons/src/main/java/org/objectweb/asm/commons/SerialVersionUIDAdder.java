@@ -61,7 +61,7 @@ import org.objectweb.asm.*;
  *   ClassWriter classWriter = new ClassWriter(...);
  *   ClassVisitor svuidAdder = new SerialVersionUIDAdder(classWriter);
  *   ClassVisitor classVisitor = new MyClassAdapter(svuidAdder);
- *   new ClassReader(orginalClass).acceptTypeAnn(classVisitor, 0);
+ *   new ClassReader(orginalClass).accept(classVisitor, 0);
  * </pre>
  *
  * <p>The SVUID algorithm can be found at <a href=
@@ -119,6 +119,7 @@ import org.objectweb.asm.*;
  * </ol>
  *
  * @author Rajendra Inamdar, Vishal Vishnoi
+ * @author OblivRuinDev
  */
 // DontCheck(AbbreviationAsWordInName): can't be renamed (for backward binary compatibility).
 public class SerialVersionUIDAdder extends ClassVisitor {
@@ -154,25 +155,18 @@ public class SerialVersionUIDAdder extends ClassVisitor {
   private Collection<Item> svuidMethods;
 
   /**
-   * Constructs a new {@link SerialVersionUIDAdder}. <i>Subclasses must not use this
-   * constructor</i>. Instead, they must use the {@link #SerialVersionUIDAdder(int, IClassVisitor)}
-   * version.
+   * Constructs a new {@link SerialVersionUIDAdder}.
    *
    * @param classVisitor a {@link ClassVisitor} to which this visitor will delegate calls.
-   * @throws IllegalStateException If a subclass calls this constructor.
    */
   public SerialVersionUIDAdder(final IClassVisitor classVisitor) {
-    this(/* latest api = */ Opcodes.V_DYNA, classVisitor);
-    if (getClass() != SerialVersionUIDAdder.class) {
-      throw new IllegalStateException();
-    }
+    super(classVisitor);
   }
 
   /**
    * Constructs a new {@link SerialVersionUIDAdder}.
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of the {@code
-   *     ASM}<i>x</i> values in {@link Opcodes}.
+   * @param api -//todo
    * @param classVisitor a {@link ClassVisitor} to which this visitor will delegate calls.
    */
   protected SerialVersionUIDAdder(final int api, final IClassVisitor classVisitor) {

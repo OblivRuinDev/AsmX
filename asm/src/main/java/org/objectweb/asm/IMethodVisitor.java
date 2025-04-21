@@ -42,22 +42,81 @@
 package org.objectweb.asm;
 
 /**
- * An interface visitor to visit a Java method. The methods of this class must be called in the following
- * order: ( {@code visitParameter} )* [ {@code visitAnnotationDefault} ] ( {@code visitAnnotation} |
- * {@code visitAnnotableParameterCount} | {@code visitParameterAnnotation} | {@code
- * visitTypeAnnotation} | {@code visitAttribute} )* [ {@code visitCode} ( {@code visitFrame} |
- * {@code visit<i>X</i>Insn} | {@code visitLabel} | {@code visitInsnAnnotation} | {@code
- * visitTryCatchBlock} | {@code visitTryCatchAnnotation} | {@code visitLocalVariable} | {@code
- * visitLocalVariableAnnotation} | {@code visitLineNumber} | {@code visitAttribute} )* {@code
- * visitMaxs} ] {@code visitEnd}. In addition, the {@code visit<i>X</i>Insn} and {@code visitLabel}
- * methods must be called in the sequential order of the bytecode instructions of the visited code,
- * {@code visitInsnAnnotation} must be called <i>after</i> the annotated instruction, {@code
- * visitTryCatchBlock} must be called <i>before</i> the labels passed as arguments have been
- * visited, {@code visitTryCatchBlockAnnotation} must be called <i>after</i> the corresponding try
- * catch block has been visited, and the {@code visitLocalVariable}, {@code
- * visitLocalVariableAnnotation} and {@code visitLineNumber} methods must be called <i>after</i> the
- * labels passed as arguments have been visited. Finally, the {@code visitAttribute} method must be
- * called before {@code visitCode} for non-code attributes, and after it for code attributes.
+ * An interface visitor to visit a Java method.<br>
+ * The methods of this class must be called in the following table order:
+ *
+ * <table class="striped" style="text-align:left">
+ * <caption style="display:none">Visit Order</caption>
+ * <thead><tr><th scope="col">Method</th>
+ *            <th scope="col">Optional</th>
+ *            <th scope="col">Detail</th></tr></thead>
+ * <tbody>
+ * <tr><th scope="row">{@link #visitParameter}</th>
+ *     <td>True</td>
+ *     <td>N/A</td></tr>
+ * <tr><th scope="row">{@link #visitAnnotationDefault}</th>
+ *     <td>True</td>
+ *     <td>N/A</td></tr>
+ * <tr><th scope="row">{@link #visitAnnotation}</th>
+ *     <td>True</td>
+ *     <td>N/A</td></tr>
+ * <tr><th scope="row">{@link #visitTypeAnnotation}</th>
+ *     <td>True</td>
+ *     <td>N/A</td></tr>
+ * <tr><th scope="row">{@link #visitAnnotableParameterCount}</th>
+ *     <td>True</td>
+ *     <td>N/A</td></tr>
+ * <tr><th scope="row">{@link #visitParameterAnnotation}</th>
+ *     <td>True</td>
+ *     <td>N/A</td></tr>
+ * <tr><th scope="row">{@link #visitTypeAnnotation}</th>
+ *     <td>True</td>
+ *     <td>N/A</td></tr>
+ * <tr><th scope="row">{@link #visitAttribute}</th>
+ *     <td>True</td>
+ *     <td>N/A</td></tr>
+ * <tr><th scope="row">{@link #visitCode}</th>
+ *     <td>True</td>
+ *     <td>N/A</td></tr>
+ * <tr><th scope="row">{@link #visitFrame}</th>
+ *     <td>True</td>
+ *     <td>N/A</td></tr>
+ * <tr><th scope="row">{@code visit<i>X</i>Insn}<br>
+ *                     (include {@link #visitInsn})</th>
+ *     <td>True</td>
+ *     <td>must be called in the sequential order of the bytecode instructions of the visited code</td></tr>
+ * <tr><th scope="row">{@link #visitLabel}</th>
+ *     <td>True</td>
+ *     <td>must be called in the sequential order of the bytecode instructions of the visited code</td></tr>
+ * <tr><th scope="row">{@link #visitInsnAnnotation}</th>
+ *     <td>True</td>
+ *     <td>must be called after the annotated instruction</td></tr>
+ * <tr><th scope="row">{@link #visitTryCatchBlock}</th>
+ *     <td>True</td>
+ *     <td>must be called before the labels passed as arguments have been visited</td></tr>
+ * <tr><th scope="row">{@link #visitTryCatchAnnotation}</th>
+ *     <td>True</td>
+ *     <td>must be called after the corresponding try catch block has been visited</td></tr>
+ * <tr><th scope="row">{@link #visitLocalVariable}</th>
+ *     <td>True</td>
+ *     <td>methods must be called after the labels passed as arguments have been visited</td></tr>
+ * <tr><th scope="row">{@link #visitLocalVariableAnnotation}</th>
+ *     <td>True</td>
+ *     <td>methods must be called after the labels passed as arguments have been visited</td></tr>
+ * <tr><th scope="row">{@link #visitLineNumber}</th>
+ *     <td>True</td>
+ *     <td>methods must be called after the labels passed as arguments have been visited</td></tr>
+ * <tr><th scope="row">{@link #visitAttribute}</th>
+ *     <td>True</td>
+ *     <td>N/A</td></tr>
+ * <tr><th scope="row">{@link #visitMaxs}</th>
+ *     <td>True</td>
+ *     <td>N/A</td></tr>
+ * <tr><th scope="row">{@link #visitEnd}</th>
+ *     <td>False</td>
+ *     <td>N/A</td></tr>
+ * </tbody>
+ * </table>
  *
  * @author OblivRuinDev
  */
@@ -85,6 +144,10 @@ public interface IMethodVisitor extends IVisitor, ISpecialVisitor {
      */
     IAnnotationVisitor visitAnnotationDefault();
 
+    /** {@inheritDoc} */
+    @Override
+    IAnnotationVisitor visitAnnotation(String descriptor, boolean visible);
+
     /**
      * Visits an annotation on a type in the method signature.
      *
@@ -92,18 +155,19 @@ public interface IMethodVisitor extends IVisitor, ISpecialVisitor {
      *                   {@link TypeReference#METHOD_TYPE_PARAMETER}, {@link
      *                   TypeReference#METHOD_TYPE_PARAMETER_BOUND}, {@link TypeReference#METHOD_RETURN}, {@link
      *                   TypeReference#METHOD_RECEIVER}, {@link TypeReference#METHOD_FORMAL_PARAMETER} or {@link
-     *                   TypeReference#THROWS}. See {@link TypeReference}.
-     * @param typePath   the path to the annotated type argument, wildcard bound, array element type, or
-     *                   static inner type within 'typeRef'. May be {@literal null} if the annotation targets
-     *                   'typeRef' as a whole.
-     * @param descriptor the class descriptor of the annotation class.
-     * @param visible    {@literal true} if the annotation is visible at runtime.
-     * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
-     * interested in visiting this annotation.
+     *                   TypeReference#THROWS}. {@inheritDoc}
+     * @param typePath   {@inheritDoc}
+     * @param descriptor {@inheritDoc}
+     * @param visible    {@inheritDoc}
+     * @return           {@inheritDoc}
      */
     @Override
     IAnnotationVisitor visitTypeAnnotation(
             int typeRef, TypePath typePath, String descriptor, boolean visible);
+
+    /** {@inheritDoc} */
+    @Override
+    void visitAttribute(Attribute attribute);
 
     /**
      * Visits the number of method parameters that can have annotations. By default (i.e. when this
@@ -232,14 +296,14 @@ public interface IMethodVisitor extends IVisitor, ISpecialVisitor {
     /**
      * Visits an instruction with a single int operand.
      *
-     * @param opcode  the opcode of the instruction to be visited. This opcode is either BIPUSH, SIPUSH
-     *                or NEWARRAY.
+     * @param opcode  the opcode of the instruction to be visited. This opcode is either {@link Opcodes#BIPUSH},
+     *                {@link Opcodes#SIPUSH} or {@link Opcodes#NEWARRAY}.
      * @param operand the operand of the instruction to be visited.<br>
-     *                When opcode is BIPUSH, operand value should be between Byte.MIN_VALUE and Byte.MAX_VALUE.
+     *                When opcode is {@link Opcodes#BIPUSH}, operand value should be between {@link Byte#MIN_VALUE} and {@link Byte#MAX_VALUE}.
      *                <br>
-     *                When opcode is SIPUSH, operand value should be between Short.MIN_VALUE and Short.MAX_VALUE.
+     *                When opcode is {@link Opcodes#SIPUSH}, operand value should be between {@link Short#MIN_VALUE} and {@link Short#MAX_VALUE}.
      *                <br>
-     *                When opcode is NEWARRAY, operand value should be one of {@link Opcodes#T_BOOLEAN}, {@link
+     *                When opcode is {@link Opcodes#NEWARRAY}, operand value should be one of {@link Opcodes#T_BOOLEAN}, {@link
      *                Opcodes#T_CHAR}, {@link Opcodes#T_FLOAT}, {@link Opcodes#T_DOUBLE}, {@link Opcodes#T_BYTE},
      *                {@link Opcodes#T_SHORT}, {@link Opcodes#T_INT} or {@link Opcodes#T_LONG}.
      */
@@ -250,7 +314,9 @@ public interface IMethodVisitor extends IVisitor, ISpecialVisitor {
      * or stores the value of a local variable.
      *
      * @param opcode   the opcode of the local variable instruction to be visited. This opcode is either
-     *                 ILOAD, LLOAD, FLOAD, DLOAD, ALOAD, ISTORE, LSTORE, FSTORE, DSTORE, ASTORE or RET.
+     *                 {@link Opcodes#ILOAD}, {@link Opcodes#LLOAD}, {@link Opcodes#FLOAD}, {@link Opcodes#DLOAD},
+     *                 {@link Opcodes#ALOAD}, {@link Opcodes#ISTORE}, {@link Opcodes#LSTORE}, {@link Opcodes#FSTORE},
+     *                 {@link Opcodes#DSTORE}, {@link Opcodes#ASTORE} or {@link Opcodes#RET}.
      * @param varIndex the operand of the instruction to be visited. This operand is the index of a
      *                 local variable.
      */
@@ -272,7 +338,8 @@ public interface IMethodVisitor extends IVisitor, ISpecialVisitor {
      * value of a field of an object.
      *
      * @param opcode     the opcode of the type instruction to be visited. This opcode is either
-     *                   GETSTATIC, PUTSTATIC, GETFIELD or PUTFIELD.
+     *                   {@link Opcodes#GETSTATIC}, {@link Opcodes#PUTSTATIC}, {@link Opcodes#GETFIELD}
+     *                   or {@link Opcodes#PUTFIELD}.
      * @param owner      the internal name of the field's owner class (see {@link Type#getInternalName()}).
      * @param name       the field's name.
      * @param descriptor the field's descriptor (see {@link Type}).

@@ -62,6 +62,7 @@ import org.objectweb.asm.*;
  * and {@link #stack} fields will be null for these instructions.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class AnalyzerAdapter extends MethodVisitor {
 
@@ -125,7 +126,29 @@ public class AnalyzerAdapter extends MethodVisitor {
       final String name,
       final String descriptor,
       final IMethodVisitor methodVisitor) {
-    super(methodVisitor);
+    this(Opcodes.V_BYPASS, owner, access, name, descriptor, methodVisitor);
+  }
+
+  /**
+   * Constructs a new {@link AnalyzerAdapter}.
+   *
+   * @param api the ASM API version implemented by this visitor. Must be one of the {@code
+   *     ASM}<i>x</i> values in {@link Opcodes}.
+   * @param owner the owner's class name.
+   * @param access the method's access flags (see {@link Opcodes}).
+   * @param name the method's name.
+   * @param descriptor the method's descriptor (see {@link Type}).
+   * @param methodVisitor the method visitor to which this adapter delegates calls. May be {@literal
+   *     null}.
+   */
+  protected AnalyzerAdapter(
+      final int api,
+      final String owner,
+      final int access,
+      final String name,
+      final String descriptor,
+      final IMethodVisitor methodVisitor) {
+    super(api, methodVisitor);
     this.owner = owner;
     locals = new ArrayList<>();
     stack = new ArrayList<>();
@@ -169,29 +192,6 @@ public class AnalyzerAdapter extends MethodVisitor {
       }
     }
     maxLocals = locals.size();
-  }
-
-  /**
-   * Constructs a new {@link AnalyzerAdapter}.
-   *
-   * @param api the ASM API version implemented by this visitor. Must be one of the {@code
-   *     ASM}<i>x</i> values in {@link Opcodes}.
-   * @param owner the owner's class name.
-   * @param access the method's access flags (see {@link Opcodes}).
-   * @param name the method's name.
-   * @param descriptor the method's descriptor (see {@link Type}).
-   * @param methodVisitor the method visitor to which this adapter delegates calls. May be {@literal
-   *     null}.
-   */
-  @Deprecated
-  protected AnalyzerAdapter(
-      final int api,
-      final String owner,
-      final int access,
-      final String name,
-      final String descriptor,
-      final IMethodVisitor methodVisitor) {
-    this(owner, access, name, descriptor, methodVisitor);
   }
 
   @Override

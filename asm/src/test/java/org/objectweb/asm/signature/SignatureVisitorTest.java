@@ -42,9 +42,9 @@ class SignatureVisitorTest {
 
   @Test
   void testConstructor_invalidApi() {
-    Executable constructor = () -> new SignatureVisitor(0) {};
+    Executable constructor = () -> new SignatureVisitor(-1) {};
 
     Exception exception = assertThrows(IllegalArgumentException.class, constructor);
-    assertEquals("Unsupported api 0", exception.getMessage());
+    assertEquals("Unsupported ClassFile version -1", exception.getMessage());
   }
 }

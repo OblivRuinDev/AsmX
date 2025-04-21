@@ -42,13 +42,14 @@
 
 package org.objectweb.asm.commons;
 
-import dev.oblivruin.asmx.VersionChecker;
+import dev.oblivruin.asm.VersionChecker;
 import org.objectweb.asm.*;
 
 /**
  * A {@link MethodVisitor} providing a more detailed API to generate and transform instructions.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class InstructionAdapter extends MethodVisitor {
 
@@ -95,7 +96,7 @@ public class InstructionAdapter extends MethodVisitor {
         break;
       case Opcodes.LCONST_0:
       case Opcodes.LCONST_1:
-        lconst((long) (opcode - Opcodes.LCONST_0));
+        lconst(opcode - Opcodes.LCONST_0);
         break;
       case Opcodes.FCONST_0:
       case Opcodes.FCONST_1:
@@ -104,7 +105,7 @@ public class InstructionAdapter extends MethodVisitor {
         break;
       case Opcodes.DCONST_0:
       case Opcodes.DCONST_1:
-        dconst((double) (opcode - Opcodes.DCONST_0));
+        dconst(opcode - Opcodes.DCONST_0);
         break;
       case Opcodes.IALOAD:
         aload(Type.INT_TYPE);

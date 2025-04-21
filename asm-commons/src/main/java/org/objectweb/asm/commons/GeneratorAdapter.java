@@ -88,6 +88,7 @@ import org.objectweb.asm.*;
  * @author Chris Nokleberg
  * @author Eric Bruneton
  * @author Prashant Deva
+ * @author OblivRuinDev
  */
 public class GeneratorAdapter extends LocalVariablesSorter {
 
@@ -230,17 +231,13 @@ public class GeneratorAdapter extends LocalVariablesSorter {
       final int access,
       final String name,
       final String descriptor) {
-
+      this(methodVisitor, access, name, descriptor);
   }
 
   /**
-   * Constructs a new {@link GeneratorAdapter}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #GeneratorAdapter(int, IMethodVisitor, int, String, String)}
-   * version.
+   * Constructs a new {@link GeneratorAdapter}.
    *
-   * @param access access flags of the adapted method.
-   * @param method the adapted method.
-   * @param methodVisitor the method visitor to which this adapter delegates calls.
+   * @see #GeneratorAdapter(int, IMethodVisitor, int, String, String)
    */
   public GeneratorAdapter(
       final int access, final Method method, final IMethodVisitor methodVisitor) {

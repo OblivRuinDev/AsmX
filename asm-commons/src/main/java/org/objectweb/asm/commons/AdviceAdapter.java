@@ -57,6 +57,7 @@ import org.objectweb.asm.*;
  *
  * @author Eugene Kuleshov
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes {
 
@@ -657,7 +658,7 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
    *     box(Type.getReturnType(this.methodDesc));
    *   }
    *   visitIntInsn(SIPUSH, opcode);
-   *   visitMethodInsn(INVOKESTATIC, owner, "onExit", "(Ljava/lang/Object;I)V", false);
+   *   visitMethodInsn(INVOKESTATIC, owner, "onExit", "(Ljava/lang/Object;I)V", false);//todo:
    * }
    *
    * // An actual call back method.

@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -44,6 +58,7 @@ import org.objectweb.asm.test.ClassFile;
  * Unit tests for {@link TraceClassVisitor}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 class TraceClassVisitorTest extends AsmTest {
 
@@ -64,7 +79,7 @@ class TraceClassVisitorTest extends AsmTest {
     assertEquals(new ClassFile(classFile), new ClassFile(classWriter.toByteArray()));
   }
 
-  /** Tests that ClassReader can acceptTypeAnn a TraceClassVisitor without delegate. */
+  /** Tests that ClassReader can accept a TraceClassVisitor without delegate. */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
   void testVisitMethods_noDelegate(final PrecompiledClass classParameter, final Api apiParameter) {
@@ -78,7 +93,7 @@ class TraceClassVisitorTest extends AsmTest {
   }
 
   /**
-   * Tests that ClassReader can acceptTypeAnn a TraceAnnotationVisitor, TraceFieldVisitor,
+   * Tests that ClassReader can accept a TraceAnnotationVisitor, TraceFieldVisitor,
    * TraceMethodVisitor or TraceModuleVisitor without delegate.
    */
   @ParameterizedTest
@@ -89,9 +104,8 @@ class TraceClassVisitorTest extends AsmTest {
     ClassReader classReader = new ClassReader(classFile);
 
     Executable accept =
-        () ->
-            classReader.accept(
-                new ClassVisitor(apiParameter.value()) {
+        () -> classReader.accept(
+                new ClassVisitor(apiParameter.value) {
 
                   @Override
                   public IModuleVisitor visitModule(

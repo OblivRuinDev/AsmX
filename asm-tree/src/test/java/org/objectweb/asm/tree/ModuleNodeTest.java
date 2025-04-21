@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -39,6 +53,7 @@ import org.objectweb.asm.test.AsmTest;
  * Unit tests for {@link ModuleNode}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 class ModuleNodeTest extends AsmTest {
 
@@ -78,7 +93,7 @@ class ModuleNodeTest extends AsmTest {
     ModuleNode moduleNode = new ModuleNode("module", 123, "1.0");
     ModuleNode dstModuleNode = new ModuleNode("", 0, "");
     IClassVisitor copyModuleVisitor =
-        new ClassVisitor(/* latest */ Opcodes.ASM10_EXPERIMENTAL) {
+        new ClassVisitor() {
           @Override
           public IModuleVisitor visitModule(
               final String name, final int access, final String version) {

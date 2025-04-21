@@ -1,7 +1,21 @@
-// ASM: a very sm14all and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
+// ASM: a very small and fast Java bytecode manipulation framework
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -1502,13 +1516,13 @@ class JsrInlinerAdapterTest extends AsmTest {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     ClassWriter classWriter = new ClassWriter(0);
 
-    classReader.accept(new JsrInlinerClassAdapter(apiParameter.value(), classWriter), 0);
+    classReader.accept(new JsrInlinerClassAdapter(apiParameter.value, classWriter), 0);
 
     ClassFile classFile = new ClassFile(classWriter.toByteArray());
     if (classParameter.isNotCompatibleWithCurrentJdk()) {
-      assertThrows(UnsupportedClassVersionError.class, () -> classFile.newInstance());
+      assertThrows(UnsupportedClassVersionError.class, classFile::newInstance);
     } else {
-      assertDoesNotThrow(() -> classFile.newInstance());
+      assertDoesNotThrow(classFile::newInstance);
     }
   }
 

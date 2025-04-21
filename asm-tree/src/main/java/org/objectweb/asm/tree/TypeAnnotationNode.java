@@ -44,6 +44,8 @@ package org.objectweb.asm.tree;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.TypePath;
 
+import java.util.Objects;
+
 /**
  * A node that represents a type annotation.
  *
@@ -101,5 +103,19 @@ public class TypeAnnotationNode extends AnnotationNode implements Cloneable {
     TypeAnnotationNode clone = new TypeAnnotationNode(typeRef, typePath, desc);
     accept(clone);
     return clone;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj == this || (obj instanceof TypeAnnotationNode && equals((TypeAnnotationNode) obj));
+  }
+
+  @Override
+  public boolean equals(AnnotationNode node) {
+    return false;
+  }
+
+  public boolean equals(TypeAnnotationNode node) {
+    return super.equals(node) && typeRef == node.typeRef && Objects.equals(typePath, node.typePath);
   }
 }

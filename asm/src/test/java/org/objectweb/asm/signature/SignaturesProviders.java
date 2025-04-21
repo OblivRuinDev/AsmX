@@ -14,6 +14,7 @@ import org.objectweb.asm.test.AsmTest.PrecompiledClass;
  * Provides class, field and method signatures for parameterized unit tests.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public final class SignaturesProviders {
 
@@ -24,7 +25,7 @@ public final class SignaturesProviders {
   static {
     AsmTest.allClassesAndLatestApi()
         .map(argument -> (PrecompiledClass) argument.get()[0])
-        .filter(precompiledClass -> !precompiledClass.isMoreRecentThan(AsmTest.Api.ASM7))
+        .filter(precompiledClass -> !precompiledClass.isMoreRecentThan(AsmTest.Api.ASM7))//todo:unsolve
         .forEach(precompiledClass -> collectSignatures(precompiledClass));
     assertFalse(CLASS_SIGNATURES.isEmpty());
     assertFalse(FIELD_SIGNATURES.isEmpty());
@@ -39,7 +40,7 @@ public final class SignaturesProviders {
   private static void collectSignatures(final PrecompiledClass classParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     classReader.accept(
-        new ClassVisitor(/*latest api */ Opcodes.V_DYNA) {
+        new ClassVisitor() {
           @Override
           public void visit(
               final int version,

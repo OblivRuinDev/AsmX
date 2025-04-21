@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -51,28 +65,29 @@ import org.objectweb.asm.test.ClassFile;
  * {@link ModuleVisitor} and {@link AnnotationVisitor}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 class ClassVisitorTest extends AsmTest {
 
   @Test
   void testConstructor_validApi() {
-    Executable constructor = () -> new ClassVisitor(Opcodes.ASM4) {};
+    Executable constructor = () -> new ClassVisitor() {};
 
     assertDoesNotThrow(constructor);
   }
 
   @Test
   void testConstructor_invalidApi() {
-    Executable constructor = () -> new ClassVisitor(0) {};
+    Executable constructor = () -> new ClassVisitor(-1) {};
 
     Exception exception = assertThrows(IllegalArgumentException.class, constructor);
-    assertEquals("Unsupported api 0", exception.getMessage());
+    assertEquals("Unsupported ClassFile version -1", exception.getMessage());
   }
 
   @Test
   void testGetDelegate() {
-    IClassVisitor delegate = new ClassVisitor(Opcodes.ASM4) {};
-    ClassVisitor visitor = new ClassVisitor(Opcodes.ASM4, delegate) {};
+    ClassVisitor delegate = new ClassVisitor() {};
+    ClassVisitor visitor = new ClassVisitor(delegate) {};
 
     assertSame(delegate, visitor.getDelegate());
   }
@@ -89,7 +104,7 @@ class ClassVisitorTest extends AsmTest {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
-    ClassAdapter classAdapter = new ClassAdapter(apiParameter.value(), classWriter);
+      ClassAdapter classAdapter = new ClassAdapter(apiParameter.value, classWriter);
 
     Executable transform = () -> classReader.accept(classAdapter, attributes(), 0);
 
@@ -259,12 +274,12 @@ class ClassVisitorTest extends AsmTest {
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
     IClassVisitor classVisitor =
-        new ClassVisitor(/* latest */ Opcodes.ASM10_EXPERIMENTAL, classWriter) {
+        new ClassVisitor(classWriter) {
 
           @Override
           public IModuleVisitor visitModule(
               final String name, final int access, final String version) {
-            return new ModuleVisitor(ver, super.visitModule(name, access, version)) {
+            return new ModuleVisitor(Opcodes.V_BYPASS, super.visitModule(name, access, version)) {
 
               @Override
               public void visitMainClass(final String mainClass) {}
@@ -463,7 +478,7 @@ class ClassVisitorTest extends AsmTest {
   private static class ChangeExceptionAdapter extends ClassVisitor {
 
     ChangeExceptionAdapter(final IClassVisitor classVisitor) {
-      super(/* latest */ Opcodes.ASM10_EXPERIMENTAL, classVisitor);
+      super(classVisitor);
     }
 
     @Override
@@ -485,7 +500,7 @@ class ClassVisitorTest extends AsmTest {
     private final int newVersion;
 
     ChangeVersionAdapter(final IClassVisitor classVisitor, final int newVersion) {
-      super(/* latest */ Opcodes.ASM10_EXPERIMENTAL, classVisitor);
+      super(classVisitor);
       this.newVersion = newVersion;
     }
 
@@ -506,7 +521,7 @@ class ClassVisitorTest extends AsmTest {
     private final int accessFlags;
 
     ChangeAccessAdapter(final IClassVisitor classVisitor, final int accessFlags) {
-      super(/* latest */ Opcodes.ASM10_EXPERIMENTAL, classVisitor);
+      super(classVisitor);
       this.accessFlags = accessFlags;
     }
 
@@ -527,7 +542,7 @@ class ClassVisitorTest extends AsmTest {
     private final boolean visibilityValue;
 
     RemoveAnnotationAdapter(final IClassVisitor classVisitor, final boolean visibilityValue) {
-      super(/* latest */ Opcodes.ASM10_EXPERIMENTAL, classVisitor);
+      super(classVisitor);
       this.visibilityValue = visibilityValue;
     }
 
@@ -668,7 +683,7 @@ class ClassVisitorTest extends AsmTest {
   private static class AddParameterAdapter extends ClassVisitor {
 
     public AddParameterAdapter(final IClassVisitor classVisitor) {
-      super(/* latest */ Opcodes.ASM10_EXPERIMENTAL, classVisitor);
+      super(classVisitor);
     }
 
     @Override

@@ -48,6 +48,7 @@ import org.objectweb.asm.*;
  * A {@link FieldVisitor} that remaps types with a {@link Remapper}.
  *
  * @author Eugene Kuleshov
+ * @author OblivRuinDev
  */
 public class FieldRemapper extends FieldVisitor {
 
@@ -55,14 +56,14 @@ public class FieldRemapper extends FieldVisitor {
   protected final Remapper remapper;
 
   /**
-   * Constructs a new {@link FieldRemapper}. <i>Subclasses must not use this constructor</i>.
-   * Instead, they must use the {@link #FieldRemapper(int, IFieldVisitor,Remapper)} version.
+   * Constructs a new {@link FieldRemapper}.
    *
    * @param fieldVisitor the field visitor this remapper must delegate to.
    * @param remapper the remapper to use to remap the types in the visited field.
    */
   public FieldRemapper(final IFieldVisitor fieldVisitor, final Remapper remapper) {
-    this(/* latest api = */ Opcodes.V_DYNA, fieldVisitor, remapper);
+    super(fieldVisitor);
+    this.remapper = remapper;
   }
 
   /**

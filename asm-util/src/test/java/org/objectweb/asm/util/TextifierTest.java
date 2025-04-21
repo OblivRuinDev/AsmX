@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -65,7 +79,7 @@ class TextifierTest extends AsmTest {
   }
 
   /**
-   * Tests that the text produced with a Textifier is equal to the expected text.
+   * Tests that the text produced with a Textifier is equals to the expected text.
    *
    * @throws IOException if the expected text can't be read from disk.
    */
@@ -77,10 +91,10 @@ class TextifierTest extends AsmTest {
     StringWriter output = new StringWriter();
     assumeTrue(classFile.length < 32768);
 
-    new ClassReader(classFile)
+      new ClassReader(classFile)
         .accept(
             new TraceClassVisitor(
-                null, new Textifier(apiParameter.value()) {}, new PrintWriter(output)),
+                null, new Textifier(apiParameter.value) {}, new PrintWriter(output)),
             0);
 
     String expectedText =

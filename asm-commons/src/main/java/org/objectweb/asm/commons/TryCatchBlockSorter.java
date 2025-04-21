@@ -62,9 +62,10 @@ import org.objectweb.asm.tree.TryCatchBlockNode;
  * be larger than any block it contains).
  *
  * @author Adrian Sampson
+ * @author OblivRuinDev
  */
-public class TryCatchBlockSorter extends MethodNode {//todo: lang problem!!!
-
+public class TryCatchBlockSorter extends MethodNode {
+    final IMethodVisitor mv;
   /**
    * Constructs a new {@link TryCatchBlockSorter}.
    *
@@ -86,17 +87,8 @@ public class TryCatchBlockSorter extends MethodNode {//todo: lang problem!!!
       final String descriptor,
       final String signature,
       final String[] exceptions) {
-    this(
-        /* latest api = */ Opcodes.V_DYNA,
-        methodVisitor,
-        access,
-        name,
-        descriptor,
-        signature,
-        exceptions);
-    if (getClass() != TryCatchBlockSorter.class) {
-      throw new IllegalStateException();
-    }
+    super(access, name, descriptor, signature, exceptions);
+    this.mv = methodVisitor;
   }
 
   protected TryCatchBlockSorter(
@@ -107,30 +99,27 @@ public class TryCatchBlockSorter extends MethodNode {//todo: lang problem!!!
       final String descriptor,
       final String signature,
       final String[] exceptions) {
-    super(api, access, name, descriptor, signature, exceptions);
-    this.mv = methodVisitor;
+    this(methodVisitor, access, name, descriptor, signature, exceptions);
   }
 
   @Override
   public void visitEnd() {
     // Sort the TryCatchBlockNode elements by the length of their "try" block.
-    Collections.sort(
-        tryCatchBlocks,
-            new Comparator<>() {
+    tryCatchBlocks.sort(new Comparator<TryCatchBlockNode>() {
 
-                @Override
-                public int compare(
-                        final TryCatchBlockNode tryCatchBlockNode1,
-                        final TryCatchBlockNode tryCatchBlockNode2) {
-                    return blockLength(tryCatchBlockNode1) - blockLength(tryCatchBlockNode2);
-                }
+        @Override
+        public int compare(
+                final TryCatchBlockNode tryCatchBlockNode1,
+                final TryCatchBlockNode tryCatchBlockNode2) {
+            return blockLength(tryCatchBlockNode1) - blockLength(tryCatchBlockNode2);
+        }
 
-                private int blockLength(final TryCatchBlockNode tryCatchBlockNode) {
-                    int startIndex = instructions.indexOf(tryCatchBlockNode.start);
-                    int endIndex = instructions.indexOf(tryCatchBlockNode.end);
-                    return endIndex - startIndex;
-                }
-            });
+        private int blockLength(final TryCatchBlockNode tryCatchBlockNode) {
+            int startIndex = instructions.indexOf(tryCatchBlockNode.start);
+            int endIndex = instructions.indexOf(tryCatchBlockNode.end);
+            return endIndex - startIndex;
+        }
+    });
     // Update the 'target' of each try catch block annotation.
     for (int i = 0; i < tryCatchBlocks.size(); ++i) {
       tryCatchBlocks.get(i).updateIndex(i);

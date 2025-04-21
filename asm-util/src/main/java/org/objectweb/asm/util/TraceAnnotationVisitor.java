@@ -49,6 +49,7 @@ import org.objectweb.asm.Opcodes;
  * An {@link AnnotationVisitor} that prints the annotations it visits with a {@link Printer}.
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public final class TraceAnnotationVisitor extends AnnotationVisitor {
 
@@ -61,7 +62,8 @@ public final class TraceAnnotationVisitor extends AnnotationVisitor {
    * @param printer the printer to convert the visited annotation into text.
    */
   public TraceAnnotationVisitor(final Printer printer) {
-    this(null, printer);
+    super();
+    this.printer = printer;
   }
 
   /**
@@ -72,7 +74,7 @@ public final class TraceAnnotationVisitor extends AnnotationVisitor {
    * @param printer the printer to convert the visited annotation into text.
    */
   public TraceAnnotationVisitor(final IAnnotationVisitor annotationVisitor, final Printer printer) {
-    super(/* latest api = */ Opcodes.V_DYNA, annotationVisitor);
+    super(annotationVisitor);
     this.printer = printer;
   }
 

@@ -41,7 +41,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
-import dev.oblivruin.asmx.VersionChecker;
+import dev.oblivruin.asm.VersionChecker;
 
 import static org.objectweb.asm.Opcodes.*;
 

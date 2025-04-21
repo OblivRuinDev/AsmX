@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -195,7 +209,7 @@ class ClassRemapperTest extends AsmTest {
     ClassNode classNode = new ClassNode();
     ClassRemapper classRemapper =
         new ClassRemapper(
-            /* latest api */ Opcodes.V_DYNA,
+            /* latest api */ Opcodes.V_BYPASS,
             classNode,
             new Remapper() {
               @Override
@@ -236,7 +250,7 @@ class ClassRemapperTest extends AsmTest {
     ClassNode classNode = new ClassNode();
     ClassRemapper classRemapper =
         new ClassRemapper(
-            /* latest api */ Opcodes.V_DYNA,
+            /* latest api */ Opcodes.V_BYPASS,
             classNode,
             new Remapper() {
               @Override
@@ -272,7 +286,7 @@ class ClassRemapperTest extends AsmTest {
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
     ClassRemapper classRemapper =
-        newClassRemapper(apiParameter.value(), classWriter, new SimpleRemapper(Map.of()));
+        newClassRemapper(apiParameter.value, classWriter, new SimpleRemapper(Map.of()));
 
     Executable accept =
         () -> classReader.accept(classRemapper, new Attribute[] {new CodeComment()}, 0);
@@ -322,7 +336,7 @@ class ClassRemapperTest extends AsmTest {
     ClassWriter classWriter = new ClassWriter(0);
     UpperCaseRemapper upperCaseRemapper = new UpperCaseRemapper(classParameter.getInternalName());
     ClassRemapper classRemapper =
-        newClassRemapper(apiParameter.value(), classWriter, upperCaseRemapper);
+        newClassRemapper(apiParameter.value, classWriter, upperCaseRemapper);
 
     Executable accept = () -> classReader.accept(classRemapper, 0);
 
@@ -353,7 +367,7 @@ class ClassRemapperTest extends AsmTest {
     ClassWriter classWriter = new ClassWriter(0);
     UpperCaseRemapper upperCaseRemapper = new UpperCaseRemapper(classParameter.getInternalName());
     ClassRemapper classRemapper =
-        newClassRemapper(apiParameter.value(), classWriter, upperCaseRemapper);
+        newClassRemapper(apiParameter.value, classWriter, upperCaseRemapper);
 
     Executable accept = () -> classNode.accept(classRemapper);
 

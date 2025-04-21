@@ -1,7 +1,21 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License (inherits original terms)
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -70,6 +84,7 @@ import org.junit.jupiter.params.provider.Arguments;
  * </pre>
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public abstract class AsmTest {
 
@@ -96,12 +111,12 @@ public abstract class AsmTest {
 
   /** JDK version with the corresponding ASM version. */
   enum JdkVersion {
-    JDK7(7, Api.ASM4),
-    JDK8(8, Api.ASM5),
-    JDK9(9, Api.ASM6),
-    JDK11(11, Api.ASM7),
-    JDK14(14, Api.ASM8),
-    JDK15(15, Api.ASM9);
+    JDK7(7, Api.V1_7),
+    JDK8(8, Api.V1_8),
+    JDK9(9, Api.V9),
+    JDK11(11, Api.V11),
+    JDK14(14, Api.V14),
+    JDK15(15, Api.V15);//todo
 
     private final int majorVersion;
     private final Api minimumApi;
@@ -210,7 +225,7 @@ public abstract class AsmTest {
      * @return whether this class was compiled with a JDK which is more recent than api.
      */
     public boolean isMoreRecentThan(final Api api) {
-      return api.value() < jdkVersion.minimumApi().value();
+      return api.value < jdkVersion.minimumApi().value;
     }
 
     /**
@@ -301,20 +316,37 @@ public abstract class AsmTest {
 
   /** An ASM API version. */
   public enum Api {
-    ASM4("ASM4", 4 << 16),
-    ASM5("ASM5", 5 << 16),
-    ASM6("ASM6", 6 << 16),
-    ASM7("ASM7", 7 << 16),
-    ASM8("ASM8", 8 << 16),
-    ASM9("ASM9", 9 << 16),
+    V1_2(46),
+    V1_3(47),
+    V1_4(48),
+    V1_5(49),
+    V1_6(50),
+    V1_7(51),
+    V1_8(52),
+    V9(53),
+    V10(54),
+    V11(55),
+    V12(56),
+    V13(57),
+    V14(58),
+    V15(59),
+    V16(60),
+    V17(61),
+    V18(62),
+    V19(63),
+    V20(64),
+    V21(65),
+    V22(66),
+    V23(67),
+    V24(68),
+    V25(69)
     ;
 
-    private final String name;
-    private final int value;
+    public final int value;
 
-    Api(final String name, final int value) {
-      this.name = name;
+    Api(int value) {
       this.value = value;
+
     }
 
     /**
@@ -325,16 +357,6 @@ public abstract class AsmTest {
      */
     public int value() {
       return value;
-    }
-
-    /**
-     * Returns a human readable symbol corresponding to this version.
-     *
-     * @return one of "ASM4", "ASM5", "ASM6" "ASM7", "ASM8" or "ASM9".
-     */
-    @Override
-    public String toString() {
-      return name;
     }
   }
 
@@ -358,7 +380,7 @@ public abstract class AsmTest {
    * @return all the possible (precompiledClass, ASM9) pairs, for all the precompiled classes.
    */
   public static Stream<Arguments> allClassesAndLatestApi() {
-    return classesAndApis(Api.ASM9);
+    return classesAndApis(Api.V25);
   }
 
   private static Stream<Arguments> classesAndApis(final Api... apis) {
