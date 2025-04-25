@@ -60,6 +60,9 @@ public class FieldNode extends SpecialNode implements IFieldVisitor, Consumer<IC
    */
   public Object value;
 
+  /** The field's descriptor (see {@link org.objectweb.asm.Type}). */
+  public String desc;
+
   /**
    * Constructs a new {@link FieldNode}.
    *
@@ -78,7 +81,8 @@ public class FieldNode extends SpecialNode implements IFieldVisitor, Consumer<IC
       final String descriptor,
       final String signature,
       final Object value) {
-    super(access, name, descriptor, signature);
+    super(access, name, signature);
+    this.desc = descriptor;
     this.value = value;
   }
 
@@ -145,7 +149,7 @@ public class FieldNode extends SpecialNode implements IFieldVisitor, Consumer<IC
     }
     // Visit the annotations.
     // Visit the non standard attributes.
-    acceptSpecial(classVisitor);
+    acceptSpecial(fieldVisitor);
     fieldVisitor.visitEnd();
   }
 }

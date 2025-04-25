@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import dev.oblivruin.asm.UtilX;
 import dev.oblivruin.asm.VersionChecker;
 import org.objectweb.asm.*;
 
@@ -395,33 +396,34 @@ public class ClassNode extends SpecialNode implements IClassVisitor, Consumer<IC
 
   @Override
   public boolean equals(Object obj) {
-    return (this == obj ||(obj instanceof ClassNode && equal((ClassNode) obj)));
+    return (this == obj ||(obj instanceof ClassNode && equals((ClassNode) obj)));
   }
 
-  public boolean equal(ClassNode node) {
-    return version == node.version &&
+  public boolean equals(ClassNode node) {
+    return node != null &&
+            version == node.version &&
             access == node.access &&
             Objects.equals(name, node.name) &&
             Objects.equals(signature, node.signature) &&
             Objects.equals(superName, node.superName) &&
-            Objects.equals(interfaces, node.interfaces) &&
+            UtilX.equalE(interfaces, node.interfaces) &&
             Objects.equals(sourceFile, node.sourceFile) &&
             Objects.equals(sourceDebug, node.sourceDebug) &&
             Objects.equals(module, node.module) &&
             Objects.equals(outerClass, node.outerClass) &&
             Objects.equals(outerMethod, node.outerMethod) &&
             Objects.equals(outerMethodDesc, node.outerMethodDesc) &&
-            Objects.equals(visibleAnnotations, node.visibleAnnotations) &&
-            Objects.equals(invisibleAnnotations, node.invisibleAnnotations) &&
-            Objects.equals(visibleTypeAnnotations, node.visibleTypeAnnotations) &&
-            Objects.equals(invisibleTypeAnnotations, node.invisibleTypeAnnotations) &&
-            Objects.equals(attrs, node.attrs) &&
-            Objects.equals(innerClasses, node.innerClasses) &&
+            UtilX.equalE(visibleAnnotations, node.visibleAnnotations) &&
+            UtilX.equalE(invisibleAnnotations, node.invisibleAnnotations) &&
+            UtilX.equalE(visibleTypeAnnotations, node.visibleTypeAnnotations) &&
+            UtilX.equalE(invisibleTypeAnnotations, node.invisibleTypeAnnotations) &&
+            UtilX.equalE(attrs, node.attrs) &&
+            UtilX.equalE(innerClasses, node.innerClasses) &&
             Objects.equals(nestHostClass, node.nestHostClass) &&
-            Objects.equals(nestMembers, node.nestMembers) &&
-            Objects.equals(permittedSubclasses, node.permittedSubclasses) &&
-            Objects.equals(recordComponents, node.recordComponents) &&
-            Objects.equals(fields, node.fields) &&
-            Objects.equals(methods, node.methods);
+            UtilX.equalE(nestMembers, node.nestMembers) &&
+            UtilX.equalE(permittedSubclasses, node.permittedSubclasses) &&
+            UtilX.equalE(recordComponents, node.recordComponents) &&
+            UtilX.equalE(fields, node.fields) &&
+            UtilX.equalE(methods, node.methods);
   }
 }

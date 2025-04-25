@@ -52,13 +52,9 @@ import java.util.List;
  * @author OblivRuinDev
  */
 public abstract class ATypeAnnotatedNode {
-    /**
-     * The runtime visible type annotations of this. May be {@literal null}.
-     */
+    /**The runtime visible type annotations of this. May be {@literal null}. */
     public List<TypeAnnotationNode> visibleTypeAnnotations;
-    /**
-     * The runtime invisible type annotations of this. May be {@literal null}.
-     */
+    /** The runtime invisible type annotations of this. May be {@literal null}. */
     public List<TypeAnnotationNode> invisibleTypeAnnotations;
 
     /**

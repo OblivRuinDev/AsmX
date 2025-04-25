@@ -50,6 +50,8 @@ import org.objectweb.asm.*;
  * @author OblivRuinDev
  */
 public class RecordComponentNode extends SpecialNode implements IRecordComponentVisitor {
+  /** The record component descriptor (see {@link org.objectweb.asm.Type}). */
+  public String descriptor;
 
   /**
    * Constructs a new {@link RecordComponentNode}.
@@ -59,7 +61,8 @@ public class RecordComponentNode extends SpecialNode implements IRecordComponent
    * @param signature the record component signature.
    */
   public RecordComponentNode(final String name, final String descriptor, final String signature) {
-    super(name, descriptor, signature);
+    super(name, signature);
+    this.descriptor = descriptor;
   }
 
   /**
@@ -97,13 +100,13 @@ public class RecordComponentNode extends SpecialNode implements IRecordComponent
    */
   public void accept(final IClassVisitor classVisitor) {
     IRecordComponentVisitor recordComponentVisitor =
-        classVisitor.visitRecordComponent(name, desc, signature);
+        classVisitor.visitRecordComponent(name, descriptor, signature);
     if (recordComponentVisitor == null) {
       return;
     }
     // Visit the annotations.
     // Visit the non standard attributes.
-    super.acceptSpecial(classVisitor);
+    super.acceptSpecial(recordComponentVisitor);
     recordComponentVisitor.visitEnd();
   }
 }

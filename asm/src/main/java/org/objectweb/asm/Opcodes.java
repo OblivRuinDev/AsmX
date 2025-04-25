@@ -41,7 +41,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
-import dev.oblivruin.asm.Util;
+import dev.oblivruin.asm.UtilX;
 
 /**
  * The JVM opcodes, access flags and array type codes. This interface does not define all the JVM
@@ -98,7 +98,7 @@ public interface Opcodes {
     int V24 = 0 << 16 | 68;
     int V25 = 0 << 16 | 69;
     /** Current JVM's ClassFile version. */
-    int V_DYNA = Util.getClassVer();
+    int V_DYNA = UtilX.getClassVer();
     /** Indicates that don't check Java ClassFile version while visit. */
     int V_BYPASS = 0;
     /**

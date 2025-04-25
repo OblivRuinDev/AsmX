@@ -30,8 +30,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-public final class Util {
-    private Util() {}
+public final class UtilX {
+    private UtilX() {}
     public static int getClassVer() {
         String str = System.getProperty("java.class.version");
         if (str.endsWith(".0")) {
@@ -40,32 +40,32 @@ public final class Util {
             throw new ClassVersionException("Cannot parse Java ClassFile Version: \"java.class.version\"=" + str);
         }
     }
-    public static <T> boolean equal(List<T> list1, List<T> list2) {
-        if (list1 == list2) {
+    public static <T> boolean equalE(List<T> list1, List<T> list2) {
+        if (nullOrEmpty(list1, list2)) {
             return true;
         }
-        if ((list1 == null || list1.isEmpty()) && (list2 == null || list2.isEmpty())) {
-            return true;
+        if (list1 == null || list2 == null) {
+            return false;
         }
-        return list1 == null ? (list2 == null || list2.isEmpty()) : list1.equals(list2);
+        if (list1.size() != list2.size()) {
+            return false;
+        }
+        final Object[] array = list1.toArray();
+        lab:for (T another : list2) {
+            for (int index = 0; index < array.length; index++) {
+                if (another.equals(array[index])) {
+                    array[index] = null;
+                    continue lab;
+                }
+            }
+            return false;
+        }
+        return true;
     }
-    public static <T> boolean equalEle(Collection<T> collection1, Collection<T> collection2) {
-        if ((collection1 == null || collection1.isEmpty()) && (collection2 == null || collection2.isEmpty())) {
-            return true;
-        }
-        if (collection1 == collection2) {
-            return true;
-        }
-        if (collection1 == null || collection2 == null) {
-            return false;
-        }
-        if (collection1.size() != collection2.size()) {
-            return false;
-        }
-        EqualHelper<T>  helper = new EqualHelper<>();
-        collection1.forEach(helper);
-        helper.done = true;
-        return false;//todo
+    public static <T> boolean nullOrEmpty(Collection<T> c1, Collection<T> c2) {
+        return c1 == c2 ||
+                ((c1 == null || c1.isEmpty()) &&
+                        (c2 == null || c2.isEmpty()));
     }
     static final class EqualHelper<T> implements Consumer<T> {
         boolean done = false;

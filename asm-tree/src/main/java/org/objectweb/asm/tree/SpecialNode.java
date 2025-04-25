@@ -54,34 +54,26 @@ import java.util.List;
  * @author OblivRuinDev
  */
 public abstract class SpecialNode extends ATypeAnnotatedNode implements ISpecialVisitor {
-    /**
-     * The runtime visible annotations of this. May be {@literal null}.
-     */
+    /** The runtime visible annotations of this. May be {@literal null}. */
     public List<AnnotationNode> visibleAnnotations;
-    /**
-     * The runtime invisible annotations of this. May be {@literal null}.
-     */
+    /** The runtime invisible annotations of this. May be {@literal null}. */
     public List<AnnotationNode> invisibleAnnotations;
     /** The non standard attributes of this. * May be {@literal null}. */
     public List<Attribute> attrs;
-    /** See {@link org.objectweb.asm.Type}. */
-    public String desc;
     /** The  signature. May be {@literal null}. */
     public String signature;
     public int access;
     public String name;
 
-    public SpecialNode(int access, String name, String descriptor, String signature) {
+    public SpecialNode(int access, String name, String signature) {
         this.access = access;
         this.name = name;
         this.signature = signature;
-        this.desc = descriptor;
     }
 
-    public SpecialNode(final String name, final String descriptor, final String signature) {
+    public SpecialNode(final String name, final String signature) {
         this.name = name;
         this.signature = signature;
-        this.desc = descriptor;
     }
 
     public SpecialNode() {}

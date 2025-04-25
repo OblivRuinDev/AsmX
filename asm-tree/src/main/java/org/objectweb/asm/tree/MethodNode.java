@@ -64,6 +64,9 @@ public class MethodNode extends SpecialNode implements IMethodVisitor {
   /** The method parameter info (access flags and name). */
   public List<ParameterNode> parameters;
 
+  /** The method's descriptor (see {@link Type}). */
+  public String desc;
+
   /**
    * The default value of this annotation interface method. This field must be a {@link Byte},
    * {@link Boolean}, {@link Character}, {@link Short}, {@link Integer}, {@link Long}, {@link
@@ -164,7 +167,8 @@ public class MethodNode extends SpecialNode implements IMethodVisitor {
       final String descriptor,
       final String signature,
       final String[] exceptions) {
-    super(access, name, descriptor, signature);
+    super(access, name, signature);
+    this.desc = descriptor;
 
     this.exceptions = Util.asArrayList(exceptions);
     if ((access & Opcodes.ACC_ABSTRACT) == 0) {
