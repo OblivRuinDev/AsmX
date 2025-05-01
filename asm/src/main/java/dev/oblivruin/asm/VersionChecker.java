@@ -26,6 +26,8 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package dev.oblivruin.asm;
 
+import org.objectweb.asm.Opcodes;
+
 import static org.objectweb.asm.Opcodes.*;
 
 /**

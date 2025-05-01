@@ -39,10 +39,17 @@ public class ClassVersionException extends RuntimeException {
         super(message);
     }
 
-    /**
-     * Construct this.
-     */
+    /** Construct this. */
     public ClassVersionException() {
         super();
+    }
+
+    /** Constructs this. */
+    public ClassVersionException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ClassVersionException(int version) {
+        super("Unsupported class file major version : " + version);
     }
 }

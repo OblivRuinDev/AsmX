@@ -13,7 +13,8 @@
 // Copyright (c) 2025 OblivRuinDev
 // Modifications: See git commits for details
 //
-// Distributed under the BSD-3-Clause License (inherits original terms)
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
 // ---------------------------------------------------------------------
 
 // Redistribution and use in source and binary forms, with or without
@@ -47,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import dev.oblivruin.asm.ClassVersionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -73,16 +75,13 @@ class AnnotationVisitorTest extends AsmTest {
   void testConstructor_invalidApi() {
     Executable constructor = () -> new AnnotationVisitor(-1) {};
 
-    Exception exception = assertThrows(IllegalArgumentException.class, constructor);
-    assertEquals("Unsupported ClassFile version -1", exception.getMessage());
+      assertThrows(ClassVersionException.class, constructor);
   }
 
   @Test
   void testGetDelegate() {
-    IAnnotationVisitor delegate = new AnnotationVisitor() {};
-    AnnotationVisitor visitor = new AnnotationVisitor(delegate) {};
-
-    assertSame(delegate, visitor.getDelegate());
+      IAnnotationVisitor av = new AnnotationVisitor() {};
+      DelegateVisitorTest.testGetDelegate(av, new AnnotationVisitor(av) {});
   }
 
   /**
@@ -106,7 +105,7 @@ class AnnotationVisitorTest extends AsmTest {
 
     if (classParameter.isMoreRecentThan(apiParameter)) {
       Exception removeException =
-          assertThrows(UnsupportedOperationException.class, removeAnnotations);
+          assertThrows(ClassVersionException.class, removeAnnotations);
       Exception deleteException =
           assertThrows(UnsupportedOperationException.class, deleteAnnotations);
       assertTrue(removeException.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));

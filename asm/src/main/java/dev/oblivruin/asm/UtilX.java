@@ -26,6 +26,9 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package dev.oblivruin.asm;
 
+import org.objectweb.asm.VerObj;
+
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -33,51 +36,105 @@ import java.util.function.Consumer;
 public final class UtilX {
     private UtilX() {}
     public static int getClassVer() {
-        String str = System.getProperty("java.class.version");
-        if (str.endsWith(".0")) {
-            return Integer.parseInt(str.substring(0, str.length() - 2));
+        String str = System.getProperty("asmx.class.version");
+        if (str == null) {
+            str = System.getProperty("java.class.version");
+            if (str.endsWith(".0")) {//system property is end up with ".0"
+                try {
+                    return VerObj.checkReal(Integer.parseInt(str.substring(0, str.length() - 2)));
+                } catch (NumberFormatException | ClassVersionException e) {
+                    throw new IllegalArgumentException("Property {\"java.class.version\"=" + str +
+                            "} is unrecognizable!\nYou can set property \"asmx.class.version\" to replace it", e);
+                }
+            } else {
+                throw new IllegalArgumentException("Property {\"java.class.version\"=" + str +
+                        "} is unrecognizable!\nYou can set property \"asmx.class.version\" to replace it");
+            }
         } else {
-            throw new ClassVersionException("Cannot parse Java ClassFile Version: \"java.class.version\"=" + str);
+            try {
+                return VerObj.checkReal(Integer.parseInt(str));
+            } catch (NumberFormatException | ClassVersionException e) {
+                throw new IllegalArgumentException("Property {\"asmx.class.version\"=" + str + "} is unrecognizable!\nCheck your settings!", e);
+            }
         }
     }
+
+    /**
+     * Compares two lists for content equality regardless of element order.
+     * @param list1 first list
+     * @param list2 second list
+     * @return true if both lists contain the same elements (order-agnostic)
+     * @param <T> the class of the objects in the list
+     */
     public static <T> boolean equalE(List<T> list1, List<T> list2) {
         if (nullOrEmpty(list1, list2)) {
             return true;
         }
-        if (list1 == null || list2 == null) {
+        if (list1 == null || list2 == null) {//only one list is null and another list is not empty
             return false;
         }
         if (list1.size() != list2.size()) {
             return false;
         }
+        // Convert first list to array for destructive matching
         final Object[] array = list1.toArray();
         lab:for (T another : list2) {
             for (int index = 0; index < array.length; index++) {
                 if (another.equals(array[index])) {
+                    // Mark element as matched to prevent reuse
                     array[index] = null;
+                    // Continue with next element in list2
                     continue lab;
                 }
             }
+            // Current element(in list2) has no match in list1
             return false;
         }
+        // All elements matched successfully
         return true;
     }
+
+    /**
+     * Checks if both collections are either null or empty.<br>
+     * Null collection means empty.
+     * @param c1 first collection
+     * @param c2 second collection
+     * @return true if both collections are null/empty
+     * @param <T> the class of the objects in the collection
+     */
     public static <T> boolean nullOrEmpty(Collection<T> c1, Collection<T> c2) {
         return c1 == c2 ||
                 ((c1 == null || c1.isEmpty()) &&
                         (c2 == null || c2.isEmpty()));
     }
-    static final class EqualHelper<T> implements Consumer<T> {
-        boolean done = false;
 
-        @Override
-        public void accept(T t) {
-
+    public static String repeat(String str, int count) {
+        if (count < 0) {
+            throw new IllegalArgumentException("count is negative: " + count);
         }
-    }
-    static final class Holder<T> {
-        int count0 = 0;
-        int count = 0;
-
+        if (count == 1) {
+            return str;
+        }
+        int length = str.length();
+        if (count == 0 || length == 0) {
+            return "";
+        }
+        if (length == 1) {
+            char[] c = new char[count];
+            Arrays.fill(c, str.charAt(0));
+            return new String(c);
+        }
+        if (Integer.MAX_VALUE / count < length) {
+            throw new OutOfMemoryError("Required length exceeds implementation limit");
+        }
+        int limit = count * length;
+        char[] c = new char[limit];
+        System.arraycopy(str.toCharArray(), 0, c, 0, length);
+        int copied = length;
+        for (; copied < limit - copied; copied <<= 1) {
+            System.arraycopy(c, 0, c, copied, copied);
+        }
+        System.arraycopy(c, 0, c, copied, limit - copied);
+        return new String(c);
     }
 }

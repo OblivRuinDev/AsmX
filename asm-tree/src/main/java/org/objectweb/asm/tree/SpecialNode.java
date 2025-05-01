@@ -13,7 +13,8 @@
 // Copyright (c) 2025 OblivRuinDev
 // Modifications: See git commits for details
 //
-// Distributed under the BSD-3-Clause License (inherits original terms)
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
 // ---------------------------------------------------------------------
 
 // Redistribution and use in source and binary forms, with or without
@@ -47,6 +48,7 @@ import org.objectweb.asm.ISpecialVisitor;
 import org.objectweb.asm.TypePath;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * A class used to simplify some nodes' implementations.
@@ -83,22 +85,14 @@ public abstract class SpecialNode extends ATypeAnnotatedNode implements ISpecial
      */
     public final void acceptSpecial(ISpecialVisitor visitor) {
         if (visibleAnnotations != null) {
-            for (int i = 0, n = visibleAnnotations.size(); i < n; ++i) {
-                AnnotationNode annotation = visibleAnnotations.get(i);
-                annotation.accept(visitor.visitAnnotation(annotation.desc, true));
-            }
+            visibleAnnotations.forEach(node -> node.accept(visitor.visitAnnotation(node.desc, true)));
         }
         if (invisibleAnnotations != null) {
-            for (int i = 0, n = invisibleAnnotations.size(); i < n; ++i) {
-                AnnotationNode annotation = invisibleAnnotations.get(i);
-                annotation.accept(visitor.visitAnnotation(annotation.desc, false));
-            }
+            invisibleAnnotations.forEach(node -> node.accept(visitor.visitAnnotation(node.desc, false)));
         }
         super.acceptTypeAnn(visitor);
         if (attrs != null) {
-            for (int i = 0, n = attrs.size(); i < n; ++i) {
-                visitor.visitAttribute(attrs.get(i));
-            }
+            attrs.forEach(visitor::visitAttribute);
         }
     }
 
@@ -136,5 +130,18 @@ public abstract class SpecialNode extends ATypeAnnotatedNode implements ISpecial
     @Override
     public void visitAttribute(final Attribute attribute) {
       attrs = Util.add(attrs, attribute);
+    }
+
+    private final class Consumer0 implements Consumer<AnnotationNode> {
+        private final ISpecialVisitor visitor;
+        boolean visible = true;
+
+        Consumer0(ISpecialVisitor visitor) {
+            this.visitor = visitor;
+        }
+        @Override
+        public void accept(AnnotationNode annotationNode) {
+            annotationNode.accept(visitor.visitAnnotation(annotationNode.desc, visible));
+        }
     }
 }

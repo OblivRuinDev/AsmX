@@ -13,7 +13,8 @@
 // Copyright (c) 2025 OblivRuinDev
 // Modifications: See git commits for details
 //
-// Distributed under the BSD-3-Clause License (inherits original terms)
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
 // ---------------------------------------------------------------------
 
 // Redistribution and use in source and binary forms, with or without
@@ -41,6 +42,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
+import dev.oblivruin.asm.ClassVersionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -55,25 +57,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class DelegateVisitorTest {
     @Test
     void testConstructor_validApi() {
-        Executable constructor = () -> new DelegateVisitor<>(Opcodes.V11) {};
+        Executable constructor = () -> new DelegateVisitor<IVisitor>(Opcodes.V11) {};
 
         assertDoesNotThrow(constructor);
     }
 
     @Test
     void testConstructor_invalidApi() {
-        Executable constructor = () -> new DelegateVisitor<>(-1) {};
+        Executable constructor = () -> new DelegateVisitor<IVisitor>(-1) {};
 
-        Exception exception = assertThrows(IllegalArgumentException.class, constructor);
-        assertEquals("Unsupported ClassFile version -1", exception.getMessage());
+        assertThrows(ClassVersionException.class, constructor);
     }
 
     @Test
     void testGetDelegate() {
-        IVisitorTest delegate = new IVisitorTest();
-        DelegateVisitor<IVisitorTest> visitor = new DelegateVisitor<>(delegate) {};
+        IVisitor visitor = new IVisitorTest();
+        testGetDelegate(visitor, new DelegateVisitor<IVisitor>(visitor) {});
+    }
 
-        assertSame(delegate, visitor.getDelegate());
+    public static void testGetDelegate(IVisitor visitor, DelegateVisitor<?> delegateVisitor) {
+        assertSame(visitor, delegateVisitor.parent);
+        assertSame(visitor, delegateVisitor.getDelegate());
     }
 
     public static final class IVisitorTest implements IVisitor{}

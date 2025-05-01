@@ -13,7 +13,8 @@
 // Copyright (c) 2025 OblivRuinDev
 // Modifications: See git commits for details
 //
-// Distributed under the BSD-3-Clause License (inherits original terms)
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
 // ---------------------------------------------------------------------
 
 // Redistribution and use in source and binary forms, with or without
@@ -42,6 +43,8 @@
 package org.objectweb.asm.tree.analysis;
 
 import java.util.List;
+
+import dev.oblivruin.asm.UtilX;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
@@ -177,7 +180,7 @@ public class SimpleVerifier extends BasicVerifier {
       if (isArray) {
         value = newValue(type.getElementType());
         value = new BasicValue(Type.getType(
-                  "[".repeat(Math.max(0, type.getDimensions())) + value.getType().getDescriptor()));
+                  UtilX.repeat("[", Math.max(0, type.getDimensions())) + value.getType().getDescriptor()));
       } else {
         value = new BasicValue(type);
       }

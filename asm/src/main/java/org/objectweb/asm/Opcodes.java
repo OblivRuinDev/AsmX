@@ -13,7 +13,8 @@
 // Copyright (c) 2025 OblivRuinDev
 // Modifications: See git commits for details
 //
-// Distributed under the BSD-3-Clause License (inherits original terms)
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
 // ---------------------------------------------------------------------
 
 // Redistribution and use in source and binary forms, with or without
@@ -71,7 +72,7 @@ public interface Opcodes {
     /**
      * @deprecated It was too old and might cause some problems, and we decided to abandon it.
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated
     int V1_1 = 3 << 16 | 45;
     int V1_2 = 0 << 16 | 46;
     int V1_3 = 0 << 16 | 47;

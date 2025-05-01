@@ -13,7 +13,8 @@
 // Copyright (c) 2025 OblivRuinDev
 // Modifications: See git commits for details
 //
-// Distributed under the BSD-3-Clause License (inherits original terms)
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
 // ---------------------------------------------------------------------
 
 // Redistribution and use in source and binary forms, with or without
@@ -145,7 +146,7 @@ public class MethodNode extends SpecialNode implements IMethodVisitor {
    * @param api the ASM API version implemented by this visitor. Must be one of the {@code
    *     ASM}<i>x</i> values in {@link Opcodes}.
    */
-  @Deprecated(forRemoval = true)
+  @Deprecated
   public MethodNode(final int api) {
     this();
   }
@@ -217,7 +218,7 @@ public class MethodNode extends SpecialNode implements IMethodVisitor {
   @Override
   public AnnotationNode visitAnnotationDefault() {
     return new AnnotationNode(
-        new ArrayList<>(0) {
+        new ArrayList<Object>(0) {
           @Override
           public boolean add(final Object o) {
             annotationDefault = o;

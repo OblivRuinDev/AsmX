@@ -13,7 +13,8 @@
 // Copyright (c) 2025 OblivRuinDev
 // Modifications: See git commits for details
 //
-// Distributed under the BSD-3-Clause License (inherits original terms)
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
 // ---------------------------------------------------------------------
 
 // Redistribution and use in source and binary forms, with or without
@@ -100,7 +101,7 @@ public class FieldNode extends SpecialNode implements IFieldVisitor, Consumer<IC
    *     field does not have an initial value, must be an {@link Integer}, a {@link Float}, a {@link
    *     Long}, a {@link Double} or a {@link String}.
    */
-  @Deprecated(forRemoval = true)
+  @Deprecated
   public FieldNode(
       final int api,
       final int access,

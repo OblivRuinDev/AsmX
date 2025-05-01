@@ -13,32 +13,11 @@
 // Copyright (c) 2025 OblivRuinDev
 // Modifications: See git commits for details
 //
-// Distributed under the BSD-3-Clause License (inherits original terms)
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
 // ---------------------------------------------------------------------
 
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
-// are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-// 3. Neither the name of the copyright holders nor the names of its
-//    contributors may be used to endorse or promote products derived from
-//    this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-// THE POSSIBILITY OF SUCH DAMAGE.
+// For full license terms, see the project's LICENSE file.
 @file:Suppress("UNCHECKED_CAST")
 
 import com.diffplug.gradle.spotless.SpotlessExtension
@@ -51,6 +30,7 @@ import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.FileOutputStream
 import java.io.PrintWriter
+import java.util.function.Predicate
 
 buildscript {
     repositories { mavenCentral() }
@@ -117,7 +97,7 @@ val asm = project(":asm") {
 
 val asmTree = project(":asm-tree") {
     description = "Tree API of ${rootProject.description}"
-    setCfg(asm, "orj.objectweb.asm.tree")
+    setCfg(asm, "org.objectweb.asm.tree")
 }
 
 val asmAnalysis = project(":asm-analysis") {
@@ -157,6 +137,8 @@ val benchmarks = project(":benchmarks") {
         implementation(files("libs/csg-bytecode-1.0.0.jar", "libs/jclasslib.jar"))
         jmh(asm)
         jmh(asmTree)
+        implementation(asm)
+        implementation(asmTree)
     }
     setCfg(emptyArray(), emptyArray(), arrayOf(
         "kawa:kawa:1.7",
@@ -169,12 +151,9 @@ val benchmarks = project(":benchmarks") {
         "org.mozilla:rhino:1.7.7.1"
     ), false)
     val version = version
-    val asmConfig = configurations.create("asm$version")
-    dependencies.add("asm$version", "org.ow2.asm:asm:$version@jar")
-    dependencies.add("asm$version", "org.ow2.asm:asm-tree:$version@jar")
 
     tasks.register<Copy>("asm$version") {
-        from(asmConfig.map { zipTree(it) })
+        from(asm.sourceSets["main"].output.classesDirs, asmTree.sourceSets["main"].output.classesDirs)
         into("${layout.buildDirectory.get().asFile}/asm$version")
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
@@ -374,19 +353,22 @@ subprojects {
 
             tasks.register("genModuleInfo") {
                 group = "Build"
+                val moduleFile = layout.buildDirectory.file("generated/module-info/module-info.class").get().asFile
                 outputs.doNotCacheIf("Disabled cache always") { true }
                 outputs.upToDateWhen { false }
 
-                val file = File(sourceSets["main"].output.classesDirs.singleFile, "module-info.class")
-                outputs.file(file)
+                outputs.file(moduleFile)
                 doLast {
-                    file.createNewFile()
-                    ModuleBuilder().writeFile(file, cfg)
+                    moduleFile.createNewFile()
+                    ModuleBuilder().writeFile(moduleFile, cfg)
                 }
             }
 
             // Manifest configure
             tasks.named<Jar>("jar") {
+                dependsOn("genModuleInfo")
+                from(tasks.named("genModuleInfo").get().outputs.files)
+
                 manifest {
                     attributes(
                         "Implementation-Title" to project.description,

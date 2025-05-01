@@ -13,7 +13,8 @@
 // Copyright (c) 2025 OblivRuinDev
 // Modifications: See git commits for details
 //
-// Distributed under the BSD-3-Clause License (inherits original terms)
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
 // ---------------------------------------------------------------------
 
 // Redistribution and use in source and binary forms, with or without
@@ -40,6 +41,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
+
+import dev.oblivruin.asm.ClassVersionException;
 
 import static org.objectweb.asm.Opcodes.V_BYPASS;
 
@@ -77,8 +80,15 @@ public abstract class VerObj {
     }
 
     public static void checkClassVer(int version) {
-        if (version != 0 && (version < 46 || version > 69)) {
-            throw new IllegalArgumentException("Unsupported ClassFile version " + version);
+        if (version != 0) {
+            checkReal(version);
         }
+    }
+
+    public static int checkReal(int version) {
+        if (version < 46 || version > 69) {
+            throw new ClassVersionException(version);
+        }
+        return version;
     }
 }

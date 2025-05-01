@@ -13,7 +13,8 @@
 // Copyright (c) 2025 OblivRuinDev
 // Modifications: See git commits for details
 //
-// Distributed under the BSD-3-Clause License (inherits original terms)
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
 // ---------------------------------------------------------------------
 
 // Redistribution and use in source and binary forms, with or without
@@ -46,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import dev.oblivruin.asm.ClassVersionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -68,15 +70,13 @@ class FieldVisitorTest {
   void testConstructor_invalidApi() {
     Executable constructor = () -> new FieldVisitor(-1) {};
 
-    Exception exception = assertThrows(IllegalArgumentException.class, constructor);
-    assertEquals("Unsupported ClassFile version -1", exception.getMessage());
+      assertThrows(ClassVersionException.class, constructor);
   }
 
   @Test
   void testGetDelegate() {
     IFieldVisitor delegate = new FieldVisitor(){};
-    FieldVisitor visitor = new FieldVisitor(delegate){};
 
-    assertSame(delegate, visitor.getDelegate());
+      DelegateVisitorTest.testGetDelegate(delegate, new FieldVisitor(delegate){});
   }
 }

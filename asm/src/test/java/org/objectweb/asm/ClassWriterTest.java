@@ -13,7 +13,8 @@
 // Copyright (c) 2025 OblivRuinDev
 // Modifications: See git commits for details
 //
-// Distributed under the BSD-3-Clause License (inherits original terms)
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
 // ---------------------------------------------------------------------
 
 // Redistribution and use in source and binary forms, with or without
@@ -171,9 +172,9 @@ class ClassWriterTest extends AsmTest {
     ClassWriter classWriter = newEmptyClassWriter();
 
     classWriter.newConst(Boolean.FALSE);
-    classWriter.newConst(Byte.valueOf((byte) 1));
-    classWriter.newConst(Character.valueOf('2'));
-    classWriter.newConst(Short.valueOf((short) 3));
+    classWriter.newConst((byte) 1);
+    classWriter.newConst('2');
+    classWriter.newConst((short) 3);
 
     String constantPoolDump = getConstantPoolDump(classWriter);
     assertTrue(constantPoolDump.contains("constant_pool: 0"));

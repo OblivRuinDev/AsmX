@@ -13,7 +13,8 @@
 // Copyright (c) 2025 OblivRuinDev
 // Modifications: See git commits for details
 //
-// Distributed under the BSD-3-Clause License (inherits original terms)
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
 // ---------------------------------------------------------------------
 
 // Redistribution and use in source and binary forms, with or without
@@ -86,7 +87,7 @@ public class AnnotationNode implements IAnnotationVisitor, Consumer<IAnnotationV
    *     ASM}<i>x</i> values in {@link Opcodes}.
    * @param descriptor the class descriptor of the annotation class.
    */
-  @Deprecated(forRemoval = true)
+  @Deprecated
   public AnnotationNode(final int api, final String descriptor) {
     this(descriptor);
   }

@@ -481,21 +481,21 @@ final class SymbolTable {
    */
   Symbol addConstant(final Object value) {
     if (value instanceof Integer) {
-      return addConstantInteger(((Integer) value).intValue());
+      return addConstantInteger((Integer) value);
     } else if (value instanceof Byte) {
-      return addConstantInteger(((Byte) value).intValue());
+      return addConstantInteger((Byte) value);
     } else if (value instanceof Character) {
-      return addConstantInteger(((Character) value).charValue());
+      return addConstantInteger((Character) value);
     } else if (value instanceof Short) {
-      return addConstantInteger(((Short) value).intValue());
+      return addConstantInteger((Short) value);
     } else if (value instanceof Boolean) {
-      return addConstantInteger(((Boolean) value).booleanValue() ? 1 : 0);
+      return addConstantInteger((Boolean) value ? 1 : 0);
     } else if (value instanceof Float) {
-      return addConstantFloat(((Float) value).floatValue());
+      return addConstantFloat((Float) value);
     } else if (value instanceof Long) {
-      return addConstantLong(((Long) value).longValue());
+      return addConstantLong((Long) value);
     } else if (value instanceof Double) {
-      return addConstantDouble(((Double) value).doubleValue());
+      return addConstantDouble((Double) value);
     } else if (value instanceof String) {
       return addConstantString((String) value);
     } else if (value instanceof Type) {

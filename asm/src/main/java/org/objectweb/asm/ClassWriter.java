@@ -13,7 +13,8 @@
 // Copyright (c) 2025 OblivRuinDev
 // Modifications: See git commits for details
 //
-// Distributed under the BSD-3-Clause License (inherits original terms)
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
 // ---------------------------------------------------------------------
 
 // Redistribution and use in source and binary forms, with or without
@@ -525,14 +526,14 @@ public class ClassWriter implements IClassVisitor {
     while (fieldWriter != null) {
       ++fieldsCount;
       size += fieldWriter.computeFieldInfoSize();
-      fieldWriter = (FieldWriter) fieldWriter.fv;
+      fieldWriter = fieldWriter.fv;
     }
     int methodsCount = 0;
     MethodWriter methodWriter = firstMethod;
     while (methodWriter != null) {
       ++methodsCount;
       size += methodWriter.computeMethodInfoSize();
-      methodWriter = (MethodWriter) methodWriter.mv;
+      methodWriter = methodWriter.mv;
     }
 
     // For ease of reference, we use here the same attribute order as in Section 4.7 of the JVMS.
@@ -626,7 +627,7 @@ public class ClassWriter implements IClassVisitor {
       while (recordComponentWriter != null) {
         ++recordComponentCount;
         recordSize += recordComponentWriter.computeRecordComponentInfoSize();
-        recordComponentWriter = (RecordComponentWriter) recordComponentWriter.delegate;
+        recordComponentWriter = recordComponentWriter.delegate;
       }
       ++attributesCount;
       size += 8 + recordSize;
@@ -659,7 +660,7 @@ public class ClassWriter implements IClassVisitor {
     fieldWriter = firstField;
     while (fieldWriter != null) {
       fieldWriter.putFieldInfo(result);
-      fieldWriter = (FieldWriter) fieldWriter.fv;
+      fieldWriter = fieldWriter.fv;
     }
     result.putShort(methodsCount);
     boolean hasFrames = false;
@@ -669,7 +670,7 @@ public class ClassWriter implements IClassVisitor {
       hasFrames |= methodWriter.hasFrames();
       hasAsmInstructions |= methodWriter.hasAsmInstructions();
       methodWriter.putMethodInfo(result);
-      methodWriter = (MethodWriter) methodWriter.mv;
+      methodWriter = methodWriter.mv;
     }
     // For ease of reference, we use here the same attribute order as in Section 4.7 of the JVMS.
     result.putShort(attributesCount);

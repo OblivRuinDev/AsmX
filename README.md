@@ -44,23 +44,28 @@ For actual changes, please see [Compare me](https://github.com/OblivRuinDev/AsmX
 - [France Telecom](https://www.orange.com/)
 - OW2 ASM development team
 
-This project modifies original ASM code under the terms of BSD-3-Clause license. See full [LICENSE](LICENSE.txt).
+**Copyright Clarification:**
+- Modified ASM files carry dual copyright headers (Original ASM + ASMX)
+- Newly created files are exclusively under ASMX's BSD-3-Clause
+- The "ASM" name remains a trademark of its original rights holders
+
+This project modifies original ASM code under the terms of BSD-3-Clause license. See full [LICENSE](LICENSE).
 
 ---
 
 ## 🐛 Reporting Issues
 
 If you encounter any issues with the ASMX project, please create a new issue
-on the [Github Issue Tracker](https://github.com/OblivRuinDev/AsmX/issues).
+on the [GitHub Issue Tracker](https://github.com/OblivRuinDev/AsmX/issues).
 
 ## 📜 Copyright
 ### License Hierarchy
-| Component Type       | Rights Holder        | License          |
-|----------------------|----------------------|------------------|
-| Original ASM Code    | INRIA/France Telecom | BSD-3-Clause     |
-| ASM Modifications and Derivatives    | OblivRuinDev         | BSD-3-Clause     |
-| New Components       | OblivRuinDev         | BSD-3-Clause     |
+| Component Type                    | Rights Holder        | License          |
+|-----------------------------------|----------------------|------------------|
+| Original ASM Code                 | INRIA/France Telecom | BSD-3-Clause     |
+| ASM Modifications and Derivatives | OblivRuinDev         | BSD-3-Clause     |
+| New Components                    | OblivRuinDev         | BSD-3-Clause     |
 
 ⚠️ **Important Notice**  
 This declaration doesn't transfer any original ASM copyrights.  
-Full license terms in [LICENSE.txt](LICENSE.txt).
+Full license terms in [LICENSE](LICENSE).
