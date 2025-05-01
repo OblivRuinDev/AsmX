@@ -2,6 +2,7 @@
 
 ![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)
 [![Project Status](https://img.shields.io/badge/Status-Active-brightgreen.svg)](https://github.com/OblivRuinDev/AsmX)
+![Java Requirement](https://img.shields.io/badge/Java_Requirement-1.8+-red.svg)
 
 ![AsmX Logo](.github/avatar.png?raw=true)
 
@@ -21,6 +22,7 @@ but we're still working hard to keep the majority of the API available and add m
 
 For more API breaking changes, please see [changes.md](changes.md)<br>
 For actual changes, please see [Compare me](https://github.com/OblivRuinDev/AsmX/compare/upstream...dev)
+> ⚠️ **Note**: Require run on Java **1.8+**
 
 > ⚠️ **Note**: ASMX is **not** an official ASM branch. See [Legal Disclaimer](#-legal-disclaimer).
 
