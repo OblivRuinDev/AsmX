@@ -83,7 +83,7 @@ public final class VersionChecker {
     }
 
     public static void invokeInterface(int version) {
-        if (version < V1_7 && version != 0) {
+        if (version < V1_8 && version != 0) {
             invokeInterface();
         }
     }

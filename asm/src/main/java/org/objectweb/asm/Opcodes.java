@@ -59,14 +59,6 @@ import dev.oblivruin.asm.UtilX;
 // DontCheck(InterfaceIsType): can't be fixed (for backward binary compatibility).
 public interface Opcodes {
 
-    /**
-     * <i>Experimental, use at your own risk. This field will be renamed when it becomes stable, this
-     * will break existing code using it. Only code compiled with --enable-preview can use this.</i>
-     *
-     * @deprecated This API is experimental.
-     */
-    @Deprecated int ASM10_EXPERIMENTAL = 1 << 24 | 10 << 16 | 0 << 8;
-
     // AsmX Java ClassFile Versions (the minor version is stored in the 16 most significant bits, and the
     // major version in the 16 least significant bits).
     /**

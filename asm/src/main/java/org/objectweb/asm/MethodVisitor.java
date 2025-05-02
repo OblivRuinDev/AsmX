@@ -207,7 +207,9 @@ public abstract class MethodVisitor extends DelegateVisitor<IMethodVisitor> impl
           final String name,
           final String descriptor,
           final boolean isInterface) {
-    checkInterfaceInvoke(ver, opcode, isInterface);
+    if(isInterface && (opcode != INVOKEINTERFACE)) {
+      VersionChecker.invokeInterface(ver);
+    }
     if (parent != null) {
       parent.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
     }
@@ -357,11 +359,6 @@ public abstract class MethodVisitor extends DelegateVisitor<IMethodVisitor> impl
   public void visitEnd() {
     if (parent != null) {
       parent.visitEnd();
-    }
-  }
-  public static void checkInterfaceInvoke(int api, int opcode, boolean isInterface) {
-    if(isInterface && (opcode != INVOKEINTERFACE)) {
-      VersionChecker.invokeInterface(api);
     }
   }
 }
