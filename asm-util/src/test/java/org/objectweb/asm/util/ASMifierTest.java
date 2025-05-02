@@ -85,7 +85,7 @@ class ASMifierTest extends AsmTest {
    */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
-  void testAsmify_precompiledClass(final PrecompiledClass classParameter, final Api apiParameter)
+  void testAsmify_precompiledClass(final PrecompiledClass classParameter, final JavaVer apiParameter)
       throws Exception {
     byte[] classFile = classParameter.getBytes();
     assumeTrue(classFile.length < Short.MAX_VALUE);

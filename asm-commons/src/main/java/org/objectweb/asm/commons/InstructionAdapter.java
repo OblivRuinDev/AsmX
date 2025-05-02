@@ -519,8 +519,7 @@ public class InstructionAdapter extends MethodVisitor {
       final String owner,
       final String name,
       final String descriptor,
-      final boolean isInterface) {//todo: uncheck
-    checkInterfaceInvoke(ver, opcodeAndSource, isInterface);
+      final boolean isInterface) {
 
       switch (opcodeAndSource) {
       case Opcodes.INVOKESPECIAL:

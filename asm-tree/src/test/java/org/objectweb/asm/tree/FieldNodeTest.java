@@ -49,11 +49,4 @@ class FieldNodeTest extends AsmTest {
     assertEquals("field", fieldNode.name);
     assertEquals("I", fieldNode.desc);
   }
-
-  @Test
-  void testConstructor_illegalState() {
-    Executable constructor = () -> new FieldNode(123, "field", "I", null, null) {};
-
-    assertThrows(IllegalStateException.class, constructor);
-  }
 }

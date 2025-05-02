@@ -30,6 +30,7 @@ package org.objectweb.asm.signature;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import dev.oblivruin.asm.ClassVersionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -44,7 +45,6 @@ class SignatureVisitorTest {
   void testConstructor_invalidApi() {
     Executable constructor = () -> new SignatureVisitor(-1) {};
 
-    Exception exception = assertThrows(IllegalArgumentException.class, constructor);
-    assertEquals("Unsupported ClassFile version -1", exception.getMessage());
+    Exception exception = assertThrows(ClassVersionException.class, constructor);
   }
 }

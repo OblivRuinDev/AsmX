@@ -46,7 +46,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.test.AsmTest;
-import org.objectweb.asm.test.AsmTest.PrecompiledClass;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -85,7 +84,7 @@ class AnalyzerWithBasicInterpreterTest extends AsmTest {
    */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
-  void testAnalyze_basicInterpreter(final PrecompiledClass classParameter, final Api apiParameter)
+  void testAnalyze_basicInterpreter(final PrecompiledClass classParameter, final JavaVer apiParameter)
       throws AnalyzerException {
     ClassNode classNode = new ClassNode();
     new ClassReader(classParameter.getBytes()).accept(classNode, 0);
@@ -123,7 +122,7 @@ class AnalyzerWithBasicInterpreterTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
   void testAnalyzeAndComputeMaxs_basicInterpreter(
-      final PrecompiledClass classParameter, final Api apiParameter) throws AnalyzerException {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) throws AnalyzerException {
     ClassNode classNode = new ClassNode();
     new ClassReader(classParameter.getBytes()).accept(classNode, 0);
     ArrayList<MethodMaxs> methodMaxs = new ArrayList<>();
@@ -179,7 +178,7 @@ class AnalyzerWithBasicInterpreterTest extends AsmTest {
     new ClassReader(PrecompiledClass.JDK8_ALL_FRAMES.getBytes()).accept(classNode, 0);
     Analyzer<BasicValue> analyzer =
         new Analyzer<BasicValue>(
-            new BasicInterpreter(/* latest */ Opcodes.ASM10_EXPERIMENTAL) {
+            new BasicInterpreter() {
               @Override
               public BasicValue merge(final BasicValue value1, final BasicValue value2) {
                 return new BasicValue(super.merge(value1, value2).getType());

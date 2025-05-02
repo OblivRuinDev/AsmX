@@ -51,7 +51,7 @@ class ModuleTargetAttributeTest {
     ModuleTargetAttribute moduleTargetAttribute = new ModuleTargetAttribute();
     new ClassReader(classWriter.toByteArray())
         .accept(
-            new ClassVisitor(/* latest */ Opcodes.ASM10_EXPERIMENTAL) {
+            new ClassVisitor() {
 
               @Override
               public void visitAttribute(final Attribute attribute) {

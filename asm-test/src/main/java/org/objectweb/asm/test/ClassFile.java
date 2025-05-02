@@ -140,6 +140,11 @@ public class ClassFile {
    */
   public ClassFile(final byte[] classBytes) {
     this.classBytes = classBytes;
+
+    int v = (((classBytes[6] & 0xFF) << 8) | classBytes[7] & 0xFF);
+    if (v > 59) {
+      new Throwable().printStackTrace();//todo
+    }
   }
 
   /**

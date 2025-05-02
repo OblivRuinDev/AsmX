@@ -50,6 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import dev.oblivruin.asm.ClassVersionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -202,7 +204,7 @@ class LocalVariablesSorterTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAllMethods_precompiledClass(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     ClassWriter classWriter = new ClassWriter(0);
     IClassVisitor localVariablesSorter =
@@ -210,9 +212,8 @@ class LocalVariablesSorterTest extends AsmTest {
 
     Executable accept = () -> classReader.accept(localVariablesSorter, ClassReader.EXPAND_FRAMES);
 
-    if (classParameter.isMoreRecentThan(apiParameter)) {
-      Exception exception = assertThrows(UnsupportedOperationException.class, accept);
-      assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+    if (classParameter.notSuit(apiParameter)) {
+      Exception exception = assertThrows(ClassVersionException.class, accept);
     } else {
       assertDoesNotThrow(accept);
       Executable newInstance = () -> new ClassFile(classWriter.toByteArray()).newInstance();

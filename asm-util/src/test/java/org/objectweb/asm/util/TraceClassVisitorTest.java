@@ -68,7 +68,7 @@ class TraceClassVisitorTest extends AsmTest {
    */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
-  void testVisitMethods(final PrecompiledClass classParameter, final Api apiParameter) {
+  void testVisitMethods(final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
@@ -83,7 +83,7 @@ class TraceClassVisitorTest extends AsmTest {
   /** Tests that ClassReader can accept a TraceClassVisitor without delegate. */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
-  void testVisitMethods_noDelegate(final PrecompiledClass classParameter, final Api apiParameter) {
+  void testVisitMethods_noDelegate(final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     StringWriter output = new StringWriter();
@@ -100,7 +100,7 @@ class TraceClassVisitorTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
   void testVisitMethods_noNestedDelegate(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
 

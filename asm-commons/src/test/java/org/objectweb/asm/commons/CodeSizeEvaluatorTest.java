@@ -48,6 +48,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
+
+import dev.oblivruin.asm.ClassVersionException;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -69,7 +71,7 @@ class CodeSizeEvaluatorTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAllMethods_precompiledClass(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
@@ -79,9 +81,8 @@ class CodeSizeEvaluatorTest extends AsmTest {
 
     Executable accept = () -> classReader.accept(codeSizesEvaluator, attributes(), 0);
 
-    if (classParameter.isMoreRecentThan(apiParameter)) {
-      Exception exception = assertThrows(UnsupportedOperationException.class, accept);
-      assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+    if (classParameter.notSuit(apiParameter)) {
+      Exception exception = assertThrows(ClassVersionException.class, accept);
     } else {
       assertDoesNotThrow(accept);
       for (CodeSizeEvaluation evaluation : evaluations) {

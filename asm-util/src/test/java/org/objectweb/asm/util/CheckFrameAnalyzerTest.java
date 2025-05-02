@@ -286,7 +286,7 @@ class CheckFrameAnalyzerTest extends AsmTest {
    */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
-  void testAnalyze_basicVerifier(final PrecompiledClass classParameter, final Api apiParameter)
+  void testAnalyze_basicVerifier(final PrecompiledClass classParameter, final JavaVer apiParameter)
       throws AnalyzerException {
     assumeFalse(hasJsrOrRetInstructions(classParameter));
     ClassNode classNode = computeFrames(classParameter);
@@ -316,7 +316,7 @@ class CheckFrameAnalyzerTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
   void testAnalyzeAndComputeMaxs_basicVerifier(
-      final PrecompiledClass classParameter, final Api apiParameter) throws AnalyzerException {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) throws AnalyzerException {
     assumeFalse(hasJsrOrRetInstructions(classParameter));
     ClassNode classNode = computeFrames(classParameter);
     ArrayList<MethodMaxs> methodMaxs = MethodMaxs.getAndClear(classNode);

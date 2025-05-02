@@ -86,12 +86,16 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
           final String signature,
           final String superName,
           final String[] interfaces) {
-    if (version > ver && ver != 0) {
+    if ((version & 0xFFFF) > ver && ver != 0) {
       throw new ClassVersionException("The {argument version="+version+"} should lesser than {VerObj.ver=" + ver +
               "}\nOr set {VerObj.ver} to V_BYPASS(0) to suppress version check");
     }
     if ((access & Opcodes.ACC_RECORD) != 0) {
       VersionChecker.record_(ver);
+    } else if ((access & Opcodes.ACC_ENUM) != 0) {
+      VersionChecker._enum(ver);
+    } else if((access & Opcodes.ACC_SYNTHETIC) != 0) {
+      VersionChecker._synthetic(version);
     }
     if (parent != null) {
       parent.visit(version, access, name, signature, superName, interfaces);
@@ -136,6 +140,9 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
   /** {@inheritDoc} */
   @Override
   public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+    if (!visible) {
+      VersionChecker.insnTypeAnn(ver);
+    }
     if (parent != null) {
       return parent.visitAnnotation(descriptor, visible);
     }

@@ -92,12 +92,12 @@ class SerialVersionUidAdderTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
   void testAllMethods_precompiledClass(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     ClassWriter classWriter = new ClassWriter(0);
 
     classReader.accept(
-        new SerialVersionUIDAdder(/* latest */ Opcodes.ASM10_EXPERIMENTAL, classWriter) {}, 0);
+        new SerialVersionUIDAdder(classWriter) {}, 0);
 
     if ((classReader.getAccess() & Opcodes.ACC_ENUM) == 0) {
       assertTrue(new ClassFile(classWriter.toByteArray()).toString().contains("serialVersionUID"));

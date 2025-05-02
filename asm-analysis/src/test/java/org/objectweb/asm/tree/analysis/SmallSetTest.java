@@ -159,7 +159,7 @@ class SmallSetTest {
     Iterator<Object> iterator = newSmallSet(ELEMENT1, ELEMENT2).iterator();
     iterator.next();
 
-    assertThrows(UnsupportedOperationException.class, () -> iterator.remove());
+    assertThrows(ClassVersionException.class, () -> iterator.remove());
   }
 
   private static SmallSet<Object> newSmallSet(final Object element1, final Object element2) {

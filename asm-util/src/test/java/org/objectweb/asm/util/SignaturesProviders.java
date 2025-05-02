@@ -24,7 +24,7 @@ public final class SignaturesProviders {
   static {
     AsmTest.allClassesAndLatestApi()
         .map(argument -> (PrecompiledClass) argument.get()[0])
-        .filter(precompiledClass -> !precompiledClass.isMoreRecentThan(AsmTest.Api.V16))//todo
+        .filter(precompiledClass -> !precompiledClass.notSuit(AsmTest.JavaVer.V16))//todo
         .forEach(precompiledClass -> collectSignatures(precompiledClass));
     assertFalse(CLASS_SIGNATURES.isEmpty());
     assertFalse(FIELD_SIGNATURES.isEmpty());

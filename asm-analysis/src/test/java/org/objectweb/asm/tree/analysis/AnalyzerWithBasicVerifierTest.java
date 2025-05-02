@@ -300,7 +300,7 @@ class AnalyzerWithBasicVerifierTest extends AsmTest {
    */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
-  void testAnalyze_basicVerifier(final PrecompiledClass classParameter, final Api apiParameter) {
+  void testAnalyze_basicVerifier(final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassNode classNode = new ClassNode();
     new ClassReader(classParameter.getBytes()).accept(classNode, 0);
     Analyzer<BasicValue> analyzer = newAnalyzer();

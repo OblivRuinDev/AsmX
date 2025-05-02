@@ -155,8 +155,8 @@ final class Util {
 
   static <T> List<T> asArrayList(final int length, final T[] array) {
     List<T> list = new ArrayList<>(length);
-    for (T obj : array) {
-      list.add(obj); // NOPMD(UseArraysAsList): we convert a part of the array.
+    for (int i = 0; i < Math.min(length, array.length); i++) {
+      list.add(array[i]); // NOPMD(UseArraysAsList): we convert a part of the array.
     }
     return list;
   }

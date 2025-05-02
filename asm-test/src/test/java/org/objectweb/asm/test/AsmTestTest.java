@@ -66,21 +66,21 @@ class AsmTestTest extends AsmTest {
     assertEquals("jdk3.AllInstructions", PrecompiledClass.JDK3_ALL_INSTRUCTIONS.getName());
     assertEquals("jdk8/AllInstructions", PrecompiledClass.JDK8_ALL_INSTRUCTIONS.getInternalName());
     assertEquals("module-info", PrecompiledClass.JDK9_MODULE.getInternalName());
-    assertFalse(PrecompiledClass.JDK3_ALL_INSTRUCTIONS.isMoreRecentThan(Api.V1_3));
-    assertTrue(PrecompiledClass.JDK8_ALL_INSTRUCTIONS.isMoreRecentThan(Api.V1_7));
-    assertFalse(PrecompiledClass.JDK8_ALL_INSTRUCTIONS.isMoreRecentThan(Api.V1_8));
-    assertTrue(PrecompiledClass.JDK9_MODULE.isMoreRecentThan(Api.V1_8));
-    assertFalse(PrecompiledClass.JDK9_MODULE.isMoreRecentThan(Api.V9));
-    assertTrue(PrecompiledClass.JDK11_ALL_INSTRUCTIONS.isMoreRecentThan(Api.V10));
-    assertFalse(PrecompiledClass.JDK11_ALL_INSTRUCTIONS.isMoreRecentThan(Api.V11));
+    assertFalse(PrecompiledClass.JDK3_ALL_INSTRUCTIONS.notSuit(JavaVer.V1_3));
+    assertTrue(PrecompiledClass.JDK8_ALL_INSTRUCTIONS.notSuit(JavaVer.V1_7));
+    assertFalse(PrecompiledClass.JDK8_ALL_INSTRUCTIONS.notSuit(JavaVer.V1_8));
+    assertTrue(PrecompiledClass.JDK9_MODULE.notSuit(JavaVer.V1_8));
+    assertFalse(PrecompiledClass.JDK9_MODULE.notSuit(JavaVer.V9));
+    assertTrue(PrecompiledClass.JDK11_ALL_INSTRUCTIONS.notSuit(JavaVer.V10));
+    assertFalse(PrecompiledClass.JDK11_ALL_INSTRUCTIONS.notSuit(JavaVer.V11));
     assertNotNull(PrecompiledClass.JDK11_ALL_INSTRUCTIONS.getBytes());
     assertEquals("jdk11.AllInstructions", PrecompiledClass.JDK11_ALL_INSTRUCTIONS.toString());
-    assertTrue(PrecompiledClass.JDK14_ALL_STRUCTURES_RECORD.isMoreRecentThan(Api.V13));
-    assertFalse(PrecompiledClass.JDK14_ALL_STRUCTURES_RECORD.isMoreRecentThan(Api.V14));
-    assertTrue(PrecompiledClass.JDK14_ALL_STRUCTURES_EMPTY_RECORD.isMoreRecentThan(Api.V13));
-    assertFalse(PrecompiledClass.JDK14_ALL_STRUCTURES_EMPTY_RECORD.isMoreRecentThan(Api.V14));
-    assertTrue(PrecompiledClass.JDK15_ALL_STRUCTURES.isMoreRecentThan(Api.V14));
-    assertFalse(PrecompiledClass.JDK15_ALL_STRUCTURES.isMoreRecentThan(Api.V15));
+    assertTrue(PrecompiledClass.JDK14_ALL_STRUCTURES_RECORD.notSuit(JavaVer.V13));
+    assertFalse(PrecompiledClass.JDK14_ALL_STRUCTURES_RECORD.notSuit(JavaVer.V14));
+    assertTrue(PrecompiledClass.JDK14_ALL_STRUCTURES_EMPTY_RECORD.notSuit(JavaVer.V13));
+    assertFalse(PrecompiledClass.JDK14_ALL_STRUCTURES_EMPTY_RECORD.notSuit(JavaVer.V14));
+    assertTrue(PrecompiledClass.JDK15_ALL_STRUCTURES.notSuit(JavaVer.V14));
+    assertFalse(PrecompiledClass.JDK15_ALL_STRUCTURES.notSuit(JavaVer.V15));
   }
 
   @Test
@@ -99,7 +99,7 @@ class AsmTestTest extends AsmTest {
         Set.of(PrecompiledClass.values()),
         allArguments.stream().map(arg -> arg.get()[0]).collect(Collectors.toSet()));
     assertEquals(
-        Set.of(Api.values()),
+        Set.of(JavaVer.values()),
         allArguments.stream().map(arg -> arg.get()[1]).collect(Collectors.toSet()));
   }
 
@@ -111,7 +111,7 @@ class AsmTestTest extends AsmTest {
         Set.of(PrecompiledClass.values()),
         allArguments.stream().map(arg -> arg.get()[0]).collect(Collectors.toSet()));
     assertEquals(
-        Set.of(Api.V17),//todo
+        Set.of(JavaVer.V17),//todo
         allArguments.stream().map(arg -> arg.get()[1]).collect(Collectors.toSet()));
   }
 }

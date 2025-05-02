@@ -42,12 +42,6 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import dev.oblivruin.asm.ClassVersionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -55,6 +49,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.objectweb.asm.test.AsmTest;
 import org.objectweb.asm.test.ClassFile;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link AnnotationVisitor}.
@@ -89,27 +85,36 @@ class AnnotationVisitorTest extends AsmTest {
    * null AnnotationVisitor is equivalent to returning an EmptyAnnotationVisitor.
    */
   @ParameterizedTest
-  @MethodSource("allClassesAndAllApis")
+  @MethodSource(AsmTest.ALL_CLASSES_AND_ALL_APIS)
   void testReadAndWrite_removeOrDeleteAnnotations(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     ClassWriter removedAnnotationsClassWriter = new ClassWriter(0);
     ClassWriter deletedAnnotationsClassWriter = new ClassWriter(0);
       IClassVisitor removeAnnotationsAdapter =
-        new RemoveAnnotationsAdapter(apiParameter.value, removedAnnotationsClassWriter);
+        new RemoveAnnotationsAdapter(apiParameter.value, removedAnnotationsClassWriter) {
+          @Override
+          public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+            super.visit(version & 0xFFFF, access, name, signature, superName, interfaces);
+          }
+        };
       IClassVisitor deleteAnnotationsAdapter =
-        new DeleteAnnotationsAdapter(apiParameter.value, deletedAnnotationsClassWriter);
+        new DeleteAnnotationsAdapter(apiParameter.value, deletedAnnotationsClassWriter) {
+          @Override
+          public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+            super.visit(version & 0xFFFF, access, name, signature, superName, interfaces);
+          }
+        };
 
     Executable removeAnnotations = () -> classReader.accept(removeAnnotationsAdapter, 0);
     Executable deleteAnnotations = () -> classReader.accept(deleteAnnotationsAdapter, 0);
 
-    if (classParameter.isMoreRecentThan(apiParameter)) {
-      Exception removeException =
-          assertThrows(ClassVersionException.class, removeAnnotations);
+    if (classParameter.notSuit(apiParameter)) {
       Exception deleteException =
-          assertThrows(UnsupportedOperationException.class, deleteAnnotations);
-      assertTrue(removeException.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
-      assertTrue(deleteException.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+              assertThrows(ClassVersionException.class, deleteAnnotations);
+      Exception removeException =
+              assertThrows(ClassVersionException.class, removeAnnotations);
+
     } else {
       assertDoesNotThrow(removeAnnotations);
       assertDoesNotThrow(deleteAnnotations);

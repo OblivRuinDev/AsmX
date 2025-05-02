@@ -76,6 +76,9 @@ public abstract class FieldVisitor extends DelegateVisitor<IFieldVisitor> implem
   /** @see DelegateVisitor#DelegateVisitor() */
   @Override
   public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+    if (!visible) {
+      VersionChecker.invisAnn(ver);
+    }
     if (parent != null) {
       return parent.visitAnnotation(descriptor, visible);
     }

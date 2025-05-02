@@ -106,6 +106,9 @@ public abstract class MethodVisitor extends DelegateVisitor<IMethodVisitor> impl
 
   @Override
   public IAnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
+    if (!visible) {
+      VersionChecker.invisAnn(ver);
+    }
     if (parent != null) {
       return parent.visitAnnotation(descriptor, visible);
     }

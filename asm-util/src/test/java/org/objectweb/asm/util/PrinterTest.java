@@ -48,249 +48,252 @@ class PrinterTest {
 
   @Test
   void testVisitModule_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitModule = () -> printer.visitModule(null, 0, null);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitModule);
+    Exception exception = assertThrows(ClassVersionException.class, visitModule);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitNestHost_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitNestHost = () -> printer.visitNestHost(null);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitNestHost);
+    Exception exception = assertThrows(ClassVersionException.class, visitNestHost);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitClassTypeAnnotation_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitClassTypeAnnotation =
         () -> printer.visitClassTypeAnnotation(0, null, null, false);
 
     Exception exception =
-        assertThrows(UnsupportedOperationException.class, visitClassTypeAnnotation);
+        assertThrows(ClassVersionException.class, visitClassTypeAnnotation);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitNestMember_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitNestMember = () -> printer.visitNestMember(null);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitNestMember);
+    Exception exception = assertThrows(ClassVersionException.class, visitNestMember);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitPermittedSubclass_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitPermittedSubclass = () -> printer.visitPermittedSubclass(null);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitPermittedSubclass);
+    Exception exception = assertThrows(ClassVersionException.class, visitPermittedSubclass);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitMainClass_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitMainClass = () -> printer.visitMainClass(null);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitMainClass);
+    Exception exception = assertThrows(ClassVersionException.class, visitMainClass);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitPackage_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitPackage = () -> printer.visitPackage(null);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitPackage);
+    Exception exception = assertThrows(ClassVersionException.class, visitPackage);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitRequire_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitRequire = () -> printer.visitRequire(null, 0, null);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitRequire);
+    Exception exception = assertThrows(ClassVersionException.class, visitRequire);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitExport_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitExport = () -> printer.visitExport(null, 0);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitExport);
+    Exception exception = assertThrows(ClassVersionException.class, visitExport);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitOpen_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitOpen = () -> printer.visitOpen(null, 0);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitOpen);
+    Exception exception = assertThrows(ClassVersionException.class, visitOpen);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitUse_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitUse = () -> printer.visitUse(null);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitUse);
+    Exception exception = assertThrows(ClassVersionException.class, visitUse);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitProvide_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitProvide = () -> printer.visitProvide(null);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitProvide);
+    Exception exception = assertThrows(ClassVersionException.class, visitProvide);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitModuleEnd_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitModuleEnd = () -> printer.visitModuleEnd();
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitModuleEnd);
+    Exception exception = assertThrows(ClassVersionException.class, visitModuleEnd);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitFieldTypeAnnotation_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitFieldTypeAnnotation =
         () -> printer.visitFieldTypeAnnotation(0, null, null, false);
 
     Exception exception =
-        assertThrows(UnsupportedOperationException.class, visitFieldTypeAnnotation);
+        assertThrows(ClassVersionException.class, visitFieldTypeAnnotation);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitParameter_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitParameter = () -> printer.visitParameter(null, 0);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitParameter);
+    Exception exception = assertThrows(ClassVersionException.class, visitParameter);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitMethodTypeAnnotation_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitMethodTypeAnnotation =
         () -> printer.visitMethodTypeAnnotation(0, null, null, false);
 
     Exception exception =
-        assertThrows(UnsupportedOperationException.class, visitMethodTypeAnnotation);
+        assertThrows(ClassVersionException.class, visitMethodTypeAnnotation);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitAnnotableParameterCount_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitAnnotableParameterCount = () -> printer.visitAnnotableParameterCount(0, false);
 
     Exception exception =
-        assertThrows(UnsupportedOperationException.class, visitAnnotableParameterCount);
+        assertThrows(ClassVersionException.class, visitAnnotableParameterCount);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitMethodInsn_asm4_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(Opcodes.ASM4);
+    Printer printer = new EmptyPrinter(Opcodes.V_BYPASS);
 
     Executable visitMethodInsn =
         () -> printer.visitMethodInsn(Opcodes.INVOKESPECIAL, "owner", "name", "()V", false);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitMethodInsn);
+    Exception exception = assertThrows(ClassVersionException.class, visitMethodInsn);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitMethodInsn_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitMethodInsn =
         () -> printer.visitMethodInsn(Opcodes.INVOKESPECIAL, "owner", "name", "()V", false);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitMethodInsn);
+    Exception exception = assertThrows(ClassVersionException.class, visitMethodInsn);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitMethodInsn_ifItf_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitMethodInsn =
         () -> printer.visitMethodInsn(Opcodes.INVOKESPECIAL, "owner", "name", "()V", true);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitMethodInsn);
+    Exception exception = assertThrows(ClassVersionException.class, visitMethodInsn);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitInsnAnnotation_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitInsnAnnotation = () -> printer.visitInsnAnnotation(0, null, null, false);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitInsnAnnotation);
+    Exception exception = assertThrows(ClassVersionException.class, visitInsnAnnotation);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitTryCatchAnnotation_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitTryCatchAnnotation =
         () -> printer.visitTryCatchAnnotation(0, null, null, false);
 
     Exception exception =
-        assertThrows(UnsupportedOperationException.class, visitTryCatchAnnotation);
+        assertThrows(ClassVersionException.class, visitTryCatchAnnotation);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   @Test
   void testVisitLocalVariableAnnotation_unsupportedByDefault() {
-    Printer printer = new EmptyPrinter(/* latest */ Opcodes.ASM10_EXPERIMENTAL);
+    Printer printer = new EmptyPrinter();
 
     Executable visitLocalVariableAnnotation =
         () -> printer.visitLocalVariableAnnotation(0, null, null, null, null, null, false);
 
     Exception exception =
-        assertThrows(UnsupportedOperationException.class, visitLocalVariableAnnotation);
+        assertThrows(ClassVersionException.class, visitLocalVariableAnnotation);
     assertEquals(UNSUPPORTED_OPERATION_MESSAGE, exception.getMessage());
   }
 
   static class EmptyPrinter extends Printer {
+    public EmptyPrinter() {
+        super(Opcodes.V_BYPASS);
+    }
 
     EmptyPrinter(final int api) {
       super(api);

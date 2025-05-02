@@ -49,6 +49,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import dev.oblivruin.asm.ClassVersionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -105,7 +107,7 @@ class AnalyzerAdapterTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAllMethods_precompiledClass(
-      final PrecompiledClass classParameter, final Api apiParameter) throws Exception {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) throws Exception {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
@@ -118,9 +120,8 @@ class AnalyzerAdapterTest extends AsmTest {
         || classParameter == PrecompiledClass.JDK3_LARGE_METHOD) {
       Exception exception = assertThrows(IllegalArgumentException.class, accept);
       assertEquals("JSR/RET are not supported", exception.getMessage());
-    } else if (classParameter.isMoreRecentThan(apiParameter)) {
-      Exception exception = assertThrows(UnsupportedOperationException.class, accept);
-      assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+    } else if (classParameter.notSuit(apiParameter)) {
+      Exception exception = assertThrows(ClassVersionException.class, accept);
     } else {
       assertDoesNotThrow(accept);
       Executable newInstance = () -> new ClassFile(classWriter.toByteArray()).newInstance();

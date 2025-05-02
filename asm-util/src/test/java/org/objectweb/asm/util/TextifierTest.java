@@ -86,7 +86,7 @@ class TextifierTest extends AsmTest {
    */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
-  void testTextify_precompiledClass(final PrecompiledClass classParameter, final Api apiParameter)
+  void testTextify_precompiledClass(final PrecompiledClass classParameter, final JavaVer apiParameter)
       throws IOException {
     byte[] classFile = classParameter.getBytes();
     StringWriter output = new StringWriter();

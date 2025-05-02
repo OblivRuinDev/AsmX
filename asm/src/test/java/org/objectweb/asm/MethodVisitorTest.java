@@ -235,12 +235,11 @@ class MethodVisitorTest extends AsmTest {
   void testVisitMethodInsn_overridenAsm4Visitor_isInterface() {
     StringWriter log = new StringWriter();
     LogMethodVisitor logMethodVisitor = new LogMethodVisitor(log);
-    MethodVisitor methodVisitor = new MethodVisitor4Override(logMethodVisitor, log);
+    MethodVisitor methodVisitor = new MethodVisitor(Opcodes.V1_7, logMethodVisitor) {};
 
     Executable visitMethodInsn = () -> methodVisitor.visitMethodInsn(0, "C", "m", "()V", true);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitMethodInsn);
-    assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+    Exception exception = assertThrows(ClassVersionException.class, visitMethodInsn);
   }
 
   /** Tests the ASM5 visitMethodInsn on an ASM5 visitor. */
@@ -279,7 +278,7 @@ class MethodVisitorTest extends AsmTest {
       @Override
       public void visitMethodInsn(int opcodeAndSource, String owner, String name, String descriptor, boolean isInterface) {
         super.visitMethodInsn(opcodeAndSource, owner, name, descriptor, isInterface);
-        log.append("Trace1").append(owner).append(name).append(descriptor).append(';');
+        log.append("Trace1:").append(name).append(descriptor).append(';');
       }
     };
 
@@ -347,6 +346,11 @@ class MethodVisitorTest extends AsmTest {
       this.log = log;
     }
 
+    @Override
+    public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+      super.visitMethodInsn(opcode, owner, name + "4", descriptor, isInterface);
+      log.append("MethodVisitor4:").append(name).append(descriptor).append(';');
+    }
   }
 
   /** An ASM5 {@link MethodVisitor} which does not override the ASM5 visitMethodInsn method. */
@@ -374,7 +378,7 @@ class MethodVisitorTest extends AsmTest {
         final String descriptor,
         final boolean isInterface) {
       super.visitMethodInsn(opcode, owner, name + "5", descriptor, isInterface);
-      log.append("MethodVisitor5:" + name + descriptor + ";");
+      log.append("MethodVisitor5:").append(name).append(descriptor).append(";");
     }
   }
 
@@ -402,15 +406,6 @@ class MethodVisitorTest extends AsmTest {
 
       log.append("TraceMethodVisitor:").append(name).append(descriptor).append(";");
     }
-  }
-
-  /** A user subclass of {@link TraceMethodVisitor}, implemented for ASM4. */
-  private static class UserTraceMethodVisitor4 extends TraceMethodVisitor {
-
-    UserTraceMethodVisitor4(final IMethodVisitor methodVisitor, final StringWriter log) {
-      super(Opcodes.V1_8, methodVisitor, log);//TODO
-    }
-
   }
 
   /** A user subclass of {@link TraceMethodVisitor}, implemented for ASM5. */

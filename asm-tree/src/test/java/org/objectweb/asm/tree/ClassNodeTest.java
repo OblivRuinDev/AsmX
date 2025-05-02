@@ -78,26 +78,19 @@ class ClassNodeTest extends AsmTest {
     assertTrue(classNode.methods.isEmpty());
   }
 
-  @Test
-  void testConstructor_illegalState() {
-    Executable constructor = () -> new ClassNode() {};
-
-    assertThrows(IllegalStateException.class, constructor);
-  }
-
   /**
    * Tests that {@link ClassNode#check} throws an exception for classes that contain elements more
    * recent than the ASM API version.
    */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
-  void testCheck(final PrecompiledClass classParameter, final Api apiParameter) {
+  void testCheck(final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassNode classNode = new ClassNode() {};
     new ClassReader(classParameter.getBytes()).accept(classNode, attributes(), 0);
 
     Executable check = () -> classNode.check(apiParameter.value);
 
-    if (classParameter.isMoreRecentThan(apiParameter)) {
+    if (classParameter.notSuit(apiParameter)) {
       assertThrows(ClassVersionException.class, check);
     } else {
       assertDoesNotThrow(check);
@@ -107,7 +100,7 @@ class ClassNodeTest extends AsmTest {
   /** Tests that classes are unchanged with a ClassReader->ClassNode->ClassWriter transform. */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
-  void testVisitAndAccept(final PrecompiledClass classParameter, final Api apiParameter) {
+  void testVisitAndAccept(final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassNode classNode = new ClassNode() {};
@@ -126,7 +119,7 @@ class ClassNodeTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testVisitAndAccept_cloneInstructions(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassNode classNode = new ClassNode() {};
@@ -145,7 +138,7 @@ class ClassNodeTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testVisitAndAccept_removeMembersVisitor(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassNode classNode = new ClassNode() {};
@@ -193,7 +186,7 @@ class ClassNodeTest extends AsmTest {
         final String signature,
         final String superName,
         final String[] interfaces) {
-      super.visit(version, access & ~Opcodes.ACC_RECORD, name, signature, superName, interfaces);
+      super.visit(version & 0xFFFF, access & ~Opcodes.ACC_RECORD, name, signature, superName, interfaces);
     }
 
     @Override

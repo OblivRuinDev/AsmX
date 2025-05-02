@@ -459,8 +459,7 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
       final String owner,
       final String name,
       final String descriptor,
-      final boolean isInterface) {//todo: uncheck
-    checkInterfaceInvoke(ver, opcodeAndSource, isInterface);
+      final boolean isInterface) {
     super.visitMethodInsn(opcodeAndSource, owner, name, descriptor, isInterface);
     doVisitMethodInsn(opcodeAndSource, name, descriptor);
   }

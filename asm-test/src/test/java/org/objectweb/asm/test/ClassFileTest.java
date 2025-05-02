@@ -33,7 +33,7 @@ class ClassFileTest extends AsmTest {
   /** Tests that newInstance() succeeds for each precompiled class. */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
-  void testNewInstance_validClass(final PrecompiledClass classParameter, final Api apiParameter) {
+  void testNewInstance_validClass(final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassFile classFile = new ClassFile(classParameter.getBytes());
 
     Executable newInstance = () -> classFile.newInstance();

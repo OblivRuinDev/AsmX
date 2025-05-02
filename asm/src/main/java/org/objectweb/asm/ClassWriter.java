@@ -42,6 +42,8 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
+import dev.oblivruin.asm.ClassVersionException;
+
 /**
  * A {@link ClassVisitor} that generates a corresponding ClassFile structure, as defined in the Java
  * Virtual Machine Specification (JVMS). It can be used alone, to generate a Java class "from
@@ -309,6 +311,9 @@ public class ClassWriter implements IClassVisitor {
       final String signature,
       final String superName,
       final String[] interfaces) {
+    if (version == 0) {
+      throw new ClassVersionException(0);
+    }
     this.version = version;
     this.accessFlags = access;
     this.thisClass = symbolTable.setMajorVersionAndClassName(version & 0xFFFF, name);

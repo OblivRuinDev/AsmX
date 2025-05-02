@@ -44,6 +44,36 @@ public final class VersionChecker {
         }
     }
 
+    public static void _enum(int version) {
+        if (version < V1_5 && version != 0) {
+            _enum();
+        }
+    }
+
+    public static void _synthetic(int version) {
+        if (version < V1_5 && version != 0) {
+            _synthetic();
+        }
+    }
+
+    public static void _synthetic() {
+        throw new ClassVersionException("ACC_SYNTHETIC require Java 5+(class version 46+)");
+    }
+
+    public static void _enum() {
+        throw new ClassVersionException("Enum require Java 5+ (class version 46+)");
+    }
+
+    public static void invisAnn(int version) {
+        if (version < V1_5 && version != 0) {
+            invisAnn();
+        }
+    }
+
+    public static void invisAnn() {
+        throw new ClassVersionException("Invisible Annotation require Java 5+ (class version 49+)");
+    }
+
     public static void methodPara() {
         throw new ClassVersionException("Method parameters require Java 8+ (class version 52+)");
     }

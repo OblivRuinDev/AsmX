@@ -52,13 +52,4 @@ class TypeAnnotationNodeTest extends AsmTest {
     assertEquals(typePath, typeAnnotationNode.typePath);
     assertEquals("LI;", typeAnnotationNode.desc);
   }
-
-  @Test
-  void testConstructor_illegalState() {
-    TypePath typePath = TypePath.fromString("[");
-
-    Executable constructor = () -> new TypeAnnotationNode(123, typePath, "LI;") {};
-
-    assertThrows(IllegalStateException.class, constructor);
-  }
 }

@@ -51,6 +51,8 @@ import static org.objectweb.asm.commons.MethodNodeBuilder.toText;
 
 import java.util.ArrayList;
 import java.util.Collections;
+
+import dev.oblivruin.asm.ClassVersionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -642,7 +644,7 @@ class AdviceAdapterTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAllMethods_precompiledClass(
-      final PrecompiledClass classParameter, final Api apiParameter) throws Exception {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) throws Exception {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     ClassWriter classWriter = new ClassWriter(0);
     IClassVisitor adviceClassAdapter =
@@ -650,9 +652,8 @@ class AdviceAdapterTest extends AsmTest {
 
     Executable accept = () -> classReader.accept(adviceClassAdapter, ClassReader.EXPAND_FRAMES);
 
-    if (classParameter.isMoreRecentThan(apiParameter)) {
-      Exception exception = assertThrows(UnsupportedOperationException.class, accept);
-      assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+    if (classParameter.notSuit(apiParameter)) {
+      Exception exception = assertThrows(ClassVersionException.class, accept);
       return;
     }
     assertDoesNotThrow(accept);

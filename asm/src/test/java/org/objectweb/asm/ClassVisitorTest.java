@@ -101,17 +101,21 @@ class ClassVisitorTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testReadAndWrite_emptyVisitor(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
-    ClassReader classReader = new ClassReader(classFile);
+    ClassReader classReader = new ClassReader(classFile, true);
     ClassWriter classWriter = new ClassWriter(0);
-      ClassAdapter classAdapter = new ClassAdapter(apiParameter.value, classWriter);
+      ClassAdapter classAdapter = new ClassAdapter(apiParameter.value, classWriter) {
+        @Override
+        public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+          super.visit(version, access, name, signature, superName, interfaces);
+        }
+      };
 
     Executable transform = () -> classReader.accept(classAdapter, attributes(), 0);
 
-    if (classParameter.isMoreRecentThan(apiParameter)) {
-      Exception exception = assertThrows(UnsupportedOperationException.class, transform);
-      assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+    if (classParameter.notSuit(apiParameter)) {
+      Exception exception = assertThrows(ClassVersionException.class, transform);
     } else {
       assertDoesNotThrow(transform);
       assertEquals(new ClassFile(classFile), new ClassFile(classWriter.toByteArray()));
@@ -125,7 +129,7 @@ class ClassVisitorTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testReadAndWrite_copyPool_changeMethodExceptions(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
@@ -146,7 +150,7 @@ class ClassVisitorTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testReadAndWrite_copyPool_changeMethodDeprecatedFlag(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
@@ -168,7 +172,7 @@ class ClassVisitorTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testReadAndWrite_copyPool_changeMethodSyntheticFlag(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);

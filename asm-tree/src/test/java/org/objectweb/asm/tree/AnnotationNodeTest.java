@@ -69,13 +69,6 @@ class AnnotationNodeTest extends AsmTest {
   }
 
   @Test
-  void testConstructor_illegalState() {
-    Executable constructor = () -> new AnnotationNode("LI;") {};
-
-    assertThrows(IllegalStateException.class, constructor);
-  }
-
-  @Test
   void testVisit() {
     AnnotationNode annotationNode = new AnnotationNode("LI;");
 

@@ -129,8 +129,7 @@ public class CodeSizeEvaluator extends MethodVisitor implements Opcodes {
       final String owner,
       final String name,
       final String descriptor,
-      final boolean isInterface) {//todo: uncheck
-    checkInterfaceInvoke(ver, opcodeAndSource, isInterface);
+      final boolean isInterface) {
 
     if (opcodeAndSource == INVOKEINTERFACE) {
       minSize += 5;

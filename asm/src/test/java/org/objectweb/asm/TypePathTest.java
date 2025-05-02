@@ -27,10 +27,9 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link TypePath}.
@@ -63,8 +62,8 @@ class TypePathTest {
   /** Tests that type paths are unchanged via a fromString -> toString transform. */
   @Test
   void testFromAndToString() {
-    assertEquals(null, TypePath.fromString(null));
-    assertEquals(null, TypePath.fromString(""));
+      assertNull(TypePath.fromString(null));
+      assertNull(TypePath.fromString(""));
     assertEquals("[.[*0;", TypePath.fromString("[.[*0").toString());
     assertEquals("[*0;*[", TypePath.fromString("[*0;*[").toString());
     assertEquals("10;", TypePath.fromString("10;").toString());

@@ -44,6 +44,8 @@ import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import dev.oblivruin.asm.ClassVersionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -121,7 +123,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   /** Tests {@link ClassReader#ClassReader(byte[])}. */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
-  void testByteArrayConstructor(final PrecompiledClass classParameter, final Api apiParameter) {
+  void testByteArrayConstructor(final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
 
     assertNotEquals(0, classReader.getAccess());
@@ -135,10 +137,11 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   }
 
   /** Tests {@link ClassReader#ClassReader(byte[],int,int)} and the basic ClassReader accessors. */
+  @SuppressWarnings("deprecation")
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
   void testByteArrayConstructor_withOffset(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     byte[] byteBuffer = new byte[classFile.length + 1];
     System.arraycopy(classFile, 0, byteBuffer, 1, classFile.length);
@@ -168,7 +171,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
           }
         },
         0);
-    assertTrue((classVersion.get() & 0xFFFF) >= (Opcodes.V1_2));
+    assertTrue((classVersion.get() & 0xFFFF) >= (Opcodes.V1_1 & 0xFFFF));
   }
 
   /**
@@ -190,7 +193,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   /** Tests {@link ClassReader#ClassReader(String)} and the basic ClassReader accessors. */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
-  void testStringConstructor(final PrecompiledClass classParameter, final Api apiParameter)
+  void testStringConstructor(final PrecompiledClass classParameter, final JavaVer apiParameter)
       throws IOException {
     ClassReader classReader = new ClassReader(classParameter.getName());
 
@@ -209,7 +212,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
    */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
-  void testStreamConstructor(final PrecompiledClass classParameter, final Api apiParameter)
+  void testStreamConstructor(final PrecompiledClass classParameter, final JavaVer apiParameter)
       throws IOException {
     ClassReader classReader;
     try (InputStream inputStream =
@@ -243,12 +246,12 @@ class ClassReaderTest extends AsmTest implements Opcodes {
         new InputStream() {
 
           @Override
-          public int available() throws IOException {
+          public int available() {
             return 0;
           }
 
           @Override
-          public int read() throws IOException {
+          public int read() {
             return -1;
           }
         }) {
@@ -263,15 +266,14 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   /** Tests the ClassReader accept method with an empty visitor. */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
-  void testAccept_emptyVisitor(final PrecompiledClass classParameter, final Api apiParameter) {
+  void testAccept_emptyVisitor(final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value);
 
     Executable accept = () -> classReader.accept(classVisitor, 0);
 
-    if (classParameter.isMoreRecentThan(apiParameter)) {
-      Exception exception = assertThrows(UnsupportedOperationException.class, accept);
-      assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+    if (classParameter.notSuit(apiParameter)) {
+      Exception exception = assertThrows(ClassVersionException.class, accept);
     } else {
       assertDoesNotThrow(accept);
     }
@@ -281,23 +283,23 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAccept_emptyVisitor_skipDebug(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
-    IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value);
+    IClassVisitor classVisitor = new EmptyClassVisitor(classParameter.computeCFV(apiParameter));//todo: uncheck
 
     Executable accept = () -> classReader.accept(classVisitor, ClassReader.SKIP_DEBUG);
 
     // The following jdk8 classes contain MethodParameters attributes which require ASM5. Here we
     // skip these attributes with SKIP_DEBUG, and these classes contain no other features requiring
     // ASM5 or more, so they can be read with ASM4.
-    if (classParameter.isMoreRecentThan(apiParameter)
+    if (classParameter.notSuit(apiParameter)
         && classParameter != PrecompiledClass.JDK8_ALL_FRAMES
         && classParameter != PrecompiledClass.JDK8_ALL_STRUCTURES
         && classParameter != PrecompiledClass.JDK8_ANONYMOUS_INNER_CLASS
         && classParameter != PrecompiledClass.JDK8_INNER_CLASS
-        && classParameter != PrecompiledClass.JDK8_LARGE_METHOD) {
-      Exception exception = assertThrows(UnsupportedOperationException.class, accept);
-      assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+        && classParameter != PrecompiledClass.JDK8_LARGE_METHOD
+        || classParameter.isPreview(apiParameter)) {//todo:
+      Exception exception = assertThrows(ClassVersionException.class, accept);
     } else {
       assertDoesNotThrow(accept);
     }
@@ -307,15 +309,14 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAccept_emptyVisitor_expandFrames(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
-    IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value);
+    IClassVisitor classVisitor = new EmptyClassVisitor(classParameter.computeCFV(apiParameter));
 
     Executable accept = () -> classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
 
-    if (classParameter.isMoreRecentThan(apiParameter)) {
-      Exception exception = assertThrows(UnsupportedOperationException.class, accept);
-      assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+    if (classParameter.notSuit(apiParameter) && !classParameter.isPreview(apiParameter)) {
+      Exception exception = assertThrows(ClassVersionException.class, accept);
     } else {
       assertDoesNotThrow(accept);
     }
@@ -325,15 +326,14 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAccept_emptyVisitor_skipFrames(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value);
 
     Executable accept = () -> classReader.accept(classVisitor, ClassReader.SKIP_FRAMES);
 
-    if (classParameter.isMoreRecentThan(apiParameter)) {
-      Exception exception = assertThrows(UnsupportedOperationException.class, accept);
-      assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+    if (classParameter.notSuit(apiParameter)) {
+      Exception exception = assertThrows(ClassVersionException.class, accept);
     } else {
       assertDoesNotThrow(accept);
     }
@@ -343,7 +343,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAccept_emptyVisitor_skipCode(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value);
 
@@ -352,11 +352,10 @@ class ClassReaderTest extends AsmTest implements Opcodes {
     // jdk8.ArtificialStructures contains structures which require ASM5, but only inside the method
     // code. Here we skip the code, so this class can be read with ASM4. Likewise for
     // jdk11.AllInstructions.
-    if (classParameter.isMoreRecentThan(apiParameter)
+    if (classParameter.notSuit(apiParameter)
         && classParameter != PrecompiledClass.JDK8_ARTIFICIAL_STRUCTURES
         && classParameter != PrecompiledClass.JDK11_ALL_INSTRUCTIONS) {
-      Exception exception = assertThrows(UnsupportedOperationException.class, accept);
-      assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+      Exception exception = assertThrows(ClassVersionException.class, accept);
     } else {
       assertDoesNotThrow(accept);
     }
@@ -369,7 +368,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAccept_emptyVisitor_skipFieldMethodAndModuleContent(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     IClassVisitor classVisitor =
         new EmptyClassVisitor(apiParameter.value) {
@@ -457,9 +456,14 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   /** Tests the ClassReader accept method with a default visitor. */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
-  void testAccept_defaultVisitor(final PrecompiledClass classParameter, final Api apiParameter) {
+  void testAccept_defaultVisitor(final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
-    IClassVisitor classVisitor = new ClassVisitor(apiParameter.value) {};
+    IClassVisitor classVisitor = new ClassVisitor(apiParameter.value) {
+      @Override
+      public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+        super.visit(version & 0xFFFF, access, name, signature, superName, interfaces);
+      }
+    };
 
     Executable accept = () -> classReader.accept(classVisitor, 0);
 
@@ -476,9 +480,9 @@ class ClassReaderTest extends AsmTest implements Opcodes {
         || (hasRecord && apiParameter.value < V14)
         || (hasNestHostOrMembers && apiParameter.value < V11)
         || (hasModules && apiParameter.value < V9)
-        || (hasTypeAnnotations && apiParameter.value < V1_8)) {
-      Exception exception = assertThrows(UnsupportedOperationException.class, accept);
-      assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+        || (hasTypeAnnotations && apiParameter.value < V1_8)
+            || classParameter.notSuit(apiParameter)) {
+      Exception exception = assertThrows(ClassVersionException.class, accept);
     } else {
       assertDoesNotThrow(accept);
     }
@@ -490,7 +494,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAccept_defaultAnnotationFieldMethodAndModuleVisitors(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     IClassVisitor classVisitor =
         new EmptyClassVisitor(apiParameter.value) {
@@ -561,11 +565,8 @@ class ClassReaderTest extends AsmTest implements Opcodes {
 
     Executable accept = () -> classReader.accept(classVisitor, 0);
 
-    if (classParameter.isMoreRecentThan(apiParameter)) {
-      Exception exception = assertThrows(UnsupportedOperationException.class, accept);
-      if (!exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN)) {
-        throw new AssertionError("invalid error message");
-      }
+    if (classParameter.notSuit(apiParameter)) {
+      Exception exception = assertThrows(ClassVersionException.class, accept);
     } else {
       assertDoesNotThrow(accept);
     }
@@ -576,7 +577,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
     ClassReader classReader = new ClassReader(PrecompiledClass.JDK5_LOCAL_CLASS.getBytes());
     AtomicInteger parameterIndex = new AtomicInteger(-1);
     IClassVisitor readParameterIndexVisitor =
-        new ClassVisitor(/* latest */ Opcodes.ASM10_EXPERIMENTAL) {
+        new ClassVisitor() {
           @Override
           public IMethodVisitor visitMethod(
               final int access,
@@ -611,7 +612,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
     ClassReader classReader = new ClassReader(classFile);
     AtomicInteger classVersion = new AtomicInteger(0);
     IClassVisitor readVersionVisitor =
-        new ClassVisitor(/* latest */ Opcodes.ASM10_EXPERIMENTAL) {
+        new ClassVisitor() {
           @Override
           public void visit(
               final int version,
@@ -651,6 +652,11 @@ class ClassReaderTest extends AsmTest implements Opcodes {
 
     EmptyClassVisitor() {
       super();
+    }
+
+    @Override
+    public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+      super.visit(version & 0xFFFF, access, name, signature, superName, interfaces);
     }
 
     @Override

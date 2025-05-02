@@ -137,7 +137,7 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
 
     Executable visitCode = () -> checkAbstractMethodAdapter.visitCode();
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitCode);
+    Exception exception = assertThrows(ClassVersionException.class, visitCode);
     assertEquals("Abstract methods cannot have code", exception.getMessage());
   }
 

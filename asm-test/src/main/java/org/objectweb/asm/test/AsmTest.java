@@ -76,7 +76,7 @@ import org.junit.jupiter.params.provider.Arguments;
  *
  *   &#64;ParameterizedTest
  *   &#64;MethodSource(ALL_CLASSES_AND_ALL_APIS)
- *   public void testSomeFeature(PrecompiledClass classParameter, Api apiParameter) {
+ *   public void testSomeFeature(PrecompiledClass classParameter, JavaVer apiParameter) {
  *     byte[] b = classParameter.getBytes();
  *     ClassWriter classWriter = new ClassWriter(apiParameter.value(), 0);
  *     ...
@@ -105,98 +105,58 @@ public abstract class AsmTest {
   public static final String ALL_CLASSES_AND_LATEST_API = "allClassesAndLatestApi";
 
   /**
-   * The expected pattern (i.e. regular expression) that ASM's UnsupportedOperationException
-   * messages are supposed to match.
-   */
-  public static final String UNSUPPORTED_OPERATION_MESSAGE_PATTERN = ".* requires ASM[56789].*";
-
-  /** JDK version with the corresponding ASM version. */
-  enum JdkVersion {
-    JDK7(7, Api.V1_7),
-    JDK8(8, Api.V1_8),
-    JDK9(9, Api.V9),
-    JDK11(11, Api.V11),
-    JDK14(14, Api.V14),
-    JDK15(15, Api.V15);//todo
-
-    private final int majorVersion;
-    private final Api minimumApi;
-
-    JdkVersion(final int majorVersion, final Api minimumApi) {
-      this.majorVersion = majorVersion;
-      this.minimumApi = minimumApi;
-    }
-
-    /**
-     * Returns the major version of the current JDK version.
-     *
-     * @return the major version of the current JDK version.
-     */
-    public int majorVersion() {
-      return majorVersion;
-    }
-
-    /**
-     * Returns the minimum ASM Api version supporting the current JDK version.
-     *
-     * @return the minimum ASM Api version supporting the current JDK version.
-     */
-    public Api minimumApi() {
-      return minimumApi;
-    }
-  }
-
-  /**
    * A precompiled class, hand-crafted to contain some set of class file structures. These classes
    * are not compiled as part of the build. Instead, they have been compiled beforehand, with the
    * appropriate JDKs (including some now very hard to download and install).
    */
   public enum PrecompiledClass {
-    DEFAULT_PACKAGE("DefaultPackage"),
-    JDK3_ALL_INSTRUCTIONS("jdk3.AllInstructions"),
-    JDK3_ALL_STRUCTURES("jdk3.AllStructures"),
-    JDK3_ANONYMOUS_INNER_CLASS("jdk3.AllStructures$1"),
-    JDK3_ARTIFICIAL_STRUCTURES("jdk3.ArtificialStructures"),
-    JDK3_INNER_CLASS("jdk3.AllStructures$InnerClass"),
-    JDK3_LARGE_METHOD("jdk3.LargeMethod"),
-    JDK3_SUB_OPTIMAL_MAX_STACK_AND_LOCALS("jdk3.SubOptimalMaxStackAndLocals"),
-    JDK5_ALL_INSTRUCTIONS("jdk5.AllInstructions"),
-    JDK5_ALL_STRUCTURES("jdk5.AllStructures"),
-    JDK5_ANNOTATION("jdk5.AllStructures$InvisibleAnnotation"),
-    JDK5_ENUM("jdk5.AllStructures$EnumClass"),
-    JDK5_LOCAL_CLASS("jdk5.AllStructures$1LocalClass"),
-    JDK8_ALL_FRAMES("jdk8.AllFrames", JdkVersion.JDK8),
-    JDK8_ALL_INSTRUCTIONS("jdk8.AllInstructions", JdkVersion.JDK8),
-    JDK8_ALL_STRUCTURES("jdk8.AllStructures", JdkVersion.JDK8),
-    JDK8_ANONYMOUS_INNER_CLASS("jdk8.AllStructures$1", JdkVersion.JDK8),
-    JDK8_ARTIFICIAL_STRUCTURES("jdk8.Artificial$()$Structures", JdkVersion.JDK8),
-    JDK8_INNER_CLASS("jdk8.AllStructures$InnerClass", JdkVersion.JDK8),
-    JDK8_LARGE_METHOD("jdk8.LargeMethod", JdkVersion.JDK8),
-    JDK9_MODULE("jdk9.module-info", JdkVersion.JDK9),
-    JDK11_ALL_INSTRUCTIONS("jdk11.AllInstructions", JdkVersion.JDK11),
-    JDK11_ALL_STRUCTURES("jdk11.AllStructures", JdkVersion.JDK11),
-    JDK11_ALL_STRUCTURES_NESTED("jdk11.AllStructures$Nested", JdkVersion.JDK11),
-    JDK14_ALL_STRUCTURES_RECORD("jdk14.AllStructures$RecordSubType", JdkVersion.JDK14, true),
-    JDK14_ALL_STRUCTURES_EMPTY_RECORD("jdk14.AllStructures$EmptyRecord", JdkVersion.JDK14, true),
-    JDK15_ALL_STRUCTURES("jdk15.AllStructures", JdkVersion.JDK15, true);
+    //DEFAULT_PACKAGE("DefaultPackage"), This means to exist when Java1.1
+    JDK3_ALL_INSTRUCTIONS("jdk3.AllInstructions", JavaVer.V1_3),
+    JDK3_ALL_STRUCTURES("jdk3.AllStructures", JavaVer.V1_3),
+    JDK3_ANONYMOUS_INNER_CLASS("jdk3.AllStructures$1", JavaVer.V1_3),
+    JDK3_ARTIFICIAL_STRUCTURES("jdk3.ArtificialStructures", JavaVer.V1_3),//Bad test
+    JDK3_INNER_CLASS("jdk3.AllStructures$InnerClass", JavaVer.V1_3),
+    JDK3_LARGE_METHOD("jdk3.LargeMethod", JavaVer.V1_3),
+    JDK3_SUB_OPTIMAL_MAX_STACK_AND_LOCALS("jdk3.SubOptimalMaxStackAndLocals", JavaVer.V1_3),
+    JDK5_ALL_INSTRUCTIONS("jdk5.AllInstructions", JavaVer.V1_5),
+    JDK5_ALL_STRUCTURES("jdk5.AllStructures", JavaVer.V1_5),//todo:
+    JDK5_ANNOTATION("jdk5.AllStructures$InvisibleAnnotation", JavaVer.V1_5),
+    JDK5_ENUM("jdk5.AllStructures$EnumClass", JavaVer.V1_5),
+    JDK5_LOCAL_CLASS("jdk5.AllStructures$1LocalClass", JavaVer.V1_5),
+    JDK8_ALL_FRAMES("jdk8.AllFrames", JavaVer.V1_8),
+    JDK8_ALL_INSTRUCTIONS("jdk8.AllInstructions", JavaVer.V1_8),
+    JDK8_ALL_STRUCTURES("jdk8.AllStructures", JavaVer.V1_8),
+    JDK8_ANONYMOUS_INNER_CLASS("jdk8.AllStructures$1", JavaVer.V1_8),
+    JDK8_ARTIFICIAL_STRUCTURES("jdk8.Artificial$()$Structures", JavaVer.V1_8),
+    JDK8_INNER_CLASS("jdk8.AllStructures$InnerClass", JavaVer.V1_8),
+    JDK8_LARGE_METHOD("jdk8.LargeMethod", JavaVer.V1_8),
+    JDK9_MODULE("jdk9.module-info", JavaVer.V9),
+    JDK11_ALL_INSTRUCTIONS("jdk11.AllInstructions", JavaVer.V11),
+    JDK11_ALL_STRUCTURES("jdk11.AllStructures", JavaVer.V11),
+    JDK11_ALL_STRUCTURES_NESTED("jdk11.AllStructures$Nested", JavaVer.V11),
+    JDK14_ALL_STRUCTURES_RECORD("jdk14.AllStructures$RecordSubType", JavaVer.V14, JavaVer.V16),
+    JDK14_ALL_STRUCTURES_EMPTY_RECORD("jdk14.AllStructures$EmptyRecord", JavaVer.V14, JavaVer.V16),
+    JDK15_ALL_STRUCTURES("jdk15.AllStructures", JavaVer.V15, JavaVer.V17);
 
     private final String name;
-    private final JdkVersion jdkVersion;
-    private final boolean preview;
+    public final JavaVer java;
     private byte[] bytes;
+    public final int ver;
+      private final JavaVer publish;
 
-    PrecompiledClass(final String name, final JdkVersion jdkVersion, final boolean preview) {
+      PrecompiledClass(final String name, final JavaVer java, JavaVer publish) {
       this.name = name;
-      this.jdkVersion = jdkVersion;
-      this.preview = preview;
-    }
+      this.java = java;
+      this.ver = java.value;
+          this.publish = publish;
+      }
 
-    PrecompiledClass(final String name, final JdkVersion jdkVersion) {
-      this(name, jdkVersion, false);
+    PrecompiledClass(final String name, final JavaVer jdkVersion) {
+      this(name, jdkVersion, null);
     }
 
     PrecompiledClass(final String name) {
-      this(name, JdkVersion.JDK7, false);
+      this(name, JavaVer.V1_7, null);
     }
 
     /**
@@ -225,8 +185,16 @@ public abstract class AsmTest {
      * @param api an ASM API version.
      * @return whether this class was compiled with a JDK which is more recent than api.
      */
-    public boolean isMoreRecentThan(final Api api) {
-      return api.value < jdkVersion.minimumApi().value;
+    public boolean notSuit(final JavaVer api) {
+      return (publish != null ? publish.value : java.value) > api.value;
+    }
+
+    public boolean isPreview(final JavaVer javaVer) {
+      return publish != null && javaVer.value < publish.value && javaVer.value >= java.value;
+    }
+
+    public int computeCFV(final JavaVer require) {
+      return (publish != null && require.value < publish.value && require.value >= java.value) ? 0 : require.value;
     }
 
     /**
@@ -237,13 +205,13 @@ public abstract class AsmTest {
      *     to run the tests.
      */
     public boolean isNotCompatibleWithCurrentJdk() {
-      if (preview) {
+      if (publish != null) {
         if (!Util.previewFeatureEnabled()) {
           return true;
         }
-        return Util.getMajorJavaVersion() != jdkVersion.majorVersion();
+        return CLASSFILE_VER != java.value;
       }
-      return Util.getMajorJavaVersion() < jdkVersion.majorVersion();
+      return CLASSFILE_VER < java.value;
     }
 
     /**
@@ -261,6 +229,15 @@ public abstract class AsmTest {
     @Override
     public String toString() {
       return name;
+    }
+  }
+
+  public static final int CLASSFILE_VER;
+  static {
+    String str = System.getProperty("java.class.version");
+    CLASSFILE_VER = Integer.parseInt(str.substring(0, str.length() - 2));
+    if (CLASSFILE_VER == 0) {
+      throw new IllegalStateException("Illegal Java ClassFile Version!");
     }
   }
 
@@ -285,7 +262,7 @@ public abstract class AsmTest {
     INVALID_VERIFICATION_TYPE_INFO("invalid.InvalidVerificationTypeInfo"),
     INVALID_WIDE_OPCODE("invalid.InvalidWideOpcode");
 
-    private final String name;
+    public final String name;
 
     InvalidClass(final String name) {
       this.name = name;
@@ -315,8 +292,8 @@ public abstract class AsmTest {
     }
   }
 
-  /** An ASM API version. */
-  public enum Api {
+  /** An Java version. */
+  public enum JavaVer {
     V1_2(46),
     V1_3(47),
     V1_4(48),
@@ -345,19 +322,8 @@ public abstract class AsmTest {
 
     public final int value;
 
-    Api(int value) {
+    JavaVer(int value) {
       this.value = value;
-
-    }
-
-    /**
-     * Returns the int value of this version, as expected by ASM.
-     *
-     * @return one of the ASM4, ASM5, ASM6, ASM7, ASM8 or ASM9 constants from the ASM Opcodes
-     *     interface.
-     */
-    public int value() {
-      return value;
     }
   }
 
@@ -370,7 +336,7 @@ public abstract class AsmTest {
    *     the given ASM API versions.
    */
   public static Stream<Arguments> allClassesAndAllApis() {
-    return classesAndApis(Api.values());
+    return classesAndApis(JavaVer.values());
   }
 
   /**
@@ -381,10 +347,10 @@ public abstract class AsmTest {
    * @return all the possible (precompiledClass, ASM9) pairs, for all the precompiled classes.
    */
   public static Stream<Arguments> allClassesAndLatestApi() {
-    return classesAndApis(Api.V25);
+    return classesAndApis(JavaVer.V25);
   }
 
-  private static Stream<Arguments> classesAndApis(final Api... apis) {
+  private static Stream<Arguments> classesAndApis(final JavaVer... apis) {
     return Arrays.stream(PrecompiledClass.values())
         .flatMap(
             precompiledClass ->

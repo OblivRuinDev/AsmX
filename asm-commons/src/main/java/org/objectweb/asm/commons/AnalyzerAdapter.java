@@ -293,8 +293,7 @@ public class AnalyzerAdapter extends MethodVisitor {
       final String owner,
       final String name,
       final String descriptor,
-      final boolean isInterface) {//todo: uncheck
-    checkInterfaceInvoke(ver, opcodeAndSource, isInterface);
+      final boolean isInterface) {
     super.visitMethodInsn(opcodeAndSource, owner, name, descriptor, isInterface);
 
     if (this.locals == null) {

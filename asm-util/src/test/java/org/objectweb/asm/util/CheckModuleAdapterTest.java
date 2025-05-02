@@ -130,7 +130,7 @@ class CheckModuleAdapterTest {
 
     Executable visitOpen = () -> checkModuleAdapter.visitOpen("package", 0, (String[]) null);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class, visitOpen);
+    Exception exception = assertThrows(ClassVersionException.class, visitOpen);
     assertEquals("An open module can not use open directive", exception.getMessage());
   }
 

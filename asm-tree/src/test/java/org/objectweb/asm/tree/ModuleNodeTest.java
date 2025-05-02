@@ -83,13 +83,6 @@ class ModuleNodeTest extends AsmTest {
   }
 
   @Test
-  void testConstructor_illegalState() {
-    Executable constructor = () -> new ModuleNode("module", 123, "1.0") {};
-
-    assertThrows(IllegalStateException.class, constructor);
-  }
-
-  @Test
   void testAccept() {
     ModuleNode moduleNode = new ModuleNode("module", 123, "1.0");
     ModuleNode dstModuleNode = new ModuleNode("", 0, "");

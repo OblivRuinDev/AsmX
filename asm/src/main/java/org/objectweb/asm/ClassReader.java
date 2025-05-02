@@ -182,6 +182,10 @@ public class ClassReader {
     this(classFile, 0, classFile.length);
   }
 
+  public ClassReader(final byte[] classFile, boolean checkVer) {
+    this(classFile, 0, checkVer);
+  }
+
   /**
    * Constructs a new {@link ClassReader} object.
    *
@@ -584,7 +588,7 @@ public class ClassReader {
     // Visit the class declaration. The minor_version and major_version fields start 6 bytes before
     // the first constant pool entry, which itself starts at cpInfoOffsets[1] - 1 (by definition).
     classVisitor.visit(
-        readVer(), accessFlags, thisClass, signature, superClass, interfaces);
+        readInt(cpInfoOffsets[1] - 7), accessFlags, thisClass, signature, superClass, interfaces);
 
     // Visit the SourceFile and SourceDebugExtenstion attributes.
     if ((parsingOptions & SKIP_DEBUG) == 0

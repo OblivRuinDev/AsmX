@@ -338,10 +338,10 @@ class ClassWriterTest extends AsmTest {
     ClassWriter classWriter = newEmptyClassWriter();
     int initConstantPoolCount = 5;
     for (int i = 0; i < constantPoolCount - initConstantPoolCount; ++i) {
-      classWriter.newConst(Integer.valueOf(i));
+      classWriter.newConst(i);
     }
 
-    Executable toByteArray = () -> classWriter.toByteArray();
+    Executable toByteArray = classWriter::toByteArray;
 
     if (constantPoolCount > 65535) {
       ClassTooLargeException exception = assertThrows(ClassTooLargeException.class, toByteArray);
@@ -369,7 +369,7 @@ class ClassWriterTest extends AsmTest {
     methodVisitor.visitMaxs(0, 0);
     methodVisitor.visitEnd();
 
-    Executable toByteArray = () -> classWriter.toByteArray();
+    Executable toByteArray = classWriter::toByteArray;
 
     if (methodCodeSize > 65535) {
       MethodTooLargeException exception = assertThrows(MethodTooLargeException.class, toByteArray);
@@ -575,7 +575,7 @@ class ClassWriterTest extends AsmTest {
   /** Tests that a ClassReader -> ClassWriter transform leaves classes unchanged. */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
-  void testReadAndWrite(final PrecompiledClass classParameter, final Api apiParameter) {
+  void testReadAndWrite(final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
@@ -591,7 +591,7 @@ class ClassWriterTest extends AsmTest {
    */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
-  void testReadAndWrite_skipCode(final PrecompiledClass classParameter, final Api apiParameter) {
+  void testReadAndWrite_skipCode(final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
@@ -612,7 +612,7 @@ class ClassWriterTest extends AsmTest {
    */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
-  void testReadAndWrite_copyPool(final PrecompiledClass classParameter, final Api apiParameter) {
+  void testReadAndWrite_copyPool(final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(classReader, 0);
@@ -629,7 +629,7 @@ class ClassWriterTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testReadAndWrite_expandFrames(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
@@ -647,7 +647,7 @@ class ClassWriterTest extends AsmTest {
    */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
-  void testReadAndWrite_computeMaxs(final PrecompiledClass classParameter, final Api apiParameter) {
+  void testReadAndWrite_computeMaxs(final PrecompiledClass classParameter, final JavaVer apiParameter) {
     assumeTrue(classParameter != PrecompiledClass.JDK3_SUB_OPTIMAL_MAX_STACK_AND_LOCALS);
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
@@ -667,7 +667,7 @@ class ClassWriterTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testReadAndWrite_computeMaxs_newInstance(
-      final PrecompiledClass classParameter, final Api apiParameter) throws Exception {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) throws Exception {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
@@ -689,7 +689,7 @@ class ClassWriterTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testReadAndWrite_computeFrames(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     assumeFalse(hasJsrOrRetInstructions(classParameter));
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
@@ -704,7 +704,7 @@ class ClassWriterTest extends AsmTest {
     // JDK8 don't have ones). This is not true in general (the valid frames for a given method are
     // not unique), but this should be the case with our precompiled classes (except
     // jdk3.SubOptimalMaxStackAndLocals, which has non optimal max values on purpose).
-    if (classParameter.isMoreRecentThan(Api.V1_8)//todo:?
+    if (classParameter.notSuit(JavaVer.V1_8)//todo:?
         && classParameter != PrecompiledClass.JDK3_SUB_OPTIMAL_MAX_STACK_AND_LOCALS) {
       assertEquals(new ClassFile(classFile), new ClassFile(newClassFile));
     }
@@ -723,7 +723,7 @@ class ClassWriterTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testReadAndWrite_computeFrames_jsrInstructions(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     assumeTrue(hasJsrOrRetInstructions(classParameter));
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
@@ -742,7 +742,7 @@ class ClassWriterTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testReadAndWrite_skipAndComputeFrames(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     assumeFalse(hasJsrOrRetInstructions(classParameter));
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
@@ -755,7 +755,7 @@ class ClassWriterTest extends AsmTest {
     // JDK8 don't have ones). This is not true in general (the valid frames for a given method are
     // not unique), but this should be the case with our precompiled classes (except
     // jdk3.SubOptimalMaxStackAndLocals, which has non optimal max values on purpose).
-    if (classParameter.isMoreRecentThan(Api.V1_8)//todo:?
+    if (classParameter.notSuit(JavaVer.V1_8)//todo:?
         && classParameter != PrecompiledClass.JDK3_SUB_OPTIMAL_MAX_STACK_AND_LOCALS) {
       assertEquals(new ClassFile(classFile), new ClassFile(newClassFile));
     }
@@ -774,13 +774,13 @@ class ClassWriterTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testReadAndWrite_computeFramesAndDeadCode(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     assumeFalse(
-        hasJsrOrRetInstructions(classParameter) || classParameter.isMoreRecentThan(apiParameter));
+        hasJsrOrRetInstructions(classParameter) || classParameter.notSuit(apiParameter));
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-      DeadCodeInserter classVisitor = new DeadCodeInserter(apiParameter.value, classWriter);
+      DeadCodeInserter classVisitor = new DeadCodeInserter(Opcodes.V_BYPASS, classWriter);
     classReader.accept(classVisitor, attributes(), ClassReader.SKIP_FRAMES);
 
     byte[] newClassFile = classWriter.toByteArray();
@@ -801,19 +801,24 @@ class ClassWriterTest extends AsmTest {
    */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
-  void testReadAndWrite_largeMethod(final PrecompiledClass classParameter, final Api apiParameter) {
+  void testReadAndWrite_largeMethod(final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     assumeFalse(
-        classFile.length > Short.MAX_VALUE || classParameter.isMoreRecentThan(apiParameter));
+        classFile.length > Short.MAX_VALUE || classParameter.notSuit(apiParameter));
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriterWithoutGetCommonSuperClass();
       ForwardJumpNopInserter forwardJumpNopInserter =
-        new ForwardJumpNopInserter(apiParameter.value, classWriter);
+        new ForwardJumpNopInserter(Opcodes.V_BYPASS, classWriter) {
+          @Override
+          public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+            super.visit(version & 0xFFFF, access, name, signature, superName, interfaces);
+          }
+        };
     classReader.accept(forwardJumpNopInserter, attributes(), 0);
     if (!forwardJumpNopInserter.transformed) {
       classWriter = new ClassWriterWithoutGetCommonSuperClass();
         classReader.accept(
-          new WideForwardJumpInserter(apiParameter.value, classWriter), attributes(), 0);
+          new WideForwardJumpInserter(Opcodes.V_BYPASS, classWriter), attributes(), 0);
     }
 
     byte[] transformedClass = classWriter.toByteArray();
@@ -841,7 +846,7 @@ class ClassWriterTest extends AsmTest {
 
   private static ClassWriter newEmptyClassWriter() {
     ClassWriter classWriter = new ClassWriter(0);
-    classWriter.visit(Opcodes.V_BYPASS, Opcodes.ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    classWriter.visit(Opcodes.V_DYNA, Opcodes.ACC_PUBLIC, "C", null, "java/lang/Object", null);
     return classWriter;
   }
 
@@ -1090,13 +1095,14 @@ class ClassWriterTest extends AsmTest {
 
     @Override
     public void visit(
-        final int version,
+        int version,
         final int access,
         final String name,
         final String signature,
         final String superName,
         final String[] interfaces) {
-      needFrames = (version & 0xFFFF) >= Opcodes.V1_7;
+      version = version & 0xFFFF;
+      needFrames = version >= Opcodes.V1_7;
       super.visit(version, access, name, signature, superName, interfaces);
     }
 

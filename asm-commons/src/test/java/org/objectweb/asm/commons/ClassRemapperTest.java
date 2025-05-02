@@ -50,6 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
+
+import dev.oblivruin.asm.ClassVersionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -210,7 +212,7 @@ class ClassRemapperTest extends AsmTest {
     ClassNode classNode = new ClassNode();
     ClassRemapper classRemapper =
         new ClassRemapper(
-            /* latest api */ Opcodes.V_BYPASS,
+            Opcodes.V_BYPASS,
             classNode,
             new Remapper() {
               @Override
@@ -251,7 +253,7 @@ class ClassRemapperTest extends AsmTest {
     ClassNode classNode = new ClassNode();
     ClassRemapper classRemapper =
         new ClassRemapper(
-            /* latest api */ Opcodes.V_BYPASS,
+            Opcodes.V_BYPASS,
             classNode,
             new Remapper() {
               @Override
@@ -282,7 +284,7 @@ class ClassRemapperTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testEmptyClassRemapper_precompiledClass(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);
@@ -292,9 +294,9 @@ class ClassRemapperTest extends AsmTest {
     Executable accept =
         () -> classReader.accept(classRemapper, new Attribute[] {new CodeComment()}, 0);
 
-    if (classParameter.isMoreRecentThan(apiParameter)) {
-      Exception exception = assertThrows(UnsupportedOperationException.class, accept);
-      assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+    if (classParameter.notSuit(apiParameter)) {
+      Exception exception = assertThrows(ClassVersionException.class, accept);
+
     } else {
       assertDoesNotThrow(accept);
       assertEquals(new ClassFile(classFile), new ClassFile(classWriter.toByteArray()));
@@ -332,7 +334,7 @@ class ClassRemapperTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAllMethods_precompiledClass(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     ClassWriter classWriter = new ClassWriter(0);
     UpperCaseRemapper upperCaseRemapper = new UpperCaseRemapper(classParameter.getInternalName());
@@ -341,9 +343,8 @@ class ClassRemapperTest extends AsmTest {
 
     Executable accept = () -> classReader.accept(classRemapper, 0);
 
-    if (classParameter.isMoreRecentThan(apiParameter)) {
-      Exception exception = assertThrows(UnsupportedOperationException.class, accept);
-      assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+    if (classParameter.notSuit(apiParameter)) {
+      Exception exception = assertThrows(ClassVersionException.class, accept);
     } else {
       assertDoesNotThrow(accept);
       Executable newInstance = () -> new ClassFile(classWriter.toByteArray()).newInstance();
@@ -362,7 +363,7 @@ class ClassRemapperTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAllMethods_precompiledClass_fromClassNode(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassNode classNode = new ClassNode();
     new ClassReader(classParameter.getBytes()).accept(classNode, 0);
     ClassWriter classWriter = new ClassWriter(0);
@@ -372,9 +373,8 @@ class ClassRemapperTest extends AsmTest {
 
     Executable accept = () -> classNode.accept(classRemapper);
 
-    if (classParameter.isMoreRecentThan(apiParameter)) {
-      Exception exception = assertThrows(UnsupportedOperationException.class, accept);
-      assertTrue(exception.getMessage().matches(UNSUPPORTED_OPERATION_MESSAGE_PATTERN));
+    if (classParameter.notSuit(apiParameter)) {
+      Exception exception = assertThrows(ClassVersionException.class, accept);
     } else {
       assertDoesNotThrow(accept);
       Executable newInstance = () -> new ClassFile(classWriter.toByteArray()).newInstance();

@@ -42,12 +42,6 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -58,6 +52,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link Constants}.
@@ -97,7 +93,12 @@ class ConstantsTest {
     Set<Integer> classVersionValues =
         classVersions.stream().map(ConstantsTest::getIntValue).collect(Collectors.toSet());
 
-    assertEquals(classVersions.size(), classVersionValues.size());
+    assertEquals(classVersions.size(), classVersionValues.size() + 1);//V_DYNA is duplicate
+  }
+
+  @Test
+  void testDynaClassVer() {
+      assertNotEquals(0, Opcodes.V_DYNA);
   }
 
   @Test
@@ -178,7 +179,7 @@ class ConstantsTest {
     Set<Integer> opcodeValues =
         opcodes.stream().map(ConstantsTest::getIntValue).collect(Collectors.toSet());
 
-    assertEquals(opcodes.size(), opcodeValues.size() + 1);//V_DYNA
+    assertEquals(opcodes.size(), opcodeValues.size());
     for (int opcode : opcodeValues) {
       assertEquals(0, opcode & ~0xFF);
     }

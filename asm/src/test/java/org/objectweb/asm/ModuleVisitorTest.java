@@ -47,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import dev.oblivruin.asm.ClassVersionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -69,8 +70,7 @@ class ModuleVisitorTest {
   void testConstructor_invalidApi() {
     Executable constructor = () -> new ModuleVisitor(-1) {};
 
-    Exception exception = assertThrows(IllegalArgumentException.class, constructor);
-    assertEquals("Unsupported ClassFile version -1", exception.getMessage());
+    Exception exception = assertThrows(ClassVersionException.class, constructor);
   }
 
   @Test

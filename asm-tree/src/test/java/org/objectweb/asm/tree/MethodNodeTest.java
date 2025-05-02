@@ -47,7 +47,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.objectweb.asm.*;
@@ -71,18 +70,11 @@ class MethodNodeTest extends AsmTest {
     assertEquals("()V", methodNode.desc);
   }
 
-  @Test
-  void testConstructor_illegalState() {
-    Executable constructor = () -> new MethodNode() {};
-
-    assertThrows(IllegalStateException.class, constructor);
-  }
-
   /** Tests that an uninitialized MethodNode can receive any visit method call. */
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_LATEST_API)
   void testVisitAndAccept_withUninitializedMethodNode(
-      final PrecompiledClass classParameter, final Api apiParameter) {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassNode classNode =

@@ -167,8 +167,7 @@ public class MethodRemapper extends MethodVisitor {
       final String owner,
       final String name,
       final String descriptor,
-      final boolean isInterface) {//todo: uncheck
-    checkInterfaceInvoke(ver, opcodeAndSource, isInterface);
+      final boolean isInterface) {
     super.visitMethodInsn(
         opcodeAndSource,
         remapper.mapType(owner),

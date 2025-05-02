@@ -179,7 +179,6 @@ public final class TraceMethodVisitor extends MethodVisitor {
       final String name,
       final String descriptor,
       final boolean isInterface) {
-    checkInterfaceInvoke(ver, opcode, isInterface);
     p.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
     if (parent != null) {
       parent.visitMethodInsn(opcode, owner, name, descriptor, isInterface);

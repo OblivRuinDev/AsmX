@@ -1031,7 +1031,7 @@ class ClassWriterComputeMaxsTest {
     private final Label start;
 
     TestCaseBuilder() {
-      this(Opcodes.V_BYPASS);
+      this(Opcodes.V_DYNA);
     }
 
     TestCaseBuilder(final int classVersion) {
