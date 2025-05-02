@@ -298,7 +298,7 @@ subprojects {
                                 "-Static",
                                 "-Mode", "bin",
                                 "-FileName", sigFile.absolutePath,
-                                "-Classpath", project(":tools").file("jdk8-api.jar").path +
+                                "-Classpath", rootProject.layout.projectDirectory.file("jdk8-api.jar").asFile.path +
                                         File.pathSeparator + sourceSets["main"].output.classesDirs.asPath,
                                 "-Package"
                             ) + cfg.packages
@@ -331,7 +331,7 @@ subprojects {
                             "-ApiVersion", version.toString(),
                             "-FileName", outputs.files.singleFile.absolutePath,
                             "-Classpath", listOf<String?>(
-                                project(":tools").file("jdk8-api.jar").absolutePath,
+                                rootProject.layout.projectDirectory.file("jdk8-api.jar").asFile.absolutePath,
                                 sourceSets["main"].output.classesDirs.asPath,
                                 configurations["compileClasspath"].asPath
                             ).joinToString(File.pathSeparator),
