@@ -18,7 +18,9 @@ designed to address legacy code issues and enhance development flexibility. Key 
 - 🚀 **API Modernization**: Maintain backward compatibility while introducing developer-friendly extensions
 
 Unfortunately, this will break some of the API structure,
-but we're still working hard to keep the majority of the API available and add more developer friendly APIs.
+but we're still working hard to keep the majority of the API available and add more developer friendly APIs.<br>
+**Warning**: May not support java preview feature! If you really want to run on preview version, please make
+sure that VerObj.ver is Opcodes.V_BYPASS to suppress version check.
 
 For more API breaking changes, please see [changes.md](changes.md)<br>
 For actual changes, please see [Compare me](https://github.com/OblivRuinDev/AsmX/compare/upstream...dev)
