@@ -311,7 +311,7 @@ public class ClassWriter implements IClassVisitor {
       final String signature,
       final String superName,
       final String[] interfaces) {
-    if (version == 0) {
+    if (version == 0 || (version & 0xFFFF) == 0) {
       throw new ClassVersionException(0);
     }
     this.version = version;
@@ -757,7 +757,7 @@ public class ClassWriter implements IClassVisitor {
       RecordComponentWriter recordComponentWriter = firstRecordComponent;
       while (recordComponentWriter != null) {
         recordComponentWriter.putRecordComponentInfo(result);
-        recordComponentWriter = (RecordComponentWriter) recordComponentWriter.delegate;
+        recordComponentWriter = recordComponentWriter.delegate;
       }
     }
     if (firstAttribute != null) {
@@ -821,17 +821,17 @@ public class ClassWriter implements IClassVisitor {
     FieldWriter fieldWriter = firstField;
     while (fieldWriter != null) {
       fieldWriter.collectAttributePrototypes(attributePrototypes);
-      fieldWriter = (FieldWriter) fieldWriter.fv;
+      fieldWriter = fieldWriter.fv;
     }
     MethodWriter methodWriter = firstMethod;
     while (methodWriter != null) {
       methodWriter.collectAttributePrototypes(attributePrototypes);
-      methodWriter = (MethodWriter) methodWriter.mv;
+      methodWriter = methodWriter.mv;
     }
     RecordComponentWriter recordComponentWriter = firstRecordComponent;
     while (recordComponentWriter != null) {
       recordComponentWriter.collectAttributePrototypes(attributePrototypes);
-      recordComponentWriter = (RecordComponentWriter) recordComponentWriter.delegate;
+      recordComponentWriter = recordComponentWriter.delegate;
     }
     return attributePrototypes.toArray();
   }

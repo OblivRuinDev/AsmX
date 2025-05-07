@@ -1991,7 +1991,7 @@ final class MethodWriter implements IMethodVisitor {
    */
   private void putFrameType(final Object type) {
     if (type instanceof Integer) {
-      stackMapTableEntries.putByte(((Integer) type).intValue());
+      stackMapTableEntries.putByte((Integer) type);
     } else if (type instanceof String) {
       stackMapTableEntries
           .putByte(Frame.ITEM_OBJECT)
@@ -2044,7 +2044,7 @@ final class MethodWriter implements IMethodVisitor {
     if (source != symbolTable.getSource()
         || descriptorIndex != this.descriptorIndex
         || signatureIndex != this.signatureIndex
-        || hasDeprecatedAttribute != ((accessFlags & Opcodes.ACC_DEPRECATED) != 0)) {
+        || hasDeprecatedAttribute == ((accessFlags & Opcodes.ACC_DEPRECATED) == 0)) {//todo
       return false;
     }
     boolean needSyntheticAttribute =
@@ -2053,9 +2053,7 @@ final class MethodWriter implements IMethodVisitor {
       return false;
     }
     if (exceptionsOffset == 0) {
-      if (numberOfExceptions != 0) {
-        return false;
-      }
+        return numberOfExceptions == 0;
     } else if (source.readUnsignedShort(exceptionsOffset) == numberOfExceptions) {
       int currentExceptionOffset = exceptionsOffset + 2;
       for (int i = 0; i < numberOfExceptions; ++i) {
@@ -2404,7 +2402,7 @@ final class MethodWriter implements IMethodVisitor {
    *
    * @param attributePrototypes a set of attribute prototypes.
    */
-  final void collectAttributePrototypes(final Attribute.Set attributePrototypes) {
+  void collectAttributePrototypes(final Attribute.Set attributePrototypes) {
     attributePrototypes.addAttributes(firstAttribute);
     attributePrototypes.addAttributes(firstCodeAttribute);
   }

@@ -57,6 +57,7 @@ import dev.oblivruin.asm.VersionChecker;
  * @author OblivRuinDev
  */
 public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implements IClassVisitor {
+
   /** @see DelegateVisitor#DelegateVisitor() */
   protected ClassVisitor() {
       super();
@@ -113,7 +114,7 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
   /** {@inheritDoc} */
   @Override
   public IModuleVisitor visitModule(final String name, final int access, final String version) {
-    VersionChecker.module_(ver);
+    VersionChecker._module(ver);
     if (parent != null) {
       return parent.visitModule(name, access, version);
     }

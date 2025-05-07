@@ -45,7 +45,6 @@ package org.objectweb.asm.commons;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -243,9 +242,9 @@ class ClassRemapperTest extends AsmTest {
 
     ConstantDynamic constantDynamic =
         (ConstantDynamic) ((LdcInsnNode) classNode.methods.get(0).instructions.get(0)).cst;
-    assertEquals("new.foo", constantDynamic.getName());
-    assertEquals("Ljava/lang/Integer;", constantDynamic.getDescriptor());
-    assertEquals("()Ljava/lang/Integer;", constantDynamic.getBootstrapMethod().getDesc());
+    assertEquals("new.foo", constantDynamic.name);
+    assertEquals("Ljava/lang/Integer;", constantDynamic.descriptor);
+    assertEquals("()Ljava/lang/Integer;", constantDynamic.bsm.descriptor);
   }
 
   @Test
@@ -277,7 +276,7 @@ class ClassRemapperTest extends AsmTest {
 
     InvokeDynamicInsnNode invokeDynamic =
         (InvokeDynamicInsnNode) classNode.methods.get(0).instructions.get(0);
-    assertEquals("demo", invokeDynamic.bsm.getName());
+      assertEquals("demo", invokeDynamic.bsm.name);
   }
 
   /** Tests that classes transformed with an empty ClassRemapper are unchanged. */

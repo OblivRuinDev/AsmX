@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -164,16 +179,16 @@ public abstract class Remapper {
     }
     if (value instanceof Handle) {
       Handle handle = (Handle) value;
-      boolean isFieldHandle = handle.getTag() <= Opcodes.H_PUTSTATIC;
+      boolean isFieldHandle = handle.tag <= Opcodes.H_PUTSTATIC;
 
       return new Handle(
-          handle.getTag(),
-          mapType(handle.getOwner()),
+              handle.tag,
+          mapType(handle.owner),
           isFieldHandle
-              ? mapFieldName(handle.getOwner(), handle.getName(), handle.getDesc())
-              : mapMethodName(handle.getOwner(), handle.getName(), handle.getDesc()),
-          isFieldHandle ? mapDesc(handle.getDesc()) : mapMethodDesc(handle.getDesc()),
-          handle.isInterface());
+              ? mapFieldName(handle.owner, handle.name, handle.descriptor)
+              : mapMethodName(handle.owner, handle.name, handle.descriptor),
+          isFieldHandle ? mapDesc(handle.descriptor) : mapMethodDesc(handle.descriptor),
+              handle.isInterface);
     }
     if (value instanceof ConstantDynamic) {
       ConstantDynamic constantDynamic = (ConstantDynamic) value;
@@ -183,11 +198,11 @@ public abstract class Remapper {
         remappedBootstrapMethodArguments[i] =
             mapValue(constantDynamic.getBootstrapMethodArgument(i));
       }
-      String descriptor = constantDynamic.getDescriptor();
+      String descriptor = constantDynamic.descriptor;
       return new ConstantDynamic(
-          mapInvokeDynamicMethodName(constantDynamic.getName(), descriptor),
+          mapInvokeDynamicMethodName(constantDynamic.name, descriptor),
           mapDesc(descriptor),
-          (Handle) mapValue(constantDynamic.getBootstrapMethod()),
+          (Handle) mapValue(constantDynamic.bsm),
           remappedBootstrapMethodArguments);
     }
     return value;

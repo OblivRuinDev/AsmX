@@ -111,7 +111,7 @@ public class CheckSignatureAdapter extends SignatureVisitor {
     RETURN,
     SIMPLE_TYPE,
     CLASS_TYPE,
-    END;
+    END
   }
 
   private static final String INVALID = "Invalid ";

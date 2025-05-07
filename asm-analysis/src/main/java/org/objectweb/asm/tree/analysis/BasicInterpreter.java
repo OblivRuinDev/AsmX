@@ -163,7 +163,7 @@ public class BasicInterpreter extends Interpreter<BasicValue> implements Opcodes
         } else if (value instanceof Handle) {
           return newValue(Type.getObjectType("java/lang/invoke/MethodHandle"));
         } else if (value instanceof ConstantDynamic) {
-          return newValue(Type.getType(((ConstantDynamic) value).getDescriptor()));
+            return newValue(Type.getType(((ConstantDynamic) value).descriptor));
         } else {
           throw new AnalyzerException(insn, "Illegal LDC value " + value);
         }

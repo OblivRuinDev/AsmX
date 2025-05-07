@@ -83,7 +83,7 @@ public abstract class DelegateVisitor<T extends IVisitor> extends VerObj {
      * Construct this.<br>
      * Platform ClassFile Version checking if {@code ver != 0}
      * @param parent might be {@code null}
-     * @param ver a ClassFile Version or {@link Opcodes}'s ClassFile Version field which name started with {@code V},<br>
+     * @param ver a AsmX ClassFile Version or {@link Opcodes}'s ClassFile Version field which name started with {@code V},<br>
      *            0 or {@link Opcodes#V_BYPASS} means don't check
      * @see VerObj#VerObj(int)
      */

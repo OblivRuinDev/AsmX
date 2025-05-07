@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,6 +43,7 @@
 package org.objectweb.asm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 
@@ -79,11 +95,11 @@ class HandlerTest {
   void testRemoveRange_removeAllOrNothing() {
     Handler handler = newHandler(10, 20);
 
-    assertEquals(null, Handler.removeRange(null, newLabel(0), newLabel(10)));
+      assertNull(Handler.removeRange(null, newLabel(0), newLabel(10)));
     assertEquals(handler, Handler.removeRange(handler, newLabel(0), newLabel(10)));
     assertEquals(handler, Handler.removeRange(handler, newLabel(20), newLabel(30)));
     assertEquals(handler, Handler.removeRange(handler, newLabel(20), null));
-    assertEquals(null, Handler.removeRange(handler, newLabel(0), newLabel(30)));
+      assertNull(Handler.removeRange(handler, newLabel(0), newLabel(30)));
   }
 
   @Test
@@ -92,7 +108,7 @@ class HandlerTest {
 
     assertEquals(15, handler.startPc.bytecodeOffset);
     assertEquals(20, handler.endPc.bytecodeOffset);
-    assertEquals(null, handler.nextHandler);
+      assertNull(handler.nextHandler);
   }
 
   @Test
@@ -101,7 +117,7 @@ class HandlerTest {
 
     assertEquals(10, handler.startPc.bytecodeOffset);
     assertEquals(15, handler.endPc.bytecodeOffset);
-    assertEquals(null, handler.nextHandler);
+      assertNull(handler.nextHandler);
   }
 
   @Test
@@ -112,7 +128,7 @@ class HandlerTest {
     assertEquals(13, handler.endPc.bytecodeOffset);
     assertEquals(17, handler.nextHandler.startPc.bytecodeOffset);
     assertEquals(20, handler.nextHandler.endPc.bytecodeOffset);
-    assertEquals(null, handler.nextHandler.nextHandler);
+      assertNull(handler.nextHandler.nextHandler);
   }
 
   @Test

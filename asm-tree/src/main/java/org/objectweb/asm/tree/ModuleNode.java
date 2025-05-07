@@ -49,7 +49,6 @@ import java.util.function.Consumer;
 
 import org.objectweb.asm.IClassVisitor;
 import org.objectweb.asm.IModuleVisitor;
-import org.objectweb.asm.Opcodes;
 
 /**
  * A node that represents a module declaration.
@@ -57,7 +56,7 @@ import org.objectweb.asm.Opcodes;
  * @author Remi Forax
  * @author OblivRuinDev
  */
-public class ModuleNode implements IModuleVisitor, Consumer<IClassVisitor> {//todo
+public class ModuleNode implements IModuleVisitor, Consumer<IClassVisitor> {
 
   /** The fully qualified name (using dots) of this module. */
   public String name;

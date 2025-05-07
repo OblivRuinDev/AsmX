@@ -1024,14 +1024,16 @@ class ClassWriterComputeMaxsTest {
     }
   }
 
+  @SuppressWarnings("SameParameterValue")
   private static final class TestCaseBuilder { // NOPMD(TestClassWithoutTestCases)
 
     private final ClassWriter classWriter;
     private final IMethodVisitor methodVisitor;
     private final Label start;
 
+    @SuppressWarnings("deprecation")
     TestCaseBuilder() {
-      this(Opcodes.V_DYNA);
+      this(Opcodes.V1_1);
     }
 
     TestCaseBuilder(final int classVersion) {

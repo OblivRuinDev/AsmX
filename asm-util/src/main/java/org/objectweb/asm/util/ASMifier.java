@@ -1469,17 +1469,17 @@ public class ASMifier extends Printer {
     } else if (value instanceof Handle) {
       stringBuilder.append("new Handle(");
       Handle handle = (Handle) value;
-      stringBuilder.append("Opcodes.").append(HANDLE_TAG[handle.getTag()]).append(", \"");
-      stringBuilder.append(handle.getOwner()).append(COMMA);
-      stringBuilder.append(handle.getName()).append(COMMA);
-      stringBuilder.append(handle.getDesc()).append("\", ");
-      stringBuilder.append(handle.isInterface()).append(')');
+        stringBuilder.append("Opcodes.").append(HANDLE_TAG[handle.tag]).append(", \"");
+      stringBuilder.append(handle.owner).append(COMMA);
+      stringBuilder.append(handle.name).append(COMMA);
+      stringBuilder.append(handle.descriptor).append("\", ");
+      stringBuilder.append(handle.isInterface).append(')');
     } else if (value instanceof ConstantDynamic) {
       stringBuilder.append("new ConstantDynamic(\"");
       ConstantDynamic constantDynamic = (ConstantDynamic) value;
-      stringBuilder.append(constantDynamic.getName()).append(COMMA);
-      stringBuilder.append(constantDynamic.getDescriptor()).append("\", ");
-      appendConstant(constantDynamic.getBootstrapMethod());
+      stringBuilder.append(constantDynamic.name).append(COMMA);
+      stringBuilder.append(constantDynamic.descriptor).append("\", ");
+      appendConstant(constantDynamic.bsm);
       stringBuilder.append(NEW_OBJECT_ARRAY);
       int bootstrapMethodArgumentCount = constantDynamic.getBootstrapMethodArgumentCount();
       for (int i = 0; i < bootstrapMethodArgumentCount; ++i) {
@@ -1492,13 +1492,13 @@ public class ASMifier extends Printer {
     } else if (value instanceof Byte) {
       stringBuilder.append("Byte.valueOf((byte)").append(value).append(')');
     } else if (value instanceof Boolean) {
-      stringBuilder.append(((Boolean) value).booleanValue() ? "Boolean.TRUE" : "Boolean.FALSE");
+      stringBuilder.append((Boolean) value ? "Boolean.TRUE" : "Boolean.FALSE");
     } else if (value instanceof Short) {
       stringBuilder.append("Short.valueOf((short)").append(value).append(')');
     } else if (value instanceof Character) {
       stringBuilder
           .append("Character.valueOf((char)")
-          .append((int) ((Character) value).charValue())
+          .append((int) (Character) value)
           .append(')');
     } else if (value instanceof Integer) {
       stringBuilder.append("Integer.valueOf(").append(value).append(')');
@@ -1597,7 +1597,7 @@ public class ASMifier extends Printer {
       if (frameTypes[i] instanceof String) {
         appendConstant(frameTypes[i]);
       } else if (frameTypes[i] instanceof Integer) {
-        stringBuilder.append(FRAME_TYPES.get(((Integer) frameTypes[i]).intValue()));
+        stringBuilder.append(FRAME_TYPES.get((Integer) frameTypes[i]));
       } else {
         appendLabel((Label) frameTypes[i]);
       }

@@ -31,7 +31,6 @@ import org.objectweb.asm.VerObj;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
 
 public final class UtilX {
     private UtilX() {}

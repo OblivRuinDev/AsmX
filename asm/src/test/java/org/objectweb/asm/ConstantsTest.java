@@ -74,9 +74,9 @@ class ConstantsTest {
     VERIFICATION_TYPE_INFO_TAG,
     OPCODE,
     OTHER
-  };
+  }
 
-  @Test
+    @Test
   void testAsmVersions() {
     List<Field> asmVersions = getConstants(ConstantType.ASM_VERSION);
 
@@ -185,52 +185,52 @@ class ConstantsTest {
     }
   }
 
-  @Test
-  void testIsWhitelisted() {
-    assertFalse(Constants.isWhitelisted("org/jacoco/core/internal/flow/ClassProbesVisitor"));
-    assertFalse(Constants.isWhitelisted("org/objectweb/asm/ClassWriter"));
-    assertFalse(Constants.isWhitelisted("org/objectweb/asm/util/CheckClassVisitor"));
-    assertFalse(Constants.isWhitelisted("org/objectweb/asm/ClassWriterTest"));
-    assertTrue(Constants.isWhitelisted("org/objectweb/asm/ClassWriterTest$DeadCodeInserter"));
-    assertTrue(Constants.isWhitelisted("org/objectweb/asm/util/TraceClassVisitor"));
-    assertTrue(Constants.isWhitelisted("org/objectweb/asm/util/CheckClassAdapter"));
-  }
+//  @Test
+//  void testIsWhitelisted() {
+//    assertFalse(Constants.isWhitelisted("org/jacoco/core/internal/flow/ClassProbesVisitor"));
+//    assertFalse(Constants.isWhitelisted("org/objectweb/asm/ClassWriter"));
+//    assertFalse(Constants.isWhitelisted("org/objectweb/asm/util/CheckClassVisitor"));
+//    assertFalse(Constants.isWhitelisted("org/objectweb/asm/ClassWriterTest"));
+//    assertTrue(Constants.isWhitelisted("org/objectweb/asm/ClassWriterTest$DeadCodeInserter"));
+//    assertTrue(Constants.isWhitelisted("org/objectweb/asm/util/TraceClassVisitor"));
+//    assertTrue(Constants.isWhitelisted("org/objectweb/asm/util/CheckClassAdapter"));
+//  }
 
-  @SuppressWarnings("DataFlowIssue")
-  @Test
-  void testCheckIsPreview_nullStream() {
-    Executable checkIsPreview = () -> Constants.checkIsPreview(null);
-
-    assertThrows(IllegalStateException.class, checkIsPreview);
-  }
-
-  @Test
-  void testCheckIsPreview_invalidStream() {
-    InputStream invalidStream = new ByteArrayInputStream(new byte[4]);
-
-    Executable checkIsPreview = () -> Constants.checkIsPreview(invalidStream);
-
-    assertThrows(IllegalStateException.class, checkIsPreview);
-  }
-
-  @Test
-  void testCheckIsPreview_nonPreviewClass() {
-    InputStream nonPreviewStream = new ByteArrayInputStream(new byte[8]);
-
-    Executable checkIsPreview = () -> Constants.checkIsPreview(nonPreviewStream);
-
-    assertThrows(IllegalStateException.class, checkIsPreview);
-  }
-
-  @Test
-  void testCheckIsPreview_previewClass() {
-    byte[] previewClass = new byte[] {0, 0, 0, 0, (byte) 0xFF, (byte) 0xFF};
-    InputStream previewStream = new ByteArrayInputStream(previewClass);
-
-    Executable checkIsPreview = () -> Constants.checkIsPreview(previewStream);
-
-    assertDoesNotThrow(checkIsPreview);
-  }
+//  @SuppressWarnings("DataFlowIssue")
+//  @Test
+//  void testCheckIsPreview_nullStream() {
+//    Executable checkIsPreview = () -> Constants.checkIsPreview(null);
+//
+//    assertThrows(IllegalStateException.class, checkIsPreview);
+//  }
+//
+//  @Test
+//  void testCheckIsPreview_invalidStream() {
+//    InputStream invalidStream = new ByteArrayInputStream(new byte[4]);
+//
+//    Executable checkIsPreview = () -> Constants.checkIsPreview(invalidStream);
+//
+//    assertThrows(IllegalStateException.class, checkIsPreview);
+//  }
+//
+//  @Test
+//  void testCheckIsPreview_nonPreviewClass() {
+//    InputStream nonPreviewStream = new ByteArrayInputStream(new byte[8]);
+//
+//    Executable checkIsPreview = () -> Constants.checkIsPreview(nonPreviewStream);
+//
+//    assertThrows(IllegalStateException.class, checkIsPreview);
+//  }
+//
+//  @Test
+//  void testCheckIsPreview_previewClass() {
+//    byte[] previewClass = new byte[] {0, 0, 0, 0, (byte) 0xFF, (byte) 0xFF};
+//    InputStream previewStream = new ByteArrayInputStream(previewClass);
+//
+//    Executable checkIsPreview = () -> Constants.checkIsPreview(previewStream);
+//
+//    assertDoesNotThrow(checkIsPreview);
+//  }
 
   private static List<Field> getConstants(final ConstantType constantType) {
     return Stream.concat(

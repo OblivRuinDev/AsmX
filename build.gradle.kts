@@ -30,7 +30,6 @@ import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.FileOutputStream
 import java.io.PrintWriter
-import java.util.function.Predicate
 
 buildscript {
     repositories { mavenCentral() }
@@ -50,7 +49,7 @@ plugins {
 }
 
 description = "AsmX, extended bytecode manipulation toolkit based on ASM"
-version = "0.1-PREVIEW"
+version = "0.2-PREVIEW"
 
 // Root project configuration
 javaPlatform { allowDependencies() }
@@ -84,6 +83,11 @@ subprojects {
 // -----------------------------------------------------------------------------
 // Project descriptions
 // -----------------------------------------------------------------------------
+
+val compileDesc = project(":compile-desc") {
+    description = "A API to adjust compilation behavior"
+    setCfg()
+}
 
 val asmTest = project(":asm-test") {
     description = "Utilities for testing ${rootProject.description}"
@@ -144,7 +148,7 @@ val benchmarks = project(":benchmarks") {
         "kawa:kawa:1.7",
         "net.sf.jiapi:jiapi-reflect:0.5.2",
         "net.sourceforge.serp:serp:1.15.1",
-        "org.apache.bcel:bcel:6.0",
+        "org.apache.bcel:bcel:6.6.0",
         "org.aspectj:aspectjweaver:1.8.10",
         "org.cojen:cojen:2.2.5",
         "org.javassist:javassist:3.21.0-GA",
@@ -176,6 +180,11 @@ val benchmarks = project(":benchmarks") {
             includes.set(listOf(rootProject.property("jmhInclude") as String))
         }
     }
+}
+
+val buildTools = project(":build-tools") {
+    description = "Build tools for Asm"
+    setCfg(arrayOf("dev.oblivruin.asmx.buildtools"), arrayOf(asm), publish = false)
 }
 
 dependencies {

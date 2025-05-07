@@ -26,6 +26,8 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package dev.oblivruin.asm;
 
+import org.objectweb.asm.Type;
+
 /**
  * Exception thrown when meet Java ClassFile Version problem.
  * @author OblivRuinDev
@@ -51,5 +53,13 @@ public class ClassVersionException extends RuntimeException {
 
     public ClassVersionException(int version) {
         super("Unsupported class file major version : " + version);
+    }
+
+    public ClassVersionException(int startVer, String feature) {
+        super(feature + " require Java " + startVer + "+ (class version " + (startVer + 44) + "+)");
+    }
+
+    public ClassVersionException(int startVer, String feature, int currentVer) {
+        super(feature + " require Java " + startVer + "+ (class version " + (startVer + 44) + "+)\nCurrent version: " + currentVer);
     }
 }

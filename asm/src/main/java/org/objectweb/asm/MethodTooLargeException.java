@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -32,14 +47,15 @@ package org.objectweb.asm;
  * large.
  *
  * @author Jason Zaugg
+ * @author OblivRuinDev
  */
 public final class MethodTooLargeException extends IndexOutOfBoundsException {
   private static final long serialVersionUID = 6807380416709738314L;
 
-  private final String className;
-  private final String methodName;
-  private final String descriptor;
-  private final int codeSize;
+  public final String className;
+  public final String methodName;
+  public final String descriptor;
+  public final int codeSize;
 
   /**
    * Constructs a new {@link MethodTooLargeException}.
@@ -65,7 +81,9 @@ public final class MethodTooLargeException extends IndexOutOfBoundsException {
    * Returns the internal name of the owner class.
    *
    * @return the internal name of the owner class (see {@link Type#getInternalName()}).
+   * @deprecated use {@link #className} instead
    */
+  @Deprecated
   public String getClassName() {
     return className;
   }
@@ -74,7 +92,9 @@ public final class MethodTooLargeException extends IndexOutOfBoundsException {
    * Returns the name of the method.
    *
    * @return the name of the method.
+   * @deprecated use {@link #methodName} instead
    */
+  @Deprecated
   public String getMethodName() {
     return methodName;
   }
@@ -83,7 +103,9 @@ public final class MethodTooLargeException extends IndexOutOfBoundsException {
    * Returns the descriptor of the method.
    *
    * @return the descriptor of the method.
+   * @deprecated use {@link #descriptor} instead
    */
+  @Deprecated
   public String getDescriptor() {
     return descriptor;
   }
@@ -92,7 +114,9 @@ public final class MethodTooLargeException extends IndexOutOfBoundsException {
    * Returns the size of the method's Code attribute, in bytes.
    *
    * @return the size of the method's Code attribute, in bytes.
+   * @deprecated use {@link #codeSize} instead
    */
+  @Deprecated
   public int getCodeSize() {
     return codeSize;
   }

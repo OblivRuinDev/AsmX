@@ -313,7 +313,6 @@ public class MethodNode extends SpecialNode implements IMethodVisitor {
       final String name,
       final String descriptor,
       final boolean isInterface) {
-    //todo: class version check
     instructions.add(new MethodInsnNode(opcodeAndSource, owner, name, descriptor, isInterface));
   }
 

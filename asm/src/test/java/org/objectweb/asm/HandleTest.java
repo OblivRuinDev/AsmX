@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -47,8 +62,8 @@ class HandleTest {
     Handle handle1 = new Handle(Opcodes.H_INVOKEINTERFACE, "owner", "name", "descriptor");
     Handle handle2 = new Handle(Opcodes.H_INVOKESPECIAL, "owner", "name", "descriptor");
 
-    assertTrue(handle1.isInterface());
-    assertFalse(handle2.isInterface());
+    assertTrue(handle1.isInterface);
+    assertFalse(handle2.isInterface);
     assertEquals("owner.namedescriptor (9 itf)", handle1.toString());
     assertEquals("owner.namedescriptor (7)", handle2.toString());
   }
@@ -57,11 +72,11 @@ class HandleTest {
   void testConstructor() {
     Handle handle = new Handle(Opcodes.H_GETFIELD, "owner", "name", "descriptor", false);
 
-    assertEquals(Opcodes.H_GETFIELD, handle.getTag());
-    assertEquals("owner", handle.getOwner());
-    assertEquals("name", handle.getName());
-    assertEquals("descriptor", handle.getDesc());
-    assertFalse(handle.isInterface());
+      assertEquals(Opcodes.H_GETFIELD, handle.tag);
+    assertEquals("owner", handle.owner);
+    assertEquals("name", handle.name);
+    assertEquals("descriptor", handle.descriptor);
+    assertFalse(handle.isInterface);
     assertEquals("owner.namedescriptor (1)", handle.toString());
   }
 

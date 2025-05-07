@@ -3265,10 +3265,9 @@ public class ClassReader {
             ++currentMethodDescritorOffset;
           }
           if (methodDescriptor.charAt(currentMethodDescritorOffset) == 'L') {
-            ++currentMethodDescritorOffset;
-            while (methodDescriptor.charAt(currentMethodDescritorOffset) != ';') {
-              ++currentMethodDescritorOffset;
-            }
+              do {
+                  ++currentMethodDescritorOffset;
+              } while (methodDescriptor.charAt(currentMethodDescritorOffset) != ';');
           }
           locals[numLocal++] =
               methodDescriptor.substring(

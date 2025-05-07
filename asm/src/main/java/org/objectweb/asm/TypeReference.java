@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -32,11 +47,12 @@ package org.objectweb.asm;
  * A reference to a type appearing in a class, field or method declaration, or on an instruction.
  * Such a reference designates the part of the class where the referenced type is appearing (e.g. an
  * 'extends', 'implements' or 'throws' clause, a 'new' instruction, a 'catch' clause, a type cast, a
- * local variable declaration, etc).
+ * local variable declaration, etc.).
  *
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
-public class TypeReference {
+public final class TypeReference {
 
   /**
    * The sort of type references that target a type parameter of a generic class. See {@link
@@ -182,7 +198,7 @@ public class TypeReference {
    *     href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.20.1">JVMS
    *     4.7.20.1</a>
    */
-  private final int targetTypeAndInfo;
+  public final int targetTypeAndInfo;
 
   /**
    * Constructs a new TypeReference.
@@ -387,7 +403,9 @@ public class TypeReference {
    * to type annotations, like visitTypeAnnotation.
    *
    * @return the int encoded value of this type reference.
+   * @deprecated use {@link #targetTypeAndInfo} instead
    */
+  @Deprecated
   public int getValue() {
     return targetTypeAndInfo;
   }

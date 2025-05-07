@@ -566,21 +566,21 @@ public class Textifier extends Printer {
     } else if (value instanceof Type) {
       visitType((Type) value);
     } else if (value instanceof Byte) {
-      visitByte(((Byte) value).byteValue());
+      visitByte((Byte) value);
     } else if (value instanceof Boolean) {
-      visitBoolean(((Boolean) value).booleanValue());
+      visitBoolean((Boolean) value);
     } else if (value instanceof Short) {
-      visitShort(((Short) value).shortValue());
+      visitShort((Short) value);
     } else if (value instanceof Character) {
-      visitChar(((Character) value).charValue());
+      visitChar((Character) value);
     } else if (value instanceof Integer) {
-      visitInt(((Integer) value).intValue());
+      visitInt((Integer) value);
     } else if (value instanceof Float) {
-      visitFloat(((Float) value).floatValue());
+      visitFloat((Float) value);
     } else if (value instanceof Long) {
-      visitLong(((Long) value).longValue());
+      visitLong((Long) value);
     } else if (value instanceof Double) {
-      visitDouble(((Double) value).doubleValue());
+      visitDouble((Double) value);
     } else if (value.getClass().isArray()) {
       stringBuilder.append('{');
       if (value instanceof byte[]) {
@@ -1329,12 +1329,12 @@ public class Textifier extends Printer {
    */
   private void appendConstantDynamic(final ConstantDynamic condy, final String condyIndent) {
     stringBuilder
-        .append(condy.getName())
+        .append(condy.name)
         .append(" : ")
-        .append(condy.getDescriptor())
+        .append(condy.descriptor)
         .append(" [\n");
     stringBuilder.append(condyIndent).append(tab);
-    appendHandle(condy.getBootstrapMethod(), condyIndent + tab);
+    appendHandle(condy.bsm, condyIndent + tab);
     stringBuilder.append('\n').append(condyIndent).append(tab);
     Object[] bsmArgs = new Object[condy.getBootstrapMethodArgumentCount()];
     for (int i = 0; i < bsmArgs.length; i++) {
@@ -1443,12 +1443,8 @@ public class Textifier extends Printer {
     if (labelNames == null) {
       labelNames = new HashMap<>();
     }
-    String name = labelNames.get(label);
-    if (name == null) {
-      name = "L" + labelNames.size();
-      labelNames.put(label, name);
-    }
-    stringBuilder.append(name);
+      stringBuilder.append(
+              labelNames.computeIfAbsent(label, k -> "L" + labelNames.size()));
   }
 
   @Deprecated
@@ -1463,7 +1459,7 @@ public class Textifier extends Printer {
    * @param afterComment this is the prefix of the line after the handle kind.
    */
   protected void appendHandle(final Handle handle, final String afterComment) {
-    int tag = handle.getTag();
+    int tag = handle.tag;
     stringBuilder.append("// handle kind 0x").append(Integer.toHexString(tag)).append(" : ");
     boolean isMethodHandle = false;
     switch (tag) {
@@ -1504,17 +1500,17 @@ public class Textifier extends Printer {
     }
     stringBuilder.append('\n');
     stringBuilder.append(afterComment);
-    appendDescriptor(INTERNAL_NAME, handle.getOwner());
+    appendDescriptor(INTERNAL_NAME, handle.owner);
     stringBuilder.append('.');
-    stringBuilder.append(handle.getName());
+    stringBuilder.append(handle.name);
     if (!isMethodHandle) {
       stringBuilder.append('(');
     }
-    appendDescriptor(HANDLE_DESCRIPTOR, handle.getDesc());
+    appendDescriptor(HANDLE_DESCRIPTOR, handle.descriptor);
     if (!isMethodHandle) {
       stringBuilder.append(')');
     }
-    if (handle.isInterface()) {
+    if (handle.isInterface) {
       stringBuilder.append(" itf");
     }
   }
@@ -1650,7 +1646,7 @@ public class Textifier extends Printer {
           appendDescriptor(INTERNAL_NAME, descriptor);
         }
       } else if (frameTypes[i] instanceof Integer) {
-        stringBuilder.append(FRAME_TYPES.get(((Integer) frameTypes[i]).intValue()));
+        stringBuilder.append(FRAME_TYPES.get((Integer) frameTypes[i]));
       } else {
         appendLabel((Label) frameTypes[i]);
       }

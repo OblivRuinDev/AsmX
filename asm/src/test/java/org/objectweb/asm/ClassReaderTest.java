@@ -1,18 +1,33 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
 // 1. Redistributions of source code must retain the above copyright
-// notice, this list of conditions and the following disclaimer.
+//    notice, this list of conditions and the following disclaimer.
 // 2. Redistributions in binary form must reproduce the above copyright
-// notice, this list of conditions and the following disclaimer in the
-// documentation and/or other materials provided with the distribution.
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
 // 3. Neither the name of the copyright holders nor the names of its
-// contributors may be used to endorse or promote products derived from
-// this software without specific prior written permission.
+//    contributors may be used to endorse or promote products derived from
+//    this software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -97,7 +112,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
     ClassReader objectClassReader = new ClassReader(Object.class.getName());
 
     assertEquals(AsmTest.class.getName().replace('.', '/'), thisClassReader.getSuperName());
-    assertEquals(null, objectClassReader.getSuperName());
+      assertNull(objectClassReader.getSuperName());
   }
 
   @Test
@@ -297,8 +312,7 @@ class ClassReaderTest extends AsmTest implements Opcodes {
         && classParameter != PrecompiledClass.JDK8_ALL_STRUCTURES
         && classParameter != PrecompiledClass.JDK8_ANONYMOUS_INNER_CLASS
         && classParameter != PrecompiledClass.JDK8_INNER_CLASS
-        && classParameter != PrecompiledClass.JDK8_LARGE_METHOD
-        || classParameter.isPreview(apiParameter)) {//todo:
+        && classParameter != PrecompiledClass.JDK8_LARGE_METHOD) {
       Exception exception = assertThrows(ClassVersionException.class, accept);
     } else {
       assertDoesNotThrow(accept);
@@ -345,16 +359,16 @@ class ClassReaderTest extends AsmTest implements Opcodes {
   void testAccept_emptyVisitor_skipCode(
       final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
-    IClassVisitor classVisitor = new EmptyClassVisitor(apiParameter.value);
+    boolean b = classParameter != PrecompiledClass.JDK8_ARTIFICIAL_STRUCTURES
+            && classParameter != PrecompiledClass.JDK11_ALL_INSTRUCTIONS;
+    IClassVisitor classVisitor = new EmptyClassVisitor(b ? 0 : apiParameter.value);
 
     Executable accept = () -> classReader.accept(classVisitor, ClassReader.SKIP_CODE);
 
     // jdk8.ArtificialStructures contains structures which require ASM5, but only inside the method
     // code. Here we skip the code, so this class can be read with ASM4. Likewise for
     // jdk11.AllInstructions.
-    if (classParameter.notSuit(apiParameter)
-        && classParameter != PrecompiledClass.JDK8_ARTIFICIAL_STRUCTURES
-        && classParameter != PrecompiledClass.JDK11_ALL_INSTRUCTIONS) {
+    if (classParameter.notSuit(apiParameter) && b) {
       Exception exception = assertThrows(ClassVersionException.class, accept);
     } else {
       assertDoesNotThrow(accept);

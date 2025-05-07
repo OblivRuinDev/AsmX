@@ -26,27 +26,84 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package dev.oblivruin.asm;
 
-import org.objectweb.asm.Opcodes;
-
 import static org.objectweb.asm.Opcodes.*;
 
 /**
+ * Define class file version check behavior.<br>
+ * Warning: Checking Java Preview is not supported!
+ *
  * @author OblivRuinDev
  */
 public final class VersionChecker {
     private VersionChecker() {}
-    /**
-     * Method Parameters Exception
-     */
-    public static void methodPara(int version) {
-        if (version < V1_8 && version != 0) {
-            methodPara();
-        }
+
+    public static void invisAnn() {
+        throw new ClassVersionException(5, "Invisible Annotation");
     }
 
-    public static void _enum(int version) {
+    public static void _synthetic() {
+        throw new ClassVersionException(5, "ACC_SYNTHETIC");
+    }
+
+    public static void _enum() {
+        throw new ClassVersionException(5, "Enum");
+    }
+
+    public static void LDC() {
+        throw new ClassVersionException(7, "LDC of MethodType/Handle");
+    }
+
+    public static void invokeDyna() {
+        throw new ClassVersionException(7, "INVOKEDYNAMIC");
+    }
+
+    public static void localVarAnn() {
+        throw new ClassVersionException(8, "Local Variable Annotations");
+    }
+
+    public static void methodPara() {
+        throw new ClassVersionException(8, "Method Parameters");
+    }
+
+    public static void typeAnn() {
+        throw new ClassVersionException(8, "Type Annotations");
+    }
+
+    public static void tryTypeAnn() {
+        throw new ClassVersionException(8, "Try-catch Type Annotations");
+    }
+
+    public static void insnTypeAnn() {
+        throw new ClassVersionException(8, "Instruction Type Annotations");
+    }
+
+    public static void invokeInterface() {
+        throw new ClassVersionException(8, "INVOKE SPECIAL/STATIC on interfaces");
+    }
+
+    public static void _module() {
+        throw new ClassVersionException(9, "Module");
+    }
+
+    public static void constDyna() {
+        throw new ClassVersionException(11, "ConstantDynamic");
+    }
+
+    public static void nest() {
+        throw new ClassVersionException(11, "Nest-based access");
+    }
+
+    public static void record_() {
+        throw new ClassVersionException(16, "Records");
+    }
+
+    public static void permit() {
+        throw new ClassVersionException(17, "Permitted Subclasses");
+    }
+
+    public static void invisAnn(int version) {
         if (version < V1_5 && version != 0) {
-            _enum();
+            invisAnn();
         }
     }
 
@@ -56,30 +113,28 @@ public final class VersionChecker {
         }
     }
 
-    public static void _synthetic() {
-        throw new ClassVersionException("ACC_SYNTHETIC require Java 5+(class version 46+)");
-    }
-
-    public static void _enum() {
-        throw new ClassVersionException("Enum require Java 5+ (class version 46+)");
-    }
-
-    public static void invisAnn(int version) {
+    public static void _enum(int version) {
         if (version < V1_5 && version != 0) {
-            invisAnn();
+            _enum();
         }
     }
 
-    public static void invisAnn() {
-        throw new ClassVersionException("Invisible Annotation require Java 5+ (class version 49+)");
+    public static void LDC(int version) {
+        if (version < V1_7 && version != 0) {
+            LDC();
+        }
     }
 
-    public static void methodPara() {
-        throw new ClassVersionException("Method parameters require Java 8+ (class version 52+)");
+    public static void invokeDyna(int version) {
+        if (version < V1_7 && version != 0) {
+            invokeDyna();
+        }
     }
 
-    public static void typeAnn() {
-        throw new ClassVersionException("Type annotations require Java 8+ (class version 52+)");
+    public static void methodPara(int version) {
+        if (version < V1_8 && version != 0) {
+            methodPara();
+        }
     }
 
     public static void typeAnn(int version) {
@@ -94,22 +149,10 @@ public final class VersionChecker {
         }
     }
 
-    public static void tryTypeAnn() {
-        throw new ClassVersionException("Try-catch type annotations require Java 8+");
-    }
-
     public static void insnTypeAnn(int version) {
         if (version < V1_8 && version != 0) {
             insnTypeAnn();
         }
-    }
-
-    public static void insnTypeAnn() {
-        throw new ClassVersionException("Instruction type annotations require Java 8+");
-    }
-//todo: ?
-    public static void invokeInterface() {
-        throw new ClassVersionException("INVOKESPECIAL/STATIC/VIRTUAL on interfaces requires Java 8+");
     }
 
     public static void invokeInterface(int version) {
@@ -118,25 +161,15 @@ public final class VersionChecker {
         }
     }
 
-//(value instanceof Handle
-// || (value instanceof Type && ((Type) value).getSort() == Type.METHOD))
-    public static void LDC(int version) {
-        if (version < V1_7 && version != 0) {
-            LDC();
-        }
-    }
-
-    public static void LDC() {
-        throw new ClassVersionException("LDC of MethodType/Handle requires Java 7+");
-    }
-
-    public static void localVarAnn() {
-        throw new ClassVersionException("Local variable annotations require Java 8+");
-    }
-
     public static void localVarAnn(int version) {
         if (version < V1_8 && version != 0) {
             localVarAnn();
+        }
+    }
+
+    public static void _module(int version) {
+        if (version < V9 && version != 0) {
+            _module();
         }
     }
 
@@ -146,37 +179,21 @@ public final class VersionChecker {
         }
     }
 
-    public static void constDyna() {
-        throw new ClassVersionException("ConstantDynamic requires Java 11+ (class version 55+)");
-    }
-
-    public static void module_(int version) {
-        if (version < V9 && version != 0) {
-            throw new ClassVersionException("Modules require Java 9+ (class version 53+)");
-        }
-    }
-
     public static void nest(int version) {
         if (version < V11 && version != 0) {
-            throw new ClassVersionException("Nest-based access requires Java 11+ (class version 55+)");
+            nest();
         }
     }
 
     public static void record_(int version) {
         if (version < V16 && version != 0) {
-            throw new ClassVersionException("Records require Java 16+ (class version 60+)");
+            record_();
         }
     }
 
     public static void permit(int version) {
         if (version < V17 && version != 0) {
-            throw new ClassVersionException("Permitted subclasses require Java 17+ (class version 61+)");
-        }
-    }
-
-    public static void invokeDyna(int version) {
-        if (version < V1_7 && version != 0) {
-            throw new ClassVersionException("invokedynamic requires Java 7+ (class version 51+)");
+            permit();
         }
     }
 }

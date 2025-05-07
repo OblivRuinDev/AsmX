@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -33,6 +48,7 @@ package org.objectweb.asm;
  *
  * @author Remi Forax
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public final class Handle {
 
@@ -42,19 +58,19 @@ public final class Handle {
    * Opcodes#H_INVOKEVIRTUAL}, {@link Opcodes#H_INVOKESTATIC}, {@link Opcodes#H_INVOKESPECIAL},
    * {@link Opcodes#H_NEWINVOKESPECIAL} or {@link Opcodes#H_INVOKEINTERFACE}.
    */
-  private final int tag;
+  public final int tag;
 
   /** The internal name of the class that owns the field or method designated by this handle. */
-  private final String owner;
+  public final String owner;
 
   /** The name of the field or method designated by this handle. */
-  private final String name;
+  public final String name;
 
   /** The descriptor of the field or method designated by this handle. */
-  private final String descriptor;
+  public final String descriptor;
 
   /** Whether the owner is an interface or not. */
-  private final boolean isInterface;
+  public final boolean isInterface;
 
   /**
    * Constructs a new field or method handle.
@@ -110,7 +126,9 @@ public final class Handle {
    *     {@link Opcodes#H_PUTSTATIC}, {@link Opcodes#H_INVOKEVIRTUAL}, {@link
    *     Opcodes#H_INVOKESTATIC}, {@link Opcodes#H_INVOKESPECIAL}, {@link
    *     Opcodes#H_NEWINVOKESPECIAL} or {@link Opcodes#H_INVOKEINTERFACE}.
+   * @deprecated use {@link #tag} instead
    */
+  @Deprecated
   public int getTag() {
     return tag;
   }
@@ -120,7 +138,9 @@ public final class Handle {
    *
    * @return the internal name of the class that owns the field or method designated by this handle
    *     (see {@link Type#getInternalName()}).
+   * @deprecated use {@link #owner} instead
    */
+  @Deprecated
   public String getOwner() {
     return owner;
   }
@@ -129,7 +149,9 @@ public final class Handle {
    * Returns the name of the field or method designated by this handle.
    *
    * @return the name of the field or method designated by this handle.
+   * @deprecated use {@link #name} instead
    */
+  @Deprecated
   public String getName() {
     return name;
   }
@@ -138,7 +160,9 @@ public final class Handle {
    * Returns the descriptor of the field or method designated by this handle.
    *
    * @return the descriptor of the field or method designated by this handle.
+   * @deprecated use {@link #descriptor} instead
    */
+  @Deprecated
   public String getDesc() {
     return descriptor;
   }
@@ -147,25 +171,26 @@ public final class Handle {
    * Returns true if the owner of the field or method designated by this handle is an interface.
    *
    * @return true if the owner of the field or method designated by this handle is an interface.
+   * @deprecated use {@link #isInterface} instead
    */
+  @Deprecated
   public boolean isInterface() {
     return isInterface;
   }
 
   @Override
   public boolean equals(final Object object) {
-    if (object == this) {
-      return true;
-    }
-    if (!(object instanceof Handle)) {
-      return false;
-    }
-    Handle handle = (Handle) object;
-    return tag == handle.tag
-        && isInterface == handle.isInterface
-        && owner.equals(handle.owner)
-        && name.equals(handle.name)
-        && descriptor.equals(handle.descriptor);
+    return object == this ||
+            (object instanceof Handle && equals((Handle) object));
+  }
+
+  public boolean equals(final Handle obj) {
+    return obj != null
+            && tag == obj.tag
+            && (isInterface == obj.isInterface)
+            && owner.equals(obj.owner)
+            && name.equals(obj.name)
+            && descriptor.equals(obj.descriptor);
   }
 
   @Override

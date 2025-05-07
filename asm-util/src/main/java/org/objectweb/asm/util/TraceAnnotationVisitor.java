@@ -44,7 +44,6 @@ package org.objectweb.asm.util;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.IAnnotationVisitor;
-import org.objectweb.asm.Opcodes;
 
 /**
  * An {@link AnnotationVisitor} that prints the annotations it visits with a {@link Printer}.

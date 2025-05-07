@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -55,8 +70,8 @@ class CheckRecordComponentAdapterTest extends AsmTest {
 
     Executable visitTypeAnnotation =
         () ->
-            checkRecordComponentAdapter.visitTypeAnnotation(
-                TypeReference.newFormalParameterReference(0).getValue(), null, "LA;", true);
+                checkRecordComponentAdapter.visitTypeAnnotation(
+                        TypeReference.newFormalParameterReference(0).targetTypeAndInfo, null, "LA;", true);
 
     Exception exception = assertThrows(IllegalArgumentException.class, visitTypeAnnotation);
     assertEquals("Invalid type reference sort 0x16", exception.getMessage());

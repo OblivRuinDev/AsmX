@@ -131,17 +131,4 @@ public abstract class SpecialNode extends ATypeAnnotatedNode implements ISpecial
     public void visitAttribute(final Attribute attribute) {
       attrs = Util.add(attrs, attribute);
     }
-
-    private final class Consumer0 implements Consumer<AnnotationNode> {
-        private final ISpecialVisitor visitor;
-        boolean visible = true;
-
-        Consumer0(ISpecialVisitor visitor) {
-            this.visitor = visitor;
-        }
-        @Override
-        public void accept(AnnotationNode annotationNode) {
-            annotationNode.accept(visitor.visitAnnotation(annotationNode.desc, visible));
-        }
-    }
 }

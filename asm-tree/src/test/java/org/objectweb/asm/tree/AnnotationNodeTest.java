@@ -44,14 +44,11 @@ package org.objectweb.asm.tree;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.IAnnotationVisitor;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.test.AsmTest;
 
 /**

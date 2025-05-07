@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -193,7 +208,7 @@ class AnalyzerWithSimpleVerifierTest extends AsmTest {
   }
 
   @Test
-  void testAnalyze_mergeStackFrames() throws AnalyzerException {
+  void testAnalyze_mergeStackFrames() {
     Label loopLabel = new Label();
     MethodNode methodNode =
         new MethodNodeBuilder(1, 4)
@@ -223,7 +238,7 @@ class AnalyzerWithSimpleVerifierTest extends AsmTest {
   }
 
   @Test
-  void testAnalyze_mergeStackFramesWithExceptionHandlers() throws AnalyzerException {
+  void testAnalyze_mergeStackFramesWithExceptionHandlers() {
     Label startTry0Label = new Label();
     Label endTry0Label = new Label();
     Label catch0Label = new Label();
@@ -301,11 +316,11 @@ class AnalyzerWithSimpleVerifierTest extends AsmTest {
     new ClassReader(classParameter.getBytes()).accept(classNode, 0);
     assumeFalse(classNode.methods.isEmpty());
     Analyzer<BasicValue> analyzer =
-        new Analyzer<BasicValue>(
-            new SimpleVerifier(
-                Type.getObjectType(classNode.name),
-                Type.getObjectType(classNode.superName),
-                (classNode.access & Opcodes.ACC_INTERFACE) != 0));
+            new Analyzer<>(
+                    new SimpleVerifier(
+                            Type.getObjectType(classNode.name),
+                            Type.getObjectType(classNode.superName),
+                            (classNode.access & Opcodes.ACC_INTERFACE) != 0));
 
     for (MethodNode methodNode : classNode.methods) {
       assertDoesNotThrow(() -> analyzer.analyze(classNode.name, methodNode));
@@ -318,10 +333,9 @@ class AnalyzerWithSimpleVerifierTest extends AsmTest {
    * algorithm, due to multiple interface inheritance), but the subtyping check is relaxed if the
    * super type is an interface type.
    *
-   * @throws AnalyzerException if the test class can't be analyzed.
    */
   @Test
-  void testIsAssignableFrom_interface() throws AnalyzerException {
+  void testIsAssignableFrom_interface() {
     Label elseLabel = new Label();
     Label endIfLabel = new Label();
     MethodNode methodNode =

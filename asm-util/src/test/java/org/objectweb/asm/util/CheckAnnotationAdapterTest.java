@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -46,7 +61,7 @@ class CheckAnnotationAdapterTest extends AsmTest {
   void testVisit_illegalAnnotationName() {
     CheckAnnotationAdapter checkAnnotationAdapter = new CheckAnnotationAdapter(null);
 
-    Executable visit = () -> checkAnnotationAdapter.visit(null, Integer.valueOf(0));
+    Executable visit = () -> checkAnnotationAdapter.visit(null, 0);
 
     Exception exception = assertThrows(IllegalArgumentException.class, visit);
     assertEquals("Annotation value name must not be null", exception.getMessage());
@@ -77,7 +92,7 @@ class CheckAnnotationAdapterTest extends AsmTest {
     CheckAnnotationAdapter checkAnnotationAdapter = new CheckAnnotationAdapter(null);
     checkAnnotationAdapter.visitEnd();
 
-    Executable visit = () -> checkAnnotationAdapter.visit("name", Integer.valueOf(0));
+    Executable visit = () -> checkAnnotationAdapter.visit("name", 0);
 
     Exception exception = assertThrows(IllegalStateException.class, visit);
     assertEquals(

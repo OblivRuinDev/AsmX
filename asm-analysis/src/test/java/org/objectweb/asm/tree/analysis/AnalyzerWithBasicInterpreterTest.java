@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -28,11 +43,7 @@
 package org.objectweb.asm.tree.analysis;
 
 import static java.time.Duration.ofSeconds;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.IOException;
@@ -70,7 +81,7 @@ class AnalyzerWithBasicInterpreterTest extends AsmTest {
         new MethodNodeBuilder().iconst_0().intInsn(Opcodes.NEWARRAY, -1).vreturn().build();
 
     Executable analyze =
-        () -> new Analyzer<BasicValue>(new BasicInterpreter()).analyze(CLASS_NAME, methodNode);
+        () -> new Analyzer<>(new BasicInterpreter()).analyze(CLASS_NAME, methodNode);
 
     String message = assertThrows(AnalyzerException.class, analyze).getMessage();
     assertTrue(message.contains("Invalid array type"));
@@ -237,7 +248,7 @@ class AnalyzerWithBasicInterpreterTest extends AsmTest {
 
     @Override
     public Frame<BasicValue> init(final Frame<? extends BasicValue> frame) {
-      assertTrue(frame instanceof CustomFrame);
+        assertInstanceOf(CustomFrame.class, frame);
       return super.init(frame);
     }
   }

@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -36,25 +51,14 @@ package org.objectweb.asm;
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.23">JVMS
  *     4.7.23</a>
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public abstract class Symbol {
 
   // Tag values for the constant pool entries (using the same order as in the JVMS).
 
-  /** The tag value of CONSTANT_Class_info JVMS structures. */
-  public static final int CONSTANT_CLASS_TAG = 7;
-
-  /** The tag value of CONSTANT_Fieldref_info JVMS structures. */
-  public static final int CONSTANT_FIELDREF_TAG = 9;
-
-  /** The tag value of CONSTANT_Methodref_info JVMS structures. */
-  public static final int CONSTANT_METHODREF_TAG = 10;
-
-  /** The tag value of CONSTANT_InterfaceMethodref_info JVMS structures. */
-  public static final int CONSTANT_INTERFACE_METHODREF_TAG = 11;
-
-  /** The tag value of CONSTANT_String_info JVMS structures. */
-  public static final int CONSTANT_STRING_TAG = 8;
+  /** The tag value of CONSTANT_Utf8_info JVMS structures. */
+  public static final int CONSTANT_UTF8_TAG = 1;
 
   /** The tag value of CONSTANT_Integer_info JVMS structures. */
   public static final int CONSTANT_INTEGER_TAG = 3;
@@ -68,11 +72,23 @@ public abstract class Symbol {
   /** The tag value of CONSTANT_Double_info JVMS structures. */
   public static final int CONSTANT_DOUBLE_TAG = 6;
 
+  /** The tag value of CONSTANT_Class_info JVMS structures. */
+  public static final int CONSTANT_CLASS_TAG = 7;
+
+  /** The tag value of CONSTANT_String_info JVMS structures. */
+  public static final int CONSTANT_STRING_TAG = 8;
+
+  /** The tag value of CONSTANT_Fieldref_info JVMS structures. */
+  public static final int CONSTANT_FIELDREF_TAG = 9;
+
+  /** The tag value of CONSTANT_Methodref_info JVMS structures. */
+  public static final int CONSTANT_METHODREF_TAG = 10;
+
+  /** The tag value of CONSTANT_InterfaceMethodref_info JVMS structures. */
+  public static final int CONSTANT_INTERFACE_METHODREF_TAG = 11;
+
   /** The tag value of CONSTANT_NameAndType_info JVMS structures. */
   public static final int CONSTANT_NAME_AND_TYPE_TAG = 12;
-
-  /** The tag value of CONSTANT_Utf8_info JVMS structures. */
-  public static final int CONSTANT_UTF8_TAG = 1;
 
   /** The tag value of CONSTANT_MethodHandle_info JVMS structures. */
   public static final int CONSTANT_METHOD_HANDLE_TAG = 15;
@@ -129,20 +145,20 @@ public abstract class Symbol {
    * The index of this symbol in the constant pool, in the BootstrapMethods attribute, or in the
    * (ASM specific) type table of a class (depending on the {@link #tag} value).
    */
-  final int index;
+  public final int index;
 
   /**
    * A tag indicating the type of this symbol. Must be one of the static tag values defined in this
    * class.
    */
-  final int tag;
+  public final int tag;
 
   /**
    * The internal name of the owner class of this symbol. Only used for {@link
    * #CONSTANT_FIELDREF_TAG}, {@link #CONSTANT_METHODREF_TAG}, {@link
    * #CONSTANT_INTERFACE_METHODREF_TAG}, and {@link #CONSTANT_METHOD_HANDLE_TAG} symbols.
    */
-  final String owner;
+  public final String owner;
 
   /**
    * The name of the class field or method corresponding to this symbol. Only used for {@link
@@ -151,7 +167,7 @@ public abstract class Symbol {
    * #CONSTANT_METHOD_HANDLE_TAG}, {@link #CONSTANT_DYNAMIC_TAG} and {@link
    * #CONSTANT_INVOKE_DYNAMIC_TAG} symbols.
    */
-  final String name;
+  public final String name;
 
   /**
    * The string value of this symbol. This is:
@@ -169,7 +185,7 @@ public abstract class Symbol {
    *   <li>{@literal null} for the other types of symbol.
    * </ul>
    */
-  final String value;
+  public final String value;
 
   /**
    * The numeric value of this symbol. This is:
@@ -195,7 +211,7 @@ public abstract class Symbol {
    *   <li>0 for the other types of symbol.
    * </ul>
    */
-  final long data;
+  public final long data;
 
   /**
    * Additional information about this symbol, generally computed lazily. <i>Warning: the value of

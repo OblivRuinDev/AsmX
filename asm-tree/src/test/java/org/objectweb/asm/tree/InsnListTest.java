@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -42,7 +57,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 
 /**
  * Unit tests for {@link InsnList}.
@@ -62,12 +76,12 @@ class InsnListTest {
 
   @Test
   void testGetFirst_emptyList() {
-    assertEquals(null, newInsnList().getFirst());
+      assertNull(newInsnList().getFirst());
   }
 
   @Test
   void testGetLast_emptyList() {
-    assertEquals(null, newInsnList().getLast());
+      assertNull(newInsnList().getLast());
   }
 
   @Test
@@ -126,7 +140,7 @@ class InsnListTest {
   void testIteratorNext_noSuchElement() {
     ListIterator<AbstractInsnNode> iterator = newInsnList().iterator();
 
-    Executable next = () -> iterator.next();
+    Executable next = iterator::next;
 
     assertThrows(NoSuchElementException.class, next);
   }
@@ -149,7 +163,7 @@ class InsnListTest {
   void testIteratorPrevious_noSuchElement() {
     ListIterator<AbstractInsnNode> iterator = newInsnList().iterator();
 
-    Executable previous = () -> iterator.previous();
+    Executable previous = iterator::previous;
 
     assertThrows(NoSuchElementException.class, previous);
   }
@@ -194,7 +208,7 @@ class InsnListTest {
     InsnList insnList = newInsnList(insn1, insn2);
     ListIterator<AbstractInsnNode> iterator = insnList.iterator(1);
 
-    Executable remove = () -> iterator.remove();
+    Executable remove = iterator::remove;
 
     assertThrows(IllegalStateException.class, remove);
   }
@@ -356,8 +370,8 @@ class InsnListTest {
     assertTrue(insnList.contains(insn));
     assertEquals(0, insnList.indexOf(insn));
     assertArrayEquals(new AbstractInsnNode[] {insn}, insnList.toArray());
-    assertEquals(null, insn.getPrevious());
-    assertEquals(null, insn.getNext());
+      assertNull(insn.getPrevious());
+      assertNull(insn.getNext());
   }
 
   @Test
@@ -391,8 +405,8 @@ class InsnListTest {
     insnList.add(newInsnList());
 
     assertEquals(0, insnList.size());
-    assertEquals(null, insnList.getFirst());
-    assertEquals(null, insnList.getLast());
+      assertNull(insnList.getFirst());
+      assertNull(insnList.getLast());
     assertArrayEquals(new AbstractInsnNode[0], insnList.toArray());
   }
 
@@ -491,8 +505,8 @@ class InsnListTest {
     insnList.insert(newInsnList());
 
     assertEquals(0, insnList.size());
-    assertEquals(null, insnList.getFirst());
-    assertEquals(null, insnList.getLast());
+      assertNull(insnList.getFirst());
+      assertNull(insnList.getLast());
     assertArrayEquals(new AbstractInsnNode[0], insnList.toArray());
   }
 
@@ -762,12 +776,12 @@ class InsnListTest {
     insnList.remove(insn);
 
     assertEquals(0, insnList.size());
-    assertEquals(null, insnList.getFirst());
-    assertEquals(null, insnList.getLast());
+      assertNull(insnList.getFirst());
+      assertNull(insnList.getLast());
     assertFalse(insnList.contains(insn));
     assertArrayEquals(new AbstractInsnNode[0], insnList.toArray());
-    assertEquals(null, insn.getPrevious());
-    assertEquals(null, insn.getNext());
+      assertNull(insn.getPrevious());
+      assertNull(insn.getNext());
   }
 
   @Test
@@ -780,8 +794,8 @@ class InsnListTest {
     insnList.remove(insn);
 
     assertFalse(insnList.contains(insn));
-    assertEquals(null, insn.getPrevious());
-    assertEquals(null, insn.getNext());
+      assertNull(insn.getPrevious());
+      assertNull(insn.getNext());
   }
 
   @Test
@@ -795,8 +809,8 @@ class InsnListTest {
     insnList.remove(insn);
 
     assertFalse(insnList.contains(insn));
-    assertEquals(null, insn.getPrevious());
-    assertEquals(null, insn.getNext());
+      assertNull(insn.getPrevious());
+      assertNull(insn.getNext());
   }
 
   @Test
@@ -809,8 +823,8 @@ class InsnListTest {
     insnList.remove(insn);
 
     assertFalse(insnList.contains(insn));
-    assertEquals(null, insn.getPrevious());
-    assertEquals(null, insn.getNext());
+      assertNull(insn.getPrevious());
+      assertNull(insn.getNext());
   }
 
   @Test
@@ -824,12 +838,12 @@ class InsnListTest {
     insnList.clear();
 
     assertEquals(0, insnList.size());
-    assertEquals(null, insnList.getFirst());
-    assertEquals(null, insnList.getLast());
+      assertNull(insnList.getFirst());
+      assertNull(insnList.getLast());
     assertFalse(insnList.contains(insn));
     assertArrayEquals(new AbstractInsnNode[0], insnList.toArray());
-    assertEquals(null, insn.getPrevious());
-    assertEquals(null, insn.getNext());
+      assertNull(insn.getPrevious());
+      assertNull(insn.getNext());
   }
 
   @Test

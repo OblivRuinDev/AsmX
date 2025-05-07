@@ -129,6 +129,7 @@ public interface Opcodes {
     int ACC_SYNTHETIC = 0x1000; // class, field, method, parameter, module *
     int ACC_ANNOTATION = 0x2000; // class
     int ACC_ENUM = 0x4000; // class(?) field inner
+    /** Added in classfile v52.0, represents constructs implicitly declared in source. */
     int ACC_MANDATED = 0x8000; // field, method, parameter, module, module *
     int ACC_MODULE = 0x8000; // class
 

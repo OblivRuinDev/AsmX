@@ -373,10 +373,10 @@ class ClassWriterTest extends AsmTest {
 
     if (methodCodeSize > 65535) {
       MethodTooLargeException exception = assertThrows(MethodTooLargeException.class, toByteArray);
-      assertEquals(methodName, exception.getMethodName());
-      assertEquals("C", exception.getClassName());
-      assertEquals(descriptor, exception.getDescriptor());
-      assertEquals(methodCodeSize, exception.getCodeSize());
+      assertEquals(methodName, exception.methodName);
+      assertEquals("C", exception.className);
+      assertEquals(descriptor, exception.descriptor);
+      assertEquals(methodCodeSize, exception.codeSize);
       assertEquals("Method too large: C.m ()V", exception.getMessage());
     } else {
       assertDoesNotThrow(toByteArray);
@@ -407,7 +407,7 @@ class ClassWriterTest extends AsmTest {
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
     classReader.accept(classWriter, attributes(), 0);
 
-    Executable toByteArray = () -> classWriter.toByteArray();
+    Executable toByteArray = classWriter::toByteArray;
 
     assertDoesNotThrow(toByteArray);
   }
@@ -514,9 +514,7 @@ class ClassWriterTest extends AsmTest {
     methodVisitor.visitJumpInsn(Opcodes.GOTO, label2);
     methodVisitor.visitLabel(label0);
     Object[] topTypes = new Object[newLabels.length];
-    for (int i = 0; i < topTypes.length; ++i) {
-      topTypes[i] = Opcodes.TOP;
-    }
+      Arrays.fill(topTypes, Opcodes.TOP);
     methodVisitor.visitFrame(Opcodes.F_NEW, topTypes.length, topTypes, 0, null);
     for (int i = 0; i < newLabels.length; ++i) {
       methodVisitor.visitLabel(newLabels[i]);
@@ -526,9 +524,7 @@ class ClassWriterTest extends AsmTest {
     methodVisitor.visitJumpInsn(Opcodes.GOTO, label1);
     methodVisitor.visitLabel(label2);
     String[] newTypes = new String[newLabels.length];
-    for (int i = 0; i < newTypes.length; ++i) {
-      newTypes[i] = "A";
-    }
+      Arrays.fill(newTypes, "A");
     methodVisitor.visitFrame(Opcodes.F_NEW, newTypes.length, newTypes, 0, null);
     methodVisitor.visitInsn(Opcodes.RETURN);
     methodVisitor.visitMaxs(1, newLabels.length);
@@ -667,7 +663,7 @@ class ClassWriterTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testReadAndWrite_computeMaxs_newInstance(
-      final PrecompiledClass classParameter, final JavaVer apiParameter) throws Exception {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
@@ -811,7 +807,7 @@ class ClassWriterTest extends AsmTest {
         new ForwardJumpNopInserter(Opcodes.V_BYPASS, classWriter) {
           @Override
           public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-            super.visit(version & 0xFFFF, access, name, signature, superName, interfaces);
+            super.visit(version, access, name, signature, superName, interfaces);
           }
         };
     classReader.accept(forwardJumpNopInserter, attributes(), 0);
@@ -824,7 +820,7 @@ class ClassWriterTest extends AsmTest {
     byte[] transformedClass = classWriter.toByteArray();
 
     Executable newInstance = () -> new ClassFile(transformedClass).newInstance();
-    if (classParameter.isNotCompatibleWithCurrentJdk()) {
+    if (classParameter.notSuit(apiParameter)) {
       assertThrows(UnsupportedClassVersionError.class, newInstance);
     } else {
       assertDoesNotThrow(newInstance);
@@ -846,7 +842,7 @@ class ClassWriterTest extends AsmTest {
 
   private static ClassWriter newEmptyClassWriter() {
     ClassWriter classWriter = new ClassWriter(0);
-    classWriter.visit(Opcodes.V_DYNA, Opcodes.ACC_PUBLIC, "C", null, "java/lang/Object", null);
+    classWriter.visit(Opcodes.V11, Opcodes.ACC_PUBLIC, "C", null, "java/lang/Object", null);
     return classWriter;
   }
 
@@ -904,7 +900,7 @@ class ClassWriterTest extends AsmTest {
 
   private static class MethodDeadCodeInserter extends MethodVisitor implements Opcodes {
 
-    private Random random;
+    private final Random random;
     private boolean inserted;
 
     MethodDeadCodeInserter(final int api, final int seed, final IMethodVisitor methodVisitor) {
@@ -1101,8 +1097,7 @@ class ClassWriterTest extends AsmTest {
         final String signature,
         final String superName,
         final String[] interfaces) {
-      version = version & 0xFFFF;
-      needFrames = version >= Opcodes.V1_7;
+      needFrames = (version & 0xFFFF) >= Opcodes.V1_7;
       super.visit(version, access, name, signature, superName, interfaces);
     }
 

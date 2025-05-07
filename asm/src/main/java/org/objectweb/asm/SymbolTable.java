@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -31,11 +46,12 @@ package org.objectweb.asm;
  * The constant pool entries, the BootstrapMethods attribute entries and the (ASM specific) type
  * table entries of a class.
  *
- * @author Eric Bruneton
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.4">JVMS
  *     4.4</a>
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.23">JVMS
  *     4.7.23</a>
+ * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 final class SymbolTable {
 
@@ -83,7 +99,7 @@ final class SymbolTable {
    * The content of the ClassFile's constant_pool JVMS structure corresponding to this SymbolTable.
    * The ClassFile's constant_pool_count field is <i>not</i> included.
    */
-  private ByteVector constantPool;
+  private final ByteVector constantPool;
 
   /**
    * The number of bootstrap methods in {@link #bootstrapMethods}. Corresponds to the
@@ -511,18 +527,18 @@ final class SymbolTable {
     } else if (value instanceof Handle) {
       Handle handle = (Handle) value;
       return addConstantMethodHandle(
-          handle.getTag(),
-          handle.getOwner(),
-          handle.getName(),
-          handle.getDesc(),
-          handle.isInterface());
+          handle.tag,
+          handle.owner,
+          handle.name,
+          handle.descriptor,
+          handle.isInterface);
     } else if (value instanceof ConstantDynamic) {
       ConstantDynamic constantDynamic = (ConstantDynamic) value;
       return addConstantDynamic(
-          constantDynamic.getName(),
-          constantDynamic.getDescriptor(),
-          constantDynamic.getBootstrapMethod(),
-          constantDynamic.getBootstrapMethodArgumentsUnsafe());
+          constantDynamic.name,
+          constantDynamic.descriptor,
+          constantDynamic.bsm,
+          constantDynamic.bsmArgs);
     } else {
       throw new IllegalArgumentException("value " + value);
     }
@@ -1104,11 +1120,11 @@ final class SymbolTable {
     int bootstrapMethodOffset = bootstrapMethodsAttribute.length;
     bootstrapMethodsAttribute.putShort(
         addConstantMethodHandle(
-                bootstrapMethodHandle.getTag(),
-                bootstrapMethodHandle.getOwner(),
-                bootstrapMethodHandle.getName(),
-                bootstrapMethodHandle.getDesc(),
-                bootstrapMethodHandle.isInterface())
+                bootstrapMethodHandle.tag,
+                bootstrapMethodHandle.owner,
+                bootstrapMethodHandle.name,
+                bootstrapMethodHandle.descriptor,
+                bootstrapMethodHandle.isInterface)
             .index);
 
     bootstrapMethodsAttribute.putShort(numBootstrapArguments);

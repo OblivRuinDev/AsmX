@@ -81,7 +81,12 @@ public abstract class VerObj {
 
     public static void checkClassVer(int version) {
         if (version != 0) {
-            checkReal(version);
+            if (minor(version) != 0) {
+                System.err.println("[Warning]: AsmX detect a preview version passed as an argument!\nThis may cause problem!");
+                checkReal(major(version));
+            } else {
+                checkReal(version);
+            }
         }
     }
 
@@ -90,5 +95,21 @@ public abstract class VerObj {
             throw new ClassVersionException(version);
         }
         return version;
+    }
+
+    public final int major() {
+        return ver & 0xFFFF;
+    }
+
+    public final int minor() {
+        return ver >>> 16;
+    }
+
+    public static int major(int version) {
+        return version & 0xFFFF;
+    }
+
+    public static int minor(int version) {
+        return version >>> 16;
     }
 }

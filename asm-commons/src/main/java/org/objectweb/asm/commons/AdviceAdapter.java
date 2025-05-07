@@ -658,7 +658,7 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
    *     box(Type.getReturnType(this.methodDesc));
    *   }
    *   visitIntInsn(SIPUSH, opcode);
-   *   visitMethodInsn(INVOKESTATIC, owner, "onExit", "(Ljava/lang/Object;I)V", false);//todo:
+   *   visitMethodInsn(INVOKESTATIC, owner, "onExit", "(Ljava/lang/Object;I)V", false);
    * }
    *
    * // An actual call back method.

@@ -59,8 +59,7 @@ public class AsmFactory implements Factory {
         if (Opcodes.class.getField(version) != null) {
           return version;
         }
-      } catch (NoSuchFieldException e) {
-        continue;
+      } catch (NoSuchFieldException ignored) {
       }
     }
     return "";

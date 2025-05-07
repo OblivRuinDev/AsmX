@@ -26,7 +26,7 @@ public final class SignaturesProviders {
     AsmTest.allClassesAndLatestApi()
         .map(argument -> (PrecompiledClass) argument.get()[0])
         .filter(precompiledClass -> !precompiledClass.notSuit(AsmTest.JavaVer.V16))//todo:unsolve
-        .forEach(precompiledClass -> collectSignatures(precompiledClass));
+        .forEach(SignaturesProviders::collectSignatures);
     assertFalse(CLASS_SIGNATURES.isEmpty());
     assertFalse(FIELD_SIGNATURES.isEmpty());
     assertFalse(METHOD_SIGNATURES.isEmpty());

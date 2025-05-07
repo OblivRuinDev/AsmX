@@ -147,9 +147,7 @@ public class ClassRemapper extends ClassVisitor {
     if (attribute instanceof ModuleHashesAttribute) {
       ModuleHashesAttribute moduleHashesAttribute = (ModuleHashesAttribute) attribute;
       List<String> modules = moduleHashesAttribute.modules;
-      for (int i = 0; i < modules.size(); ++i) {
-        modules.set(i, remapper.mapModuleName(modules.get(i)));
-      }
+        modules.replaceAll(remapper::mapModuleName);
     }
     super.visitAttribute(attribute);
   }

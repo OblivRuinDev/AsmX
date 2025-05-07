@@ -291,38 +291,12 @@ public class ClassNode extends SpecialNode implements IClassVisitor, Consumer<IC
       VersionChecker.nest(version);
     }
     if (module != null) {
-      VersionChecker.module_(version);
+      VersionChecker._module(version);
     }
     super.checkSpecial(version);
-    //todo: I think it is not necessary.
 
     // Check the annotations.
-//    if (visibleAnnotations != null) {
-//      for (int i = visibleAnnotations.size() - 1; i >= 0; --i) {
-//        visibleAnnotations.get(i).check(version);
-//      }
-//    }
-//    if (invisibleAnnotations != null) {
-//      for (int i = invisibleAnnotations.size() - 1; i >= 0; --i) {
-//        invisibleAnnotations.get(i).check(version);
-//      }
-//    }
-//    if (visibleTypeAnnotations != null) {
-//      for (int i = visibleTypeAnnotations.size() - 1; i >= 0; --i) {
-//        visibleTypeAnnotations.get(i).check(version);
-//      }
-//    }
-//    if (invisibleTypeAnnotations != null) {
-//      for (int i = invisibleTypeAnnotations.size() - 1; i >= 0; --i) {
-//        invisibleTypeAnnotations.get(i).check(version);
-//      }
-//    }
-//    if (recordComponents != null) {
-//      for (int i = recordComponents.size() - 1; i >= 0; --i) {
-//        recordComponents.get(i).check(version);
-//      }
-//    }
-    for (int i = fields.size() - 1; i >= 0; --i) {
+      for (int i = fields.size() - 1; i >= 0; --i) {
       fields.get(i).checkTypeAnn(version);
     }
     for (int i = methods.size() - 1; i >= 0; --i) {

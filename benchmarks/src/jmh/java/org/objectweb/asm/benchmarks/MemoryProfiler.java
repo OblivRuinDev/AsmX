@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -80,7 +95,7 @@ public class MemoryProfiler implements InternalProfiler {
   }
 
   @Override
-  public Collection<? extends Result> afterIteration(
+  public Collection<? extends Result<?>> afterIteration(
       final BenchmarkParams benchmarkParams,
       final IterationParams iterationParams,
       final IterationResult result) {
@@ -93,7 +108,7 @@ public class MemoryProfiler implements InternalProfiler {
     long usedMemoryInIteration = usedMemoryAfterIteration - usedMemoryBeforeIteration;
     double usedMemoryPerOp =
         ((double) usedMemoryInIteration) / result.getMetadata().getMeasuredOps();
-    List<Result> results = new ArrayList<>();
+    List<Result<?>> results = new ArrayList<>();
     results.add(new ScalarResult("+memory.used", usedMemoryPerOp, "bytes", AggregationPolicy.AVG));
     return results;
   }

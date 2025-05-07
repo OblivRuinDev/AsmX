@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -73,7 +88,7 @@ class CheckSignatureAdapterTest extends AsmTest {
     CheckSignatureAdapter checkSignatureAdapter =
         new CheckSignatureAdapter(CheckSignatureAdapter.CLASS_SIGNATURE, null);
 
-    Executable visitClassBound = () -> checkSignatureAdapter.visitClassBound();
+    Executable visitClassBound = checkSignatureAdapter::visitClassBound;
 
     assertThrows(IllegalStateException.class, visitClassBound);
   }
@@ -83,7 +98,7 @@ class CheckSignatureAdapterTest extends AsmTest {
     CheckSignatureAdapter checkSignatureAdapter =
         new CheckSignatureAdapter(CheckSignatureAdapter.TYPE_SIGNATURE, null);
 
-    Executable visitClassBound = () -> checkSignatureAdapter.visitClassBound();
+    Executable visitClassBound = checkSignatureAdapter::visitClassBound;
 
     assertThrows(IllegalStateException.class, visitClassBound);
   }
@@ -93,7 +108,7 @@ class CheckSignatureAdapterTest extends AsmTest {
     CheckSignatureAdapter checkSignatureAdapter =
         new CheckSignatureAdapter(CheckSignatureAdapter.CLASS_SIGNATURE, null);
 
-    Executable visitInterfaceBound = () -> checkSignatureAdapter.visitInterfaceBound();
+    Executable visitInterfaceBound = checkSignatureAdapter::visitInterfaceBound;
 
     assertThrows(IllegalStateException.class, visitInterfaceBound);
   }
@@ -103,7 +118,7 @@ class CheckSignatureAdapterTest extends AsmTest {
     CheckSignatureAdapter checkSignatureAdapter =
         new CheckSignatureAdapter(CheckSignatureAdapter.TYPE_SIGNATURE, null);
 
-    Executable visitInterfaceBound = () -> checkSignatureAdapter.visitInterfaceBound();
+    Executable visitInterfaceBound = checkSignatureAdapter::visitInterfaceBound;
 
     assertThrows(IllegalStateException.class, visitInterfaceBound);
   }
@@ -114,7 +129,7 @@ class CheckSignatureAdapterTest extends AsmTest {
         new CheckSignatureAdapter(CheckSignatureAdapter.CLASS_SIGNATURE, null);
     checkSignatureAdapter.visitSuperclass();
 
-    Executable visitSuperClass = () -> checkSignatureAdapter.visitSuperclass();
+    Executable visitSuperClass = checkSignatureAdapter::visitSuperclass;
 
     assertThrows(IllegalStateException.class, visitSuperClass);
   }
@@ -124,7 +139,7 @@ class CheckSignatureAdapterTest extends AsmTest {
     CheckSignatureAdapter checkSignatureAdapter =
         new CheckSignatureAdapter(CheckSignatureAdapter.METHOD_SIGNATURE, null);
 
-    Executable visitSuperClass = () -> checkSignatureAdapter.visitSuperclass();
+    Executable visitSuperClass = checkSignatureAdapter::visitSuperclass;
 
     assertThrows(IllegalStateException.class, visitSuperClass);
   }
@@ -134,7 +149,7 @@ class CheckSignatureAdapterTest extends AsmTest {
     CheckSignatureAdapter checkSignatureAdapter =
         new CheckSignatureAdapter(CheckSignatureAdapter.CLASS_SIGNATURE, null);
 
-    Executable visitInterface = () -> checkSignatureAdapter.visitInterface();
+    Executable visitInterface = checkSignatureAdapter::visitInterface;
 
     assertThrows(IllegalStateException.class, visitInterface);
   }
@@ -144,7 +159,7 @@ class CheckSignatureAdapterTest extends AsmTest {
     CheckSignatureAdapter checkSignatureAdapter =
         new CheckSignatureAdapter(CheckSignatureAdapter.METHOD_SIGNATURE, null);
 
-    Executable visitInterface = () -> checkSignatureAdapter.visitInterface();
+    Executable visitInterface = checkSignatureAdapter::visitInterface;
 
     assertThrows(IllegalStateException.class, visitInterface);
   }
@@ -154,7 +169,7 @@ class CheckSignatureAdapterTest extends AsmTest {
     CheckSignatureAdapter checkSignatureAdapter =
         new CheckSignatureAdapter(CheckSignatureAdapter.CLASS_SIGNATURE, null);
 
-    Executable visitParameterType = () -> checkSignatureAdapter.visitParameterType();
+    Executable visitParameterType = checkSignatureAdapter::visitParameterType;
 
     assertThrows(IllegalStateException.class, visitParameterType);
   }
@@ -165,7 +180,7 @@ class CheckSignatureAdapterTest extends AsmTest {
         new CheckSignatureAdapter(CheckSignatureAdapter.METHOD_SIGNATURE, null);
     checkSignatureAdapter.visitReturnType();
 
-    Executable visitParameterType = () -> checkSignatureAdapter.visitParameterType();
+    Executable visitParameterType = checkSignatureAdapter::visitParameterType;
 
     assertThrows(IllegalStateException.class, visitParameterType);
   }
@@ -175,7 +190,7 @@ class CheckSignatureAdapterTest extends AsmTest {
     CheckSignatureAdapter checkSignatureAdapter =
         new CheckSignatureAdapter(CheckSignatureAdapter.CLASS_SIGNATURE, null);
 
-    Executable visitReturnType = () -> checkSignatureAdapter.visitReturnType();
+    Executable visitReturnType = checkSignatureAdapter::visitReturnType;
 
     assertThrows(IllegalStateException.class, visitReturnType);
   }
@@ -186,7 +201,7 @@ class CheckSignatureAdapterTest extends AsmTest {
         new CheckSignatureAdapter(CheckSignatureAdapter.METHOD_SIGNATURE, null);
     checkSignatureAdapter.visitReturnType();
 
-    Executable visitReturnType = () -> checkSignatureAdapter.visitReturnType();
+    Executable visitReturnType = checkSignatureAdapter::visitReturnType;
 
     assertThrows(IllegalStateException.class, visitReturnType);
   }
@@ -196,7 +211,7 @@ class CheckSignatureAdapterTest extends AsmTest {
     CheckSignatureAdapter checkSignatureAdapter =
         new CheckSignatureAdapter(CheckSignatureAdapter.CLASS_SIGNATURE, null);
 
-    Executable visitExceptionType = () -> checkSignatureAdapter.visitExceptionType();
+    Executable visitExceptionType = checkSignatureAdapter::visitExceptionType;
 
     assertThrows(IllegalStateException.class, visitExceptionType);
   }
@@ -206,7 +221,7 @@ class CheckSignatureAdapterTest extends AsmTest {
     CheckSignatureAdapter checkSignatureAdapter =
         new CheckSignatureAdapter(CheckSignatureAdapter.METHOD_SIGNATURE, null);
 
-    Executable visitExceptionType = () -> checkSignatureAdapter.visitExceptionType();
+    Executable visitExceptionType = checkSignatureAdapter::visitExceptionType;
 
     assertThrows(IllegalStateException.class, visitExceptionType);
   }
@@ -314,7 +329,7 @@ class CheckSignatureAdapterTest extends AsmTest {
     CheckSignatureAdapter checkSignatureAdapter =
         new CheckSignatureAdapter(CheckSignatureAdapter.CLASS_SIGNATURE, null);
 
-    Executable visitArrayType = () -> checkSignatureAdapter.visitArrayType();
+    Executable visitArrayType = checkSignatureAdapter::visitArrayType;
 
     assertThrows(IllegalStateException.class, visitArrayType);
   }
@@ -325,7 +340,7 @@ class CheckSignatureAdapterTest extends AsmTest {
         new CheckSignatureAdapter(CheckSignatureAdapter.TYPE_SIGNATURE, null);
     checkSignatureAdapter.visitArrayType();
 
-    Executable visitArrayType = () -> checkSignatureAdapter.visitArrayType();
+    Executable visitArrayType = checkSignatureAdapter::visitArrayType;
 
     assertThrows(IllegalStateException.class, visitArrayType);
   }
@@ -411,7 +426,7 @@ class CheckSignatureAdapterTest extends AsmTest {
     CheckSignatureAdapter checkSignatureAdapter =
         new CheckSignatureAdapter(CheckSignatureAdapter.TYPE_SIGNATURE, null);
 
-    Executable visitTypeArgument = () -> checkSignatureAdapter.visitTypeArgument();
+    Executable visitTypeArgument = checkSignatureAdapter::visitTypeArgument;
 
     assertThrows(IllegalStateException.class, visitTypeArgument);
   }
@@ -443,7 +458,7 @@ class CheckSignatureAdapterTest extends AsmTest {
     CheckSignatureAdapter checkSignatureAdapter =
         new CheckSignatureAdapter(CheckSignatureAdapter.TYPE_SIGNATURE, null);
 
-    Executable visitEnd = () -> checkSignatureAdapter.visitEnd();
+    Executable visitEnd = checkSignatureAdapter::visitEnd;
 
     assertThrows(IllegalStateException.class, visitEnd);
   }

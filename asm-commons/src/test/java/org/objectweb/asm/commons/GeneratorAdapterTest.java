@@ -232,7 +232,7 @@ class GeneratorAdapterTest {
   void testLoadThis_illegalState() {
     Generator generator = new Generator(Opcodes.ACC_STATIC, "m", "()V");
 
-    Executable loadThis = () -> generator.loadThis();
+    Executable loadThis = generator::loadThis;
 
     assertThrows(IllegalStateException.class, loadThis);
   }

@@ -629,11 +629,11 @@ public class InstructionAdapter extends MethodVisitor {
     } else if (value instanceof Byte) {
       iconst(((Byte) value).intValue());
     } else if (value instanceof Character) {
-      iconst(((Character) value).charValue());
+      iconst((Character) value);
     } else if (value instanceof Short) {
       iconst(((Short) value).intValue());
     } else if (value instanceof Boolean) {
-      iconst(((Boolean) value).booleanValue() ? 1 : 0);
+      iconst((Boolean) value ? 1 : 0);
     } else if (value instanceof Float) {
       fconst((Float) value);
     } else if (value instanceof Long) {
@@ -1071,8 +1071,6 @@ public class InstructionAdapter extends MethodVisitor {
    */
   public void invokevirtual(
       final String owner, final String name, final String descriptor, final boolean isInterface) {
-    if (isInterface)
-      VersionChecker.invokeInterface(ver);
     parent.visitMethodInsn(Opcodes.INVOKEVIRTUAL, owner, name, descriptor, isInterface);
   }
 
@@ -1087,7 +1085,9 @@ public class InstructionAdapter extends MethodVisitor {
    */
   public void invokespecial(
       final String owner, final String name, final String descriptor, final boolean isInterface) {
-    VersionChecker.invokeInterface(ver);
+    if (isInterface) {
+      VersionChecker.invokeInterface(ver);
+    }
     parent.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, name, descriptor, isInterface);
   }
 
@@ -1102,7 +1102,9 @@ public class InstructionAdapter extends MethodVisitor {
    */
   public void invokestatic(
       final String owner, final String name, final String descriptor, final boolean isInterface) {
-    VersionChecker.invokeInterface(ver);
+    if (isInterface) {
+      VersionChecker.invokeInterface(ver);
+    }
     parent.visitMethodInsn(Opcodes.INVOKESTATIC, owner, name, descriptor, isInterface);
   }
 

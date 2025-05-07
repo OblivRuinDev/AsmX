@@ -43,7 +43,6 @@
 
 package org.objectweb.asm.commons;
 
-import java.util.Collections;
 import java.util.Comparator;
 
 import org.objectweb.asm.IMethodVisitor;

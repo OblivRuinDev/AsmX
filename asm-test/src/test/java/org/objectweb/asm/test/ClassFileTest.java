@@ -36,7 +36,7 @@ class ClassFileTest extends AsmTest {
   void testNewInstance_validClass(final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassFile classFile = new ClassFile(classParameter.getBytes());
 
-    Executable newInstance = () -> classFile.newInstance();
+    Executable newInstance = classFile::newInstance;
 
     if (classParameter.isNotCompatibleWithCurrentJdk()) {
       assertThrows(UnsupportedClassVersionError.class, newInstance);
@@ -51,7 +51,7 @@ class ClassFileTest extends AsmTest {
   void testNewInstance_invalidClass(final InvalidClass invalidClass) {
     ClassFile classFile = new ClassFile(invalidClass.getBytes());
 
-    Executable newInstance = () -> classFile.newInstance();
+    Executable newInstance = classFile::newInstance;
 
     assertThrows(ClassFormatException.class, newInstance);
   }
@@ -123,7 +123,7 @@ class ClassFileTest extends AsmTest {
     InvalidClass invalidClass = InvalidClass.INVALID_CLASS_VERSION;
     ClassFile classFile = new ClassFile(invalidClass.getBytes());
 
-    Executable hashCode = () -> classFile.hashCode();
+    Executable hashCode = classFile::hashCode;
 
     Exception exception = assertThrows(ClassFormatException.class, hashCode);
     assertEquals("Unsupported class version", exception.getMessage());
@@ -144,7 +144,7 @@ class ClassFileTest extends AsmTest {
     InvalidClass invalidClass = InvalidClass.INVALID_CLASS_VERSION;
     ClassFile classFile = new ClassFile(invalidClass.getBytes());
 
-    Executable toString = () -> classFile.toString();
+    Executable toString = classFile::toString;
 
     Exception exception = assertThrows(ClassFormatException.class, toString);
     assertEquals("Unsupported class version", exception.getMessage());

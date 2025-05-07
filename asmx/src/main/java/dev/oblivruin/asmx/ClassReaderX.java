@@ -5,9 +5,6 @@ import org.objectweb.asm.ConstantDynamic;
 import org.objectweb.asm.Symbol;
 import org.objectweb.asm.VerObj;
 
-import java.lang.reflect.Field;
-
-@SuppressWarnings("ResultOfMethodCallIgnored")
 public class ClassReaderX extends VerObj {
     //If it works, I believe performance will be increased
     //However, @Stable only work in classes loaded by the boot loader

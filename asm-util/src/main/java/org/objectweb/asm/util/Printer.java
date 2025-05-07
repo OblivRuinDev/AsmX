@@ -46,6 +46,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import org.objectweb.asm.Attribute;
@@ -1295,7 +1297,7 @@ public abstract class Printer {//todo
         || className.indexOf('\\') != -1
         || className.indexOf('/') != -1) {
       // Can't fix PMD warning for 1.5 compatibility.
-      try (InputStream inputStream = new FileInputStream(className)) { // NOPMD(AvoidFileStream)
+      try (InputStream inputStream = Files.newInputStream(Paths.get(className))) { // NOPMD(AvoidFileStream)
         new ClassReader(inputStream).accept(traceClassVisitor, parsingOptions);
       }
     } else {

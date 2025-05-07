@@ -45,7 +45,6 @@ package org.objectweb.asm.commons;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.objectweb.asm.commons.MethodNodeBuilder.buildClassWithMethod;
 import static org.objectweb.asm.commons.MethodNodeBuilder.toText;
 
@@ -644,7 +643,7 @@ class AdviceAdapterTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAllMethods_precompiledClass(
-      final PrecompiledClass classParameter, final JavaVer apiParameter) throws Exception {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     ClassReader classReader = new ClassReader(classParameter.getBytes());
     ClassWriter classWriter = new ClassWriter(0);
     IClassVisitor adviceClassAdapter =

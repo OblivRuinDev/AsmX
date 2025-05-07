@@ -44,7 +44,6 @@ package org.objectweb.asm.util;
 
 import org.objectweb.asm.IModuleVisitor;
 import org.objectweb.asm.ModuleVisitor;
-import org.objectweb.asm.Opcodes;
 
 /**
  * A {@link ModuleVisitor} that prints the fields it visits with a {@link Printer}.

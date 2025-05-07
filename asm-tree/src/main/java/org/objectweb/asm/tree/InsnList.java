@@ -42,8 +42,6 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.tree;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import org.objectweb.asm.IMethodVisitor;

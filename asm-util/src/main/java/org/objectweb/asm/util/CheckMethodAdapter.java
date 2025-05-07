@@ -332,7 +332,7 @@ public class CheckMethodAdapter extends MethodVisitor {
   private final Map<Label, Integer> labelInsnIndices;
 
   /** The labels referenced by the visited method. */
-  private Set<Label> referencedLabels;
+  private final Set<Label> referencedLabels;
 
   /** The index of the instruction corresponding to the last visited stack map frame. */
   private int lastFrameInsnIndex = -1;
@@ -347,7 +347,7 @@ public class CheckMethodAdapter extends MethodVisitor {
    * The exception handler ranges. Each pair of list element contains the start and end labels of an
    * exception handler block.
    */
-  private List<Label> handlers;
+  private final List<Label> handlers;
 
   /**
    * Constructs a new {@link CheckMethodAdapter} object. This method adapter will not perform any
@@ -483,7 +483,7 @@ public class CheckMethodAdapter extends MethodVisitor {
             PrintWriter printWriter = new PrintWriter(stringWriter, true);
             CheckClassAdapter.printAnalyzerResult(this, analyzer, printWriter);
             printWriter.close();
-            throw new IllegalArgumentException(e.getMessage() + ' ' + stringWriter.toString(), e);
+            throw new IllegalArgumentException(e.getMessage() + ' ' + stringWriter, e);
           }
         },
         labelInsnIndices);
@@ -728,8 +728,7 @@ public class CheckMethodAdapter extends MethodVisitor {
       final String owner,
       final String name,
       final String descriptor,
-      final boolean isInterface) {//todo: uncheck
-    checkInterfaceInvoke(ver, opcodeAndSource, isInterface);
+      final boolean isInterface) {
 
     checkVisitCodeCalled();
     checkVisitMaxsNotCalled();
@@ -763,9 +762,10 @@ public class CheckMethodAdapter extends MethodVisitor {
     checkVisitMaxsNotCalled();
     checkMethodIdentifier(version, name, "name");
     checkMethodDescriptor(version, descriptor);
-    if (bootstrapMethodHandle.getTag() != Opcodes.H_INVOKESTATIC
-        && bootstrapMethodHandle.getTag() != Opcodes.H_NEWINVOKESPECIAL) {
-      throw new IllegalArgumentException("invalid handle tag " + bootstrapMethodHandle.getTag());
+    if (bootstrapMethodHandle.tag != Opcodes.H_INVOKESTATIC) {
+        if (bootstrapMethodHandle.tag != Opcodes.H_NEWINVOKESPECIAL) {
+            throw new IllegalArgumentException("invalid handle tag " + bootstrapMethodHandle.tag);
+        }
     }
     for (Object bootstrapMethodArgument : bootstrapMethodArguments) {
       checkLdcConstant(bootstrapMethodArgument);
@@ -954,8 +954,8 @@ public class CheckMethodAdapter extends MethodVisitor {
     checkLabel(start, /* checkVisited= */ true, START_LABEL);
     checkLabel(end, /* checkVisited= */ true, END_LABEL);
     checkUnsignedShort(index, INVALID_LOCAL_VARIABLE_INDEX);
-    int startInsnIndex = labelInsnIndices.get(start).intValue();
-    int endInsnIndex = labelInsnIndices.get(end).intValue();
+    int startInsnIndex = labelInsnIndices.get(start);
+    int endInsnIndex = labelInsnIndices.get(end);
     if (endInsnIndex < startInsnIndex) {
       throw new IllegalArgumentException(
           "Invalid start and end labels (end must be greater than start)");
@@ -992,8 +992,8 @@ public class CheckMethodAdapter extends MethodVisitor {
       checkLabel(start[i], /* checkVisited= */ true, START_LABEL);
       checkLabel(end[i], /* checkVisited= */ true, END_LABEL);
       checkUnsignedShort(index[i], INVALID_LOCAL_VARIABLE_INDEX);
-      int startInsnIndex = labelInsnIndices.get(start[i]).intValue();
-      int endInsnIndex = labelInsnIndices.get(end[i]).intValue();
+      int startInsnIndex = labelInsnIndices.get(start[i]);
+      int endInsnIndex = labelInsnIndices.get(end[i]);
       if (endInsnIndex < startInsnIndex) {
         throw new IllegalArgumentException(
             "Invalid start and end labels (end must be greater than start)");
@@ -1025,7 +1025,7 @@ public class CheckMethodAdapter extends MethodVisitor {
     for (int i = 0; i < handlers.size(); i += 2) {
       Integer startInsnIndex = labelInsnIndices.get(handlers.get(i));
       Integer endInsnIndex = labelInsnIndices.get(handlers.get(i + 1));
-      if (endInsnIndex.intValue() <= startInsnIndex.intValue()) {
+      if (endInsnIndex <= startInsnIndex) {
         throw new IllegalStateException("Empty try catch block handler range");
       }
     }
@@ -1181,17 +1181,17 @@ public class CheckMethodAdapter extends MethodVisitor {
         throw new IllegalArgumentException("ldc of a Handle requires at least version 1.7");
       }
       Handle handle = (Handle) value;
-      int tag = handle.getTag();
+        int tag = handle.tag;
       if (tag < Opcodes.H_GETFIELD || tag > Opcodes.H_INVOKEINTERFACE) {
         throw new IllegalArgumentException("invalid handle tag " + tag);
       }
-      checkInternalName(this.version, handle.getOwner(), "handle owner");
+      checkInternalName(this.version, handle.owner, "handle owner");
       if (tag <= Opcodes.H_PUTSTATIC) {
-        checkDescriptor(this.version, handle.getDesc(), false);
+        checkDescriptor(this.version, handle.descriptor, false);
       } else {
-        checkMethodDescriptor(this.version, handle.getDesc());
+        checkMethodDescriptor(this.version, handle.descriptor);
       }
-      String handleName = handle.getName();
+      String handleName = handle.name;
       if (!("<init>".equals(handleName) && tag == Opcodes.H_NEWINVOKESPECIAL)) {
         checkMethodIdentifier(this.version, handleName, "handle name");
       }
@@ -1200,9 +1200,9 @@ public class CheckMethodAdapter extends MethodVisitor {
         throw new IllegalArgumentException("ldc of a ConstantDynamic requires at least version 11");
       }
       ConstantDynamic constantDynamic = (ConstantDynamic) value;
-      checkMethodIdentifier(this.version, constantDynamic.getName(), "constant dynamic name");
-      checkDescriptor(this.version, constantDynamic.getDescriptor(), false);
-      checkLdcConstant(constantDynamic.getBootstrapMethod());
+      checkMethodIdentifier(this.version, constantDynamic.name, "constant dynamic name");
+      checkDescriptor(this.version, constantDynamic.descriptor, false);
+      checkLdcConstant(constantDynamic.bsm);
       int bootstrapMethodArgumentCount = constantDynamic.getBootstrapMethodArgumentCount();
       for (int i = 0; i < bootstrapMethodArgumentCount; ++i) {
         checkLdcConstant(constantDynamic.getBootstrapMethodArgument(i));
@@ -1270,7 +1270,7 @@ public class CheckMethodAdapter extends MethodVisitor {
    * @param message the message to use in case of error.
    */
   static void checkMethodIdentifier(final int version, final String name, final String message) {
-    if (name == null || name.length() == 0) {
+    if (name == null || name.isEmpty()) {
       throw new IllegalArgumentException(INVALID + message + MUST_NOT_BE_NULL_OR_EMPTY);
     }
     if ((version & 0xFFFF) >= Opcodes.V1_5) {
@@ -1303,7 +1303,7 @@ public class CheckMethodAdapter extends MethodVisitor {
    * @param message the message to use in case of error.
    */
   static void checkInternalName(final int version, final String name, final String message) {
-    if (name == null || name.length() == 0) {
+    if (name == null || name.isEmpty()) {
       throw new IllegalArgumentException(INVALID + message + MUST_NOT_BE_NULL_OR_EMPTY);
     }
     if (name.charAt(0) == '[') {
@@ -1413,7 +1413,7 @@ public class CheckMethodAdapter extends MethodVisitor {
    * @param descriptor the string to be checked.
    */
   static void checkMethodDescriptor(final int version, final String descriptor) {
-    if (descriptor == null || descriptor.length() == 0) {
+    if (descriptor == null || descriptor.isEmpty()) {
       throw new IllegalArgumentException("Invalid method descriptor (must not be null or empty)");
     }
     if (descriptor.charAt(0) != '(' || descriptor.length() < 3) {

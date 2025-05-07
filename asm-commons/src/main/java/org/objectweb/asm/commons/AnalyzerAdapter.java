@@ -109,7 +109,7 @@ public class AnalyzerAdapter extends MethodVisitor {
   private int maxLocals;
 
   /** The owner's class name. */
-  private String owner;
+  public final String owner;
 
   /**
    * Constructs a new {@link AnalyzerAdapter}.
@@ -392,7 +392,7 @@ public class AnalyzerAdapter extends MethodVisitor {
     } else if (value instanceof Handle) {
       push("java/lang/invoke/MethodHandle");
     } else if (value instanceof ConstantDynamic) {
-      pushDescriptor(((ConstantDynamic) value).getDescriptor());
+        pushDescriptor(((ConstantDynamic) value).descriptor);
     } else {
       throw new IllegalArgumentException();
     }

@@ -138,7 +138,7 @@ public abstract class AsmTest {
     JDK14_ALL_STRUCTURES_EMPTY_RECORD("jdk14.AllStructures$EmptyRecord", JavaVer.V14, JavaVer.V16),
     JDK15_ALL_STRUCTURES("jdk15.AllStructures", JavaVer.V15, JavaVer.V17);
 
-    private final String name;
+    public final String name;
     public final JavaVer java;
     private byte[] bytes;
     public final int ver;

@@ -1,7 +1,22 @@
+// ---------------------------------------------------------------------
+// ORIGINAL WORK:
 // ASM: a very small and fast Java bytecode manipulation framework
-// Copyright (c) 2000-2011 INRIA, France Telecom
+// Copyright (c) 2000-2011 INRIA, France Telecom (https://asm.ow2.io/)
 // All rights reserved.
 //
+// Distributed under the BSD-3-Clause License
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// MODIFIED WORK:
+// ASMX: Extended bytecode manipulation toolkit based on ASM
+// Copyright (c) 2025 OblivRuinDev
+// Modifications: See git commits for details
+//
+// Distributed under the BSD-3-Clause License, preserving original terms
+// for ASM code.
+// ---------------------------------------------------------------------
+
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -35,6 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
+import dev.oblivruin.asm.ClassVersionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -149,7 +166,7 @@ class SmallSetTest {
     iterator.next();
     iterator.next();
 
-    Executable next = () -> iterator.next();
+    Executable next = iterator::next;
 
     assertThrows(NoSuchElementException.class, next);
   }
@@ -159,7 +176,7 @@ class SmallSetTest {
     Iterator<Object> iterator = newSmallSet(ELEMENT1, ELEMENT2).iterator();
     iterator.next();
 
-    assertThrows(ClassVersionException.class, () -> iterator.remove());
+    assertThrows(ClassVersionException.class, iterator::remove);
   }
 
   private static SmallSet<Object> newSmallSet(final Object element1, final Object element2) {

@@ -43,7 +43,6 @@
 package org.objectweb.asm.signature;
 
 import org.objectweb.asm.IVisitor;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.VerObj;
 
 /**

@@ -45,7 +45,6 @@ package org.objectweb.asm.commons;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,7 +106,7 @@ class AnalyzerAdapterTest extends AsmTest {
   @ParameterizedTest
   @MethodSource(ALL_CLASSES_AND_ALL_APIS)
   void testAllMethods_precompiledClass(
-      final PrecompiledClass classParameter, final JavaVer apiParameter) throws Exception {
+      final PrecompiledClass classParameter, final JavaVer apiParameter) {
     byte[] classFile = classParameter.getBytes();
     ClassReader classReader = new ClassReader(classFile);
     ClassWriter classWriter = new ClassWriter(0);

@@ -61,7 +61,7 @@ public class AsmGenerator extends Generator {
         if (Opcodes.class.getField(version) != null) {
           return version;
         }
-      } catch (NoSuchFieldException e) {
+      } catch (NoSuchFieldException ignored) {
       }
     }
     return "";
