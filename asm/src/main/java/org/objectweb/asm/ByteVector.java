@@ -110,9 +110,8 @@ public class ByteVector {
    *
    * @param byteValue1 a byte.
    * @param byteValue2 another byte.
-   * @return this byte vector.
    */
-  final ByteVector put11(final int byteValue1, final int byteValue2) {
+  final void put11(final int byteValue1, final int byteValue2) {
     int currentLength = length;
     if (currentLength + 2 > data.length) {
       enlarge(2);
@@ -121,7 +120,6 @@ public class ByteVector {
     currentData[currentLength++] = (byte) byteValue1;
     currentData[currentLength++] = (byte) byteValue2;
     length = currentLength;
-    return this;
   }
 
   /**
@@ -170,9 +168,8 @@ public class ByteVector {
    * @param byteValue1 a byte.
    * @param byteValue2 another byte.
    * @param shortValue a short.
-   * @return this byte vector.
    */
-  final ByteVector put112(final int byteValue1, final int byteValue2, final int shortValue) {
+  final void put112(final int byteValue1, final int byteValue2, final int shortValue) {
     int currentLength = length;
     if (currentLength + 4 > data.length) {
       enlarge(4);
@@ -183,7 +180,6 @@ public class ByteVector {
     currentData[currentLength++] = (byte) (shortValue >>> 8);
     currentData[currentLength++] = (byte) shortValue;
     length = currentLength;
-    return this;
   }
 
   /**
@@ -210,12 +206,11 @@ public class ByteVector {
    * Puts one byte and two shorts into this byte vector. The byte vector is automatically enlarged
    * if necessary.
    *
-   * @param byteValue a byte.
+   * @param byteValue   a byte.
    * @param shortValue1 a short.
    * @param shortValue2 another short.
-   * @return this byte vector.
    */
-  final ByteVector put122(final int byteValue, final int shortValue1, final int shortValue2) {
+  final void put122(final int byteValue, final int shortValue1, final int shortValue2) {
     int currentLength = length;
     if (currentLength + 5 > data.length) {
       enlarge(5);
@@ -227,7 +222,6 @@ public class ByteVector {
     currentData[currentLength++] = (byte) (shortValue2 >>> 8);
     currentData[currentLength++] = (byte) shortValue2;
     length = currentLength;
-    return this;
   }
 
   /**
@@ -242,16 +236,14 @@ public class ByteVector {
       enlarge(8);
     }
     byte[] currentData = data;
-    int intValue = (int) (longValue >>> 32);
-    currentData[currentLength++] = (byte) (intValue >>> 24);
-    currentData[currentLength++] = (byte) (intValue >>> 16);
-    currentData[currentLength++] = (byte) (intValue >>> 8);
-    currentData[currentLength++] = (byte) intValue;
-    intValue = (int) longValue;
-    currentData[currentLength++] = (byte) (intValue >>> 24);
-    currentData[currentLength++] = (byte) (intValue >>> 16);
-    currentData[currentLength++] = (byte) (intValue >>> 8);
-    currentData[currentLength++] = (byte) intValue;
+    currentData[currentLength++] = (byte) (longValue >>> 56);
+    currentData[currentLength++] = (byte) (longValue >>> 48);
+    currentData[currentLength++] = (byte) (longValue >>> 40);
+    currentData[currentLength++] = (byte) (longValue >>> 32);
+    currentData[currentLength++] = (byte) (longValue >>> 24);
+    currentData[currentLength++] = (byte) (longValue >>> 16);
+    currentData[currentLength++] = (byte) (longValue >>> 8 );
+    currentData[currentLength++] = (byte)  longValue;
     length = currentLength;
     return this;
   }
@@ -376,12 +368,8 @@ public class ByteVector {
    * @param size number of additional bytes that this byte vector should be able to receive.
    */
   private void enlarge(final int size) {
-    if (length > data.length) {
-      throw new AssertionError("Internal error");
-    }
-    int doubleCapacity = 2 * data.length;
-    int minimalCapacity = length + size;
-    byte[] newData = new byte[Math.max(doubleCapacity, minimalCapacity)];
+    assert length <= data.length;
+      byte[] newData = new byte[Math.max(2 * length, length + size)];
     System.arraycopy(data, 0, newData, 0, length);
     data = newData;
   }

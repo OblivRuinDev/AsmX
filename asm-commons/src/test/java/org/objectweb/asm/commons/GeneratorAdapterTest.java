@@ -41,11 +41,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.objectweb.asm.ConstantDynamic;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.util.Textifier;
@@ -220,7 +216,7 @@ class GeneratorAdapterTest {
     assertEquals("ACONST_NULL", new Generator().push((Handle) null));
     assertEquals(
         "// handle kind 0x2 : GETSTATIC\n" + "    LDC pkg/Owner.name(I)",
-        new Generator().push(new Handle(Opcodes.H_GETSTATIC, "pkg/Owner", "name", "I", false)));
+        new Generator().push(new Handle(Tag.REF_getStatic, "pkg/Owner", "name", "I", false)));
   }
 
   @Test
@@ -759,7 +755,7 @@ class GeneratorAdapterTest {
             .invokeDynamic(
                 "m",
                 "(I)J",
-                new Handle(Opcodes.H_GETSTATIC, "pkg/Owner", "name", "I", false),
+                new Handle(Tag.REF_getStatic, "pkg/Owner", "name", "I", false),
                 1,
                 2,
                 3));
@@ -781,7 +777,7 @@ class GeneratorAdapterTest {
                 new ConstantDynamic(
                     "name",
                     "Ljava/lang/Object;",
-                    new Handle(Opcodes.H_GETSTATIC, "pkg/Owner", "name", "I", false),
+                    new Handle(Tag.REF_getStatic, "pkg/Owner", "name", "I", false),
                     1,
                     2,
                     3)));

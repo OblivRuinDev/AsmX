@@ -238,29 +238,29 @@ public class ClassReader {
       cpInfoOffsets[currentCpInfoIndex++] = currentCpInfoOffset + 1;
       int cpInfoSize;
       switch (classFileBuffer[currentCpInfoOffset]) {
-        case Symbol.CONSTANT_FIELDREF_TAG:
-        case Symbol.CONSTANT_METHODREF_TAG:
-        case Symbol.CONSTANT_INTERFACE_METHODREF_TAG:
-        case Symbol.CONSTANT_INTEGER_TAG:
-        case Symbol.CONSTANT_FLOAT_TAG:
-        case Symbol.CONSTANT_NAME_AND_TYPE_TAG:
+        case Tag.Fieldref:
+        case Tag.Methodref:
+        case Tag.InterfaceMethodRef:
+        case Tag.Integer:
+        case Tag.Float:
+        case Tag.NameAndType:
           cpInfoSize = 5;
           break;
-        case Symbol.CONSTANT_DYNAMIC_TAG:
+        case Tag.Dynamic:
           cpInfoSize = 5;
           hasBootstrapMethods = true;
           hasConstantDynamic = true;
           break;
-        case Symbol.CONSTANT_INVOKE_DYNAMIC_TAG:
+        case Tag.InvokeDynamic:
           cpInfoSize = 5;
           hasBootstrapMethods = true;
           break;
-        case Symbol.CONSTANT_LONG_TAG:
-        case Symbol.CONSTANT_DOUBLE_TAG:
+        case Tag.Long:
+        case Tag.Double:
           cpInfoSize = 9;
           currentCpInfoIndex++;
           break;
-        case Symbol.CONSTANT_UTF8_TAG:
+        case Tag.Utf8:
           cpInfoSize = 3 + readUnsignedShort(currentCpInfoOffset + 1);
           if (cpInfoSize > currentMaxStringLength) {
             // The size in bytes of this CONSTANT_Utf8 structure provides a conservative estimate
@@ -269,14 +269,14 @@ public class ClassReader {
             currentMaxStringLength = cpInfoSize;
           }
           break;
-        case Symbol.CONSTANT_METHOD_HANDLE_TAG:
+        case Tag.MethodHandle:
           cpInfoSize = 4;
           break;
-        case Symbol.CONSTANT_CLASS_TAG:
-        case Symbol.CONSTANT_STRING_TAG:
-        case Symbol.CONSTANT_METHOD_TYPE_TAG:
-        case Symbol.CONSTANT_PACKAGE_TAG:
-        case Symbol.CONSTANT_MODULE_TAG:
+        case Tag.Class:
+        case Tag.String:
+        case Tag.MethodType:
+        case Tag.Package:
+        case Tag.Module:
           cpInfoSize = 3;
           break;
         default:
@@ -2463,7 +2463,7 @@ public class ClassReader {
               methodVisitor.visitFieldInsn(opcode, owner, name, descriptor);
             } else {
               boolean isInterface =
-                  classBuffer[cpInfoOffset - 1] == Symbol.CONSTANT_INTERFACE_METHODREF_TAG;
+                  classBuffer[cpInfoOffset - 1] == Tag.InterfaceMethodRef;
               methodVisitor.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
             }
             if (opcode == Opcodes.INVOKEINTERFACE) {
@@ -3865,21 +3865,21 @@ public class ClassReader {
   public Object readConst(final int constantPoolEntryIndex, final char[] charBuffer) {
     int cpInfoOffset = cpInfoOffsets[constantPoolEntryIndex];
     switch (classFileBuffer[cpInfoOffset - 1]) {
-      case Symbol.CONSTANT_INTEGER_TAG:
+      case Tag.Integer:
         return readInt(cpInfoOffset);
-      case Symbol.CONSTANT_FLOAT_TAG:
+      case Tag.Float:
         return Float.intBitsToFloat(readInt(cpInfoOffset));
-      case Symbol.CONSTANT_LONG_TAG:
+      case Tag.Long:
         return readLong(cpInfoOffset);
-      case Symbol.CONSTANT_DOUBLE_TAG:
+      case Tag.Double:
         return Double.longBitsToDouble(readLong(cpInfoOffset));
-      case Symbol.CONSTANT_CLASS_TAG:
+      case Tag.Class:
         return Type.getObjectType(readUTF8(cpInfoOffset, charBuffer));
-      case Symbol.CONSTANT_STRING_TAG:
+      case Tag.String:
         return readUTF8(cpInfoOffset, charBuffer);
-      case Symbol.CONSTANT_METHOD_TYPE_TAG:
+      case Tag.MethodType:
         return Type.getMethodType(readUTF8(cpInfoOffset, charBuffer));
-      case Symbol.CONSTANT_METHOD_HANDLE_TAG:
+      case Tag.MethodHandle:
         int referenceKind = readByte(cpInfoOffset);
         int referenceCpInfoOffset = cpInfoOffsets[readUnsignedShort(cpInfoOffset + 1)];
         int nameAndTypeCpInfoOffset = cpInfoOffsets[readUnsignedShort(referenceCpInfoOffset + 2)];
@@ -3887,9 +3887,9 @@ public class ClassReader {
         String name = readUTF8(nameAndTypeCpInfoOffset, charBuffer);
         String descriptor = readUTF8(nameAndTypeCpInfoOffset + 2, charBuffer);
         boolean isInterface =
-            classFileBuffer[referenceCpInfoOffset - 1] == Symbol.CONSTANT_INTERFACE_METHODREF_TAG;
+            classFileBuffer[referenceCpInfoOffset - 1] == Tag.InterfaceMethodRef;
         return new Handle(referenceKind, owner, name, descriptor, isInterface);
-      case Symbol.CONSTANT_DYNAMIC_TAG:
+      case Tag.Dynamic:
         return readConstantDynamic(constantPoolEntryIndex, charBuffer);
       default:
         throw new IllegalArgumentException();

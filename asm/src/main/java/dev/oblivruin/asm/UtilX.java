@@ -28,7 +28,6 @@ package dev.oblivruin.asm;
 
 import org.objectweb.asm.VerObj;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -107,33 +106,4 @@ public final class UtilX {
                         (c2 == null || c2.isEmpty()));
     }
 
-    public static String repeat(String str, int count) {
-        if (count < 0) {
-            throw new IllegalArgumentException("count is negative: " + count);
-        }
-        if (count == 1) {
-            return str;
-        }
-        int length = str.length();
-        if (count == 0 || length == 0) {
-            return "";
-        }
-        if (length == 1) {
-            char[] c = new char[count];
-            Arrays.fill(c, str.charAt(0));
-            return new String(c);
-        }
-        if (Integer.MAX_VALUE / count < length) {
-            throw new OutOfMemoryError("Required length exceeds implementation limit");
-        }
-        int limit = count * length;
-        char[] c = new char[limit];
-        System.arraycopy(str.toCharArray(), 0, c, 0, length);
-        int copied = length;
-        for (; copied < limit - copied; copied <<= 1) {
-            System.arraycopy(c, 0, c, copied, copied);
-        }
-        System.arraycopy(c, 0, c, copied, limit - copied);
-        return new String(c);
-    }
 }

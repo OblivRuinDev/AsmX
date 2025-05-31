@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Tag;
 import org.objectweb.asm.test.AsmTest;
 
 /**
@@ -43,7 +44,7 @@ class InvokeDynamicInsnNodeTest extends AsmTest {
 
   @Test
   void testConstructor() {
-    Handle handle = new Handle(Opcodes.H_INVOKESTATIC, "owner", "name", "()V", false);
+    Handle handle = new Handle(Tag.REF_invokeStatic, "owner", "name", "()V", false);
     Object[] bootstrapMethodArguments = new Object[] {"s"};
 
     InvokeDynamicInsnNode invokeDynamicInsnNode =

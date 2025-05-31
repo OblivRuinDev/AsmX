@@ -168,7 +168,7 @@ class InstructionAdapterTest extends AsmTest {
     instructionAdapter.visitLdcInsn("9");
     instructionAdapter.visitLdcInsn(Type.getObjectType("pkg/Class"));
     instructionAdapter.visitLdcInsn(
-        new Handle(Opcodes.H_GETFIELD, "pkg/Class", "name", "I", /* isInterface= */ false));
+        new Handle(Tag.REF_getField, "pkg/Class", "name", "I", /* isInterface= */ false));
 
     assertEquals(
         "ICONST_0 ICONST_1 ICONST_2 BIPUSH 51 ICONST_4 ICONST_5 LDC 6L LDC 7.0F LDC 8.0D LDC \"9\" "

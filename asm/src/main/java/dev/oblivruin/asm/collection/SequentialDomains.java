@@ -280,11 +280,7 @@ public class SequentialDomains<T extends SequentialDomains.Domain<T>> extends Ab
      * @param <T> the type of elements in this
      * @author OblivRuinDev
      */
-    public static class Domain<T extends Domain<T>> implements Iterable<T> {
-        /** Always bigger than or equal to 0 */
-        public final int start;
-        /** Always bigger than or equal to {@link #start} */
-        public final int end;
+    public static class Domain<T extends Domain<T>> extends dev.oblivruin.asm.Domain implements Iterable<T> {
         T next = null;
         T previous = null;
 
@@ -296,11 +292,7 @@ public class SequentialDomains<T extends SequentialDomains.Domain<T>> extends Ab
          * @throws IllegalArgumentException if arguments is illegal
          */
         protected Domain(int start, int end) {
-            if (start > end || start < 0) {
-                throw new IllegalArgumentException();
-            }
-            this.start = start;
-            this.end = end;
+            super(start, end);
         }
 
         public final T getNext() {

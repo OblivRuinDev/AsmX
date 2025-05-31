@@ -24,43 +24,41 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
-package dev.oblivruin.asm.collection;
+package dev.oblivruin.asm;
 
-public final class IntArray extends Array {
-    public int[] data;
-    public IntArray() {
-        this(80);
-    }
-    public IntArray(int size) {
-        this.data = new int[size];
-    }
-    public IntArray(int[] array) {
-        this.data = array;
-    }
+import java.util.Arrays;
 
-    public void add(int i) {
-        data[length++] = i;
-    }
-
-    @Override
-    public void ensureFree(int size) {
-        int i = length + size;
-        if (i >= data.length) {
-            System.arraycopy(data, 0,
-                    (data = new int[Math.max(i, data.length * 2)]), 0,
-                    length);
+public class JavaShadow {
+    /**
+     * @see String#repeat(int)
+     */
+    public static String repeat(String str, int count) {
+        if (count < 0) {
+            throw new IllegalArgumentException("count is negative: " + count);
         }
-    }
-
-    @Override
-    public boolean tryExpand(int size) {
-        int i = length + size;
-        if (i >= data.length) {
-            System.arraycopy(data, 0,
-                    (data = new int[Math.max(i, data.length * 2)]), 0,
-                    length);
-            return true;
+        if (count == 1) {
+            return str;
         }
-        return false;
+        int length = str.length();
+        if (count == 0 || length == 0) {
+            return "";
+        }
+        if (length == 1) {
+            char[] c = new char[count];
+            Arrays.fill(c, str.charAt(0));
+            return new String(c);
+        }
+        if (Integer.MAX_VALUE / count < length) {
+            throw new OutOfMemoryError("Required length exceeds implementation limit");
+        }
+        int limit = count * length;
+        char[] c = new char[limit];
+        System.arraycopy(str.toCharArray(), 0, c, 0, length);
+        int copied = length;
+        for (; copied < limit - copied; copied <<= 1) {
+            System.arraycopy(c, 0, c, copied, copied);
+        }
+        System.arraycopy(c, 0, c, copied, limit - copied);
+        return new String(c);
     }
 }

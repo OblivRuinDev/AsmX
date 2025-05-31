@@ -49,14 +49,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ConstantDynamic;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.TypePath;
-import org.objectweb.asm.TypeReference;
+
+import org.objectweb.asm.*;
 import org.objectweb.asm.signature.SignatureReader;
 
 /**
@@ -1463,35 +1457,35 @@ public class Textifier extends Printer {
     stringBuilder.append("// handle kind 0x").append(Integer.toHexString(tag)).append(" : ");
     boolean isMethodHandle = false;
     switch (tag) {
-      case Opcodes.H_GETFIELD:
+      case Tag.REF_getField:
         stringBuilder.append("GETFIELD");
         break;
-      case Opcodes.H_GETSTATIC:
+      case Tag.REF_getStatic:
         stringBuilder.append("GETSTATIC");
         break;
-      case Opcodes.H_PUTFIELD:
+      case Tag.REF_putField:
         stringBuilder.append("PUTFIELD");
         break;
-      case Opcodes.H_PUTSTATIC:
+      case Tag.REF_putStatic:
         stringBuilder.append("PUTSTATIC");
         break;
-      case Opcodes.H_INVOKEINTERFACE:
+      case Tag.REF_invokeInterface:
         stringBuilder.append("INVOKEINTERFACE");
         isMethodHandle = true;
         break;
-      case Opcodes.H_INVOKESPECIAL:
+      case Tag.REF_invokeSpecial:
         stringBuilder.append("INVOKESPECIAL");
         isMethodHandle = true;
         break;
-      case Opcodes.H_INVOKESTATIC:
+      case Tag.REF_invokeStatic:
         stringBuilder.append("INVOKESTATIC");
         isMethodHandle = true;
         break;
-      case Opcodes.H_INVOKEVIRTUAL:
+      case Tag.REF_invokeVirtual:
         stringBuilder.append("INVOKEVIRTUAL");
         isMethodHandle = true;
         break;
-      case Opcodes.H_NEWINVOKESPECIAL:
+      case Tag.REF_newInvokeSpecial:
         stringBuilder.append("NEWINVOKESPECIAL");
         isMethodHandle = true;
         break;

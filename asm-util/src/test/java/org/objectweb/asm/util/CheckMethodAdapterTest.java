@@ -677,7 +677,7 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
     Executable visitLdcInsn =
         () ->
             checkMethodAdapter.visitLdcInsn(
-                new Handle(Opcodes.H_NEWINVOKESPECIAL, "o", "<init>", "()V", false));
+                new Handle(Tag.REF_newInvokeSpecial, "o", "<init>", "()V", false));
 
     assertDoesNotThrow(visitLdcInsn);
   }
@@ -690,7 +690,7 @@ class CheckMethodAdapterTest extends AsmTest implements Opcodes {
     Executable visitLdcInsn =
         () ->
             checkMethodAdapter.visitLdcInsn(
-                new Handle(Opcodes.H_INVOKEVIRTUAL, "o", "<init>", "()V", false));
+                new Handle(Tag.REF_invokeVirtual, "o", "<init>", "()V", false));
 
     Exception exception = assertThrows(IllegalArgumentException.class, visitLdcInsn);
     assertEquals(

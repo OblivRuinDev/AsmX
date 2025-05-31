@@ -35,6 +35,13 @@ public abstract class Array {
      * @param size required free size
      */
     public abstract void ensureFree(int size);
+    /**
+     * Ensure that the remaining space of the array is bigger
+     * than or equal to the given value, or cause an array expansion.
+     * @param size required free size
+     * @return whether the array expansion operation was performed
+     */
+    public abstract boolean tryExpand(int size);
     public final void removeLast() {
         length--;
     }

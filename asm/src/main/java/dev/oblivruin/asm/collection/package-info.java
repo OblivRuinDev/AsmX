@@ -24,43 +24,8 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
+/**
+ * This package offers an extremely efficient array list,
+ * but all of these lists are unsafe.
+ */
 package dev.oblivruin.asm.collection;
-
-public final class IntArray extends Array {
-    public int[] data;
-    public IntArray() {
-        this(80);
-    }
-    public IntArray(int size) {
-        this.data = new int[size];
-    }
-    public IntArray(int[] array) {
-        this.data = array;
-    }
-
-    public void add(int i) {
-        data[length++] = i;
-    }
-
-    @Override
-    public void ensureFree(int size) {
-        int i = length + size;
-        if (i >= data.length) {
-            System.arraycopy(data, 0,
-                    (data = new int[Math.max(i, data.length * 2)]), 0,
-                    length);
-        }
-    }
-
-    @Override
-    public boolean tryExpand(int size) {
-        int i = length + size;
-        if (i >= data.length) {
-            System.arraycopy(data, 0,
-                    (data = new int[Math.max(i, data.length * 2)]), 0,
-                    length);
-            return true;
-        }
-        return false;
-    }
-}

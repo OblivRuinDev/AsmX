@@ -244,7 +244,7 @@ class ClassWriterTest extends AsmTest {
   void testDeprecatedNewHandle() {
     ClassWriter classWriter = newEmptyClassWriter();
 
-    classWriter.newHandle(Opcodes.H_GETFIELD, "A", "h", "I");
+    classWriter.newHandle(Tag.REF_getField, "A", "h", "I");
 
     assertTrue(
         getConstantPoolDump(classWriter)
@@ -255,7 +255,7 @@ class ClassWriterTest extends AsmTest {
   void testNewHandle() {
     ClassWriter classWriter = newEmptyClassWriter();
 
-    classWriter.newHandle(Opcodes.H_GETFIELD, "A", "h", "I", false);
+    classWriter.newHandle(Tag.REF_getField, "A", "h", "I", false);
 
     assertTrue(
         getConstantPoolDump(classWriter)
@@ -266,8 +266,8 @@ class ClassWriterTest extends AsmTest {
   void testNewHandleIsInterface() {
     ClassWriter classWriter = newEmptyClassWriter();
 
-    int index1 = classWriter.newHandle(Opcodes.H_INVOKEVIRTUAL, "A", "m", "()V", false);
-    int index2 = classWriter.newHandle(Opcodes.H_INVOKEVIRTUAL, "A", "m", "()V", true);
+    int index1 = classWriter.newHandle(Tag.REF_invokeVirtual, "A", "m", "()V", false);
+    int index2 = classWriter.newHandle(Tag.REF_invokeVirtual, "A", "m", "()V", true);
 
     assertNotEquals(index1, index2);
   }
@@ -277,7 +277,7 @@ class ClassWriterTest extends AsmTest {
     ClassWriter classWriter = newEmptyClassWriter();
 
     classWriter.newConstantDynamic(
-        "m", "Ljava/lang/String;", new Handle(Opcodes.H_INVOKESTATIC, "A", "m", "()V", false));
+        "m", "Ljava/lang/String;", new Handle(Tag.REF_invokeStatic, "A", "m", "()V", false));
 
     String constantPoolDump = getConstantPoolDump(classWriter);
     assertTrue(
@@ -292,7 +292,7 @@ class ClassWriterTest extends AsmTest {
   void testNewInvokeDynamic() {
     ClassWriter classWriter = newEmptyClassWriter();
 
-    classWriter.newInvokeDynamic("m", "()V", new Handle(Opcodes.H_GETFIELD, "A", "h", "I", false));
+    classWriter.newInvokeDynamic("m", "()V", new Handle(Tag.REF_getField, "A", "h", "I", false));
 
     String constantPoolDump = getConstantPoolDump(classWriter);
     assertTrue(constantPoolDump.contains("ConstantInvokeDynamicInfo 0.m()V"));

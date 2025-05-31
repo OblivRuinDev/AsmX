@@ -57,66 +57,12 @@ public abstract class Symbol {
 
   // Tag values for the constant pool entries (using the same order as in the JVMS).
 
-  /** The tag value of CONSTANT_Utf8_info JVMS structures. */
-  public static final int CONSTANT_UTF8_TAG = 1;
-
-  /** The tag value of CONSTANT_Integer_info JVMS structures. */
-  public static final int CONSTANT_INTEGER_TAG = 3;
-
-  /** The tag value of CONSTANT_Float_info JVMS structures. */
-  public static final int CONSTANT_FLOAT_TAG = 4;
-
-  /** The tag value of CONSTANT_Long_info JVMS structures. */
-  public static final int CONSTANT_LONG_TAG = 5;
-
-  /** The tag value of CONSTANT_Double_info JVMS structures. */
-  public static final int CONSTANT_DOUBLE_TAG = 6;
-
-  /** The tag value of CONSTANT_Class_info JVMS structures. */
-  public static final int CONSTANT_CLASS_TAG = 7;
-
-  /** The tag value of CONSTANT_String_info JVMS structures. */
-  public static final int CONSTANT_STRING_TAG = 8;
-
-  /** The tag value of CONSTANT_Fieldref_info JVMS structures. */
-  public static final int CONSTANT_FIELDREF_TAG = 9;
-
-  /** The tag value of CONSTANT_Methodref_info JVMS structures. */
-  public static final int CONSTANT_METHODREF_TAG = 10;
-
-  /** The tag value of CONSTANT_InterfaceMethodref_info JVMS structures. */
-  public static final int CONSTANT_INTERFACE_METHODREF_TAG = 11;
-
-  /** The tag value of CONSTANT_NameAndType_info JVMS structures. */
-  public static final int CONSTANT_NAME_AND_TYPE_TAG = 12;
-
-  /** The tag value of CONSTANT_MethodHandle_info JVMS structures. */
-  public static final int CONSTANT_METHOD_HANDLE_TAG = 15;
-
-  /** The tag value of CONSTANT_MethodType_info JVMS structures. */
-  public static final int CONSTANT_METHOD_TYPE_TAG = 16;
-
-  /** The tag value of CONSTANT_Dynamic_info JVMS structures. */
-  public static final int CONSTANT_DYNAMIC_TAG = 17;
-
-  /** The tag value of CONSTANT_InvokeDynamic_info JVMS structures. */
-  public static final int CONSTANT_INVOKE_DYNAMIC_TAG = 18;
-
-  /** The tag value of CONSTANT_Module_info JVMS structures. */
-  public static final int CONSTANT_MODULE_TAG = 19;
-
-  /** The tag value of CONSTANT_Package_info JVMS structures. */
-  public static final int CONSTANT_PACKAGE_TAG = 20;
-
   // Tag values for the BootstrapMethods attribute entries (ASM specific tag).
-
-  /** The tag value of the BootstrapMethods attribute entries. */
-  public static final int BOOTSTRAP_METHOD_TAG = 64;
 
   // Tag values for the type table entries (ASM specific tags).
 
   /** The tag value of a normal type entry in the (ASM specific) type table of a class. */
-  public static final int TYPE_TAG = 128;
+  static final int TYPE_TAG = 128;
 
   /**
    * The tag value of an uninitialized type entry in the type table of a class. This type is used
@@ -125,7 +71,7 @@ public abstract class Symbol {
    * constructor call is visited. If the NEW instruction is after the constructor call, use the
    * {@link #FORWARD_UNINITIALIZED_TYPE_TAG} tag value instead.
    */
-  public static final int UNINITIALIZED_TYPE_TAG = 129;
+  static final int UNINITIALIZED_TYPE_TAG = 129;
 
   /**
    * The tag value of an uninitialized type entry in the type table of a class. This type is used
@@ -134,10 +80,10 @@ public abstract class Symbol {
    * constructor call is visited. If the NEW instruction is before the constructor call, use the
    * {@link #UNINITIALIZED_TYPE_TAG} tag value instead.
    */
-  public static final int FORWARD_UNINITIALIZED_TYPE_TAG = 130;
+  static final int FORWARD_UNINITIALIZED_TYPE_TAG = 130;
 
   /** The tag value of a merged type entry in the (ASM specific) type table of a class. */
-  public static final int MERGED_TYPE_TAG = 131;
+  static final int MERGED_TYPE_TAG = 131;
 
   // Instance fields.
 
@@ -155,17 +101,17 @@ public abstract class Symbol {
 
   /**
    * The internal name of the owner class of this symbol. Only used for {@link
-   * #CONSTANT_FIELDREF_TAG}, {@link #CONSTANT_METHODREF_TAG}, {@link
-   * #CONSTANT_INTERFACE_METHODREF_TAG}, and {@link #CONSTANT_METHOD_HANDLE_TAG} symbols.
+   * Tag#Fieldref}, {@link Tag#Methodref}, {@link
+   * Tag#InterfaceMethodRef}, and {@link Tag#MethodHandle} symbols.
    */
   public final String owner;
 
   /**
    * The name of the class field or method corresponding to this symbol. Only used for {@link
-   * #CONSTANT_FIELDREF_TAG}, {@link #CONSTANT_METHODREF_TAG}, {@link
-   * #CONSTANT_INTERFACE_METHODREF_TAG}, {@link #CONSTANT_NAME_AND_TYPE_TAG}, {@link
-   * #CONSTANT_METHOD_HANDLE_TAG}, {@link #CONSTANT_DYNAMIC_TAG} and {@link
-   * #CONSTANT_INVOKE_DYNAMIC_TAG} symbols.
+   * Tag#Fieldref}, {@link Tag#Methodref}, {@link
+   * Tag#InterfaceMethodRef}, {@link Tag#NameAndType}, {@link
+   * Tag#MethodHandle}, {@link Tag#Dynamic} and {@link
+   * Tag#InvokeDynamic} symbols.
    */
   public final String name;
 
@@ -173,34 +119,36 @@ public abstract class Symbol {
    * The string value of this symbol. This is:
    *
    * <ul>
-   *   <li>a field or method descriptor for {@link #CONSTANT_FIELDREF_TAG}, {@link
-   *       #CONSTANT_METHODREF_TAG}, {@link #CONSTANT_INTERFACE_METHODREF_TAG}, {@link
-   *       #CONSTANT_NAME_AND_TYPE_TAG}, {@link #CONSTANT_METHOD_HANDLE_TAG}, {@link
-   *       #CONSTANT_METHOD_TYPE_TAG}, {@link #CONSTANT_DYNAMIC_TAG} and {@link
-   *       #CONSTANT_INVOKE_DYNAMIC_TAG} symbols,
-   *   <li>an arbitrary string for {@link #CONSTANT_UTF8_TAG} and {@link #CONSTANT_STRING_TAG}
+   *   <li>a field or method descriptor for {@link Tag#Fieldref}, {@link
+   *       Tag#Methodref}, {@link Tag#InterfaceMethodRef}, {@link
+   *       Tag#NameAndType}, {@link Tag#MethodHandle}, {@link
+   *       Tag#MethodType}, {@link Tag#Dynamic} and {@link
+   *       Tag#InvokeDynamic} symbols,
+   *   <li>an arbitrary string for {@link Tag#Utf8} and {@link Tag#String}
    *       symbols,
-   *   <li>an internal class name for {@link #CONSTANT_CLASS_TAG}, {@link #TYPE_TAG}, {@link
+   *   <li>an internal class name for {@link Tag#Class}, {@link #TYPE_TAG}, {@link
    *       #UNINITIALIZED_TYPE_TAG} and {@link #FORWARD_UNINITIALIZED_TYPE_TAG} symbols,
    *   <li>{@literal null} for the other types of symbol.
    * </ul>
    */
   public final String value;
 
+  /** The tag value of the BootstrapMethods attribute entries. */
+  public static final int BOOTSTRAP_METHOD_TAG = 64;
   /**
    * The numeric value of this symbol. This is:
    *
    * <ul>
-   *   <li>the symbol's value for {@link #CONSTANT_INTEGER_TAG},{@link #CONSTANT_FLOAT_TAG}, {@link
-   *       #CONSTANT_LONG_TAG}, {@link #CONSTANT_DOUBLE_TAG},
+   *   <li>the symbol's value for {@link Tag#Integer},{@link Tag#Float}, {@link
+   *       Tag#Long}, {@link Tag#Double},
    *   <li>the CONSTANT_MethodHandle_info reference_kind field value for {@link
-   *       #CONSTANT_METHOD_HANDLE_TAG} symbols (or this value left shifted by 8 bits for
+   *       Tag#MethodHandle} symbols (or this value left shifted by 8 bits for
    *       reference_kind values larger than or equal to H_INVOKEVIRTUAL and if the method owner is
    *       an interface),
    *   <li>the CONSTANT_InvokeDynamic_info bootstrap_method_attr_index field value for {@link
-   *       #CONSTANT_INVOKE_DYNAMIC_TAG} symbols,
+   *       Tag#InvokeDynamic} symbols,
    *   <li>the offset of a bootstrap method in the BootstrapMethods boostrap_methods array, for
-   *       {@link #CONSTANT_DYNAMIC_TAG} or {@link #BOOTSTRAP_METHOD_TAG} symbols,
+   *       {@link Tag#Dynamic} or {@link Symbol#BOOTSTRAP_METHOD_TAG} symbols,
    *   <li>the bytecode offset of the NEW instruction that created an {@link
    *       Frame#ITEM_UNINITIALIZED} type for {@link #UNINITIALIZED_TYPE_TAG} symbols,
    *   <li>the index of the {@link Label} (in the {@link SymbolTable#labelTable} table) of the NEW
@@ -221,10 +169,10 @@ public abstract class Symbol {
    *
    * <ul>
    *   <li>the {@link Type#getArgumentsAndReturnSizes} of the symbol's method descriptor for {@link
-   *       #CONSTANT_METHODREF_TAG}, {@link #CONSTANT_INTERFACE_METHODREF_TAG} and {@link
-   *       #CONSTANT_INVOKE_DYNAMIC_TAG} symbols,
+   *       Tag#Methodref}, {@link Tag#InterfaceMethodRef} and {@link
+   *       Tag#InvokeDynamic} symbols,
    *   <li>the index in the InnerClasses_attribute 'classes' array (plus one) corresponding to this
-   *       class, for {@link #CONSTANT_CLASS_TAG} symbols,
+   *       class, for {@link Tag#Class} symbols,
    *   <li>the index (in the class' type table) of the merged type of the two source types for
    *       {@link #MERGED_TYPE_TAG} symbols,
    *   <li>0 for the other types of symbol, or if this field has not been computed yet.
@@ -265,8 +213,8 @@ public abstract class Symbol {
    *
    * @return the result {@link Type#getArgumentsAndReturnSizes} on {@link #value} (memoized in
    *     {@link #info} for efficiency). This should only be used for {@link
-   *     #CONSTANT_METHODREF_TAG}, {@link #CONSTANT_INTERFACE_METHODREF_TAG} and {@link
-   *     #CONSTANT_INVOKE_DYNAMIC_TAG} symbols.
+   *     Tag#Methodref}, {@link Tag#InterfaceMethodRef} and {@link
+   *     Tag#InvokeDynamic} symbols.
    */
   int getArgumentsAndReturnSizes() {
     if (info == 0) {

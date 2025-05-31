@@ -29,12 +29,20 @@ package dev.oblivruin.asm.collection;
 import java.util.Arrays;
 
 public final class ByteArray extends Array {
+    /**
+     * Core data.
+     * Shouldn't be {@literal null}
+     */
     public byte[] data;
     public ByteArray() {
         this(200);
     }
     public ByteArray(byte[] bytes) {
+        this(bytes, bytes.length);
+    }
+    public ByteArray(byte[] bytes, int freeOff) {
         this.data = bytes;
+        this.length = freeOff;
     }
     public ByteArray(int size) {
         this.data = new byte[size];
@@ -55,7 +63,7 @@ public final class ByteArray extends Array {
 
     /**
      * Copy the source array.
-     * @param bytes source array
+     * @param bytes source array, might be null
      */
     public void add(byte[] bytes) {
         add(bytes, 0, bytes.length);
@@ -63,17 +71,18 @@ public final class ByteArray extends Array {
 
     /**
      * Copy the source array within given range.
+     *
+     * @param bytes    source array, might be null
      * @param startPos the start of the array (inclusive)
-     * @param bytes source array
-     * @param endPos the end of the array (exclusive)
+     * @param endPos   the end of the array (exclusive)
      */
-    public void addRange(int startPos, byte[] bytes, int endPos) {
+    public void addRange(byte[] bytes, int startPos, int endPos) {
         add(bytes, startPos, endPos - startPos);
     }
 
     /**
      * Copy the source array within given range.
-     * @param bytes source array
+     * @param bytes source array, might be null
      * @param startPos starting position
      * @param len the number of array elements to be copied
      */
@@ -97,12 +106,20 @@ public final class ByteArray extends Array {
         }
     }
 
-    public byte[] toArray() {
-        if (data.length == length) {
-            return data;
-        } else {
-            return Arrays.copyOf(data, length);
+    @Override
+    public boolean tryExpand(int size) {
+        int i = length + size;
+        if (i >= data.length) {
+            System.arraycopy(data, 0,
+                    (data = new byte[Math.max(i, data.length * 2)]), 0,
+                    length);
+            return true;
         }
+        return false;
+    }
+
+    public byte[] toArray() {
+        return data.length == length ? data : Arrays.copyOf(data, length);
     }
 
     public static ByteArray of(byte... bytes) {

@@ -919,10 +919,10 @@ public class ClassWriter implements IClassVisitor {
    * already contains a similar item. <i>This method is intended for {@link Attribute} sub classes,
    * and is normally not needed by class generators or adapters.</i>
    *
-   * @param tag the kind of this handle. Must be {@link Opcodes#H_GETFIELD}, {@link
-   *     Opcodes#H_GETSTATIC}, {@link Opcodes#H_PUTFIELD}, {@link Opcodes#H_PUTSTATIC}, {@link
-   *     Opcodes#H_INVOKEVIRTUAL}, {@link Opcodes#H_INVOKESTATIC}, {@link Opcodes#H_INVOKESPECIAL},
-   *     {@link Opcodes#H_NEWINVOKESPECIAL} or {@link Opcodes#H_INVOKEINTERFACE}.
+   * @param tag the kind of this handle. Must be {@link Tag#REF_getField}, {@link
+   *     Tag#REF_getStatic}, {@link Tag#REF_putField}, {@link Tag#REF_putStatic}, {@link
+   *     Tag#REF_invokeVirtual}, {@link Tag#REF_invokeStatic}, {@link Tag#REF_invokeSpecial},
+   *     {@link Tag#REF_newInvokeSpecial} or {@link Tag#REF_invokeInterface}.
    * @param owner the internal name of the field or method owner class (see {@link
    *     Type#getInternalName()}).
    * @param name the name of the field or method.
@@ -934,7 +934,7 @@ public class ClassWriter implements IClassVisitor {
   @Deprecated
   public int newHandle(
       final int tag, final String owner, final String name, final String descriptor) {
-    return newHandle(tag, owner, name, descriptor, tag == Opcodes.H_INVOKEINTERFACE);
+    return newHandle(tag, owner, name, descriptor, tag == Tag.REF_invokeInterface);
   }
 
   /**
@@ -942,10 +942,10 @@ public class ClassWriter implements IClassVisitor {
    * already contains a similar item. <i>This method is intended for {@link Attribute} sub classes,
    * and is normally not needed by class generators or adapters.</i>
    *
-   * @param tag the kind of this handle. Must be {@link Opcodes#H_GETFIELD}, {@link
-   *     Opcodes#H_GETSTATIC}, {@link Opcodes#H_PUTFIELD}, {@link Opcodes#H_PUTSTATIC}, {@link
-   *     Opcodes#H_INVOKEVIRTUAL}, {@link Opcodes#H_INVOKESTATIC}, {@link Opcodes#H_INVOKESPECIAL},
-   *     {@link Opcodes#H_NEWINVOKESPECIAL} or {@link Opcodes#H_INVOKEINTERFACE}.
+   * @param tag the kind of this handle. Must be {@link Tag#REF_getField}, {@link
+   *     Tag#REF_getStatic}, {@link Tag#REF_putField}, {@link Tag#REF_putStatic}, {@link
+   *     Tag#REF_invokeVirtual}, {@link Tag#REF_invokeStatic}, {@link Tag#REF_invokeSpecial},
+   *     {@link Tag#REF_newInvokeSpecial} or {@link Tag#REF_invokeInterface}.
    * @param owner the internal name of the field or method owner class (see {@link
    *     Type#getInternalName()}).
    * @param name the name of the field or method.

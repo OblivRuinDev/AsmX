@@ -1299,9 +1299,9 @@ final class MethodWriter implements IMethodVisitor {
     int constantIndex = constantSymbol.index;
     char firstDescriptorChar;
     boolean isLongOrDouble =
-        constantSymbol.tag == Symbol.CONSTANT_LONG_TAG
-            || constantSymbol.tag == Symbol.CONSTANT_DOUBLE_TAG
-            || (constantSymbol.tag == Symbol.CONSTANT_DYNAMIC_TAG
+        constantSymbol.tag == Tag.Long
+            || constantSymbol.tag == Tag.Double
+            || (constantSymbol.tag == Tag.Dynamic
                 && ((firstDescriptorChar = constantSymbol.value.charAt(0)) == 'J'
                     || firstDescriptorChar == 'D'));
     if (isLongOrDouble) {

@@ -238,7 +238,7 @@ class ClassRemapperTest extends AsmTest {
         new ConstantDynamic(
             "foo",
             "Ljava/lang/String;",
-            new Handle(Opcodes.H_INVOKESTATIC, "BSMHost", "bsm", "()Ljava/lang/String;", false)));
+            new Handle(Tag.REF_invokeStatic, "BSMHost", "bsm", "()Ljava/lang/String;", false)));
 
     ConstantDynamic constantDynamic =
         (ConstantDynamic) ((LdcInsnNode) classNode.methods.get(0).instructions.get(0)).cst;
@@ -272,7 +272,7 @@ class ClassRemapperTest extends AsmTest {
     methodVisitor.visitInvokeDynamicInsn(
         "foo",
         "()Ljava/lang/String;",
-        new Handle(Opcodes.H_GETFIELD, "pkg/B", "a", "Ljava/lang/String;", false));
+        new Handle(Tag.REF_getField, "pkg/B", "a", "Ljava/lang/String;", false));
 
     InvokeDynamicInsnNode invokeDynamic =
         (InvokeDynamicInsnNode) classNode.methods.get(0).instructions.get(0);

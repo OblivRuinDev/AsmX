@@ -59,8 +59,8 @@ class HandleTest {
   @Test
   @SuppressWarnings("deprecation")
   void testDeprecatedConstructor() {
-    Handle handle1 = new Handle(Opcodes.H_INVOKEINTERFACE, "owner", "name", "descriptor");
-    Handle handle2 = new Handle(Opcodes.H_INVOKESPECIAL, "owner", "name", "descriptor");
+    Handle handle1 = new Handle(Tag.REF_invokeInterface, "owner", "name", "descriptor");
+    Handle handle2 = new Handle(Tag.REF_invokeSpecial, "owner", "name", "descriptor");
 
     assertTrue(handle1.isInterface);
     assertFalse(handle2.isInterface);
@@ -70,9 +70,9 @@ class HandleTest {
 
   @Test
   void testConstructor() {
-    Handle handle = new Handle(Opcodes.H_GETFIELD, "owner", "name", "descriptor", false);
+    Handle handle = new Handle(Tag.REF_getField, "owner", "name", "descriptor", false);
 
-      assertEquals(Opcodes.H_GETFIELD, handle.tag);
+      assertEquals(Tag.REF_getField, handle.tag);
     assertEquals("owner", handle.owner);
     assertEquals("name", handle.name);
     assertEquals("descriptor", handle.descriptor);
@@ -82,23 +82,23 @@ class HandleTest {
 
   @Test
   void testEquals() {
-    Handle handle1 = new Handle(Opcodes.H_GETFIELD, "owner", "name", "descriptor", false);
-    Handle handle2 = new Handle(Opcodes.H_GETFIELD, "owner", "name", "descriptor", false);
+    Handle handle1 = new Handle(Tag.REF_getField, "owner", "name", "descriptor", false);
+    Handle handle2 = new Handle(Tag.REF_getField, "owner", "name", "descriptor", false);
     Handle nullHandle = null;
 
     final boolean equalsThis = handle1.equals(handle1);
     final boolean equalsSame = handle1.equals(handle2);
     final boolean equalsNull = handle1.equals(nullHandle);
     final boolean equalsHandleWithDifferentTag =
-        handle1.equals(new Handle(Opcodes.H_PUTFIELD, "owner", "name", "descriptor", false));
+        handle1.equals(new Handle(Tag.REF_putField, "owner", "name", "descriptor", false));
     final boolean equalsHandleWithDifferentOwner =
-        handle1.equals(new Handle(Opcodes.H_GETFIELD, "o", "name", "descriptor", false));
+        handle1.equals(new Handle(Tag.REF_getField, "o", "name", "descriptor", false));
     final boolean equalsHandleWithDifferentName =
-        handle1.equals(new Handle(Opcodes.H_GETFIELD, "owner", "n", "descriptor", false));
+        handle1.equals(new Handle(Tag.REF_getField, "owner", "n", "descriptor", false));
     final boolean equalsHandleWithDifferentDescriptor =
-        handle1.equals(new Handle(Opcodes.H_GETFIELD, "owner", "name", "d", false));
+        handle1.equals(new Handle(Tag.REF_getField, "owner", "name", "d", false));
     final boolean equalsHandleWithDifferentIsInterface =
-        handle1.equals(new Handle(Opcodes.H_GETFIELD, "owner", "n", "descriptor", true));
+        handle1.equals(new Handle(Tag.REF_getField, "owner", "n", "descriptor", true));
 
     assertTrue(equalsThis);
     assertTrue(equalsSame);
@@ -112,8 +112,8 @@ class HandleTest {
 
   @Test
   void testHashCode() {
-    Handle handle1 = new Handle(Opcodes.H_INVOKESTATIC, "owner", "name", "descriptor", false);
-    Handle handle2 = new Handle(Opcodes.H_INVOKESTATIC, "owner", "name", "descriptor", true);
+    Handle handle1 = new Handle(Tag.REF_invokeStatic, "owner", "name", "descriptor", false);
+    Handle handle2 = new Handle(Tag.REF_invokeStatic, "owner", "name", "descriptor", true);
 
     assertNotEquals(0, handle1.hashCode());
     assertNotEquals(0, handle2.hashCode());

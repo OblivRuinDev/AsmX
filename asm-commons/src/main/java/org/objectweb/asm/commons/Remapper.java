@@ -43,10 +43,7 @@
 
 package org.objectweb.asm.commons;
 
-import org.objectweb.asm.ConstantDynamic;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 import org.objectweb.asm.signature.SignatureReader;
 import org.objectweb.asm.signature.SignatureVisitor;
 import org.objectweb.asm.signature.SignatureWriter;
@@ -179,7 +176,7 @@ public abstract class Remapper {
     }
     if (value instanceof Handle) {
       Handle handle = (Handle) value;
-      boolean isFieldHandle = handle.tag <= Opcodes.H_PUTSTATIC;
+      boolean isFieldHandle = handle.tag <= Tag.REF_putStatic;
 
       return new Handle(
               handle.tag,

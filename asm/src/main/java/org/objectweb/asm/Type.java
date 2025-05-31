@@ -49,9 +49,11 @@ import java.lang.reflect.Method;
 /**
  * A Java field or method type. This class can be used to make it easier to manipulate type and
  * method descriptors.<br>
- * If an instance belongs to this but not belongs to {@link CommonType}, this instance is
- * a primitive type.<br>
- * Note: Every primitive only have one instance in runtime!
+ * If an instance belongs to this but not belongs to {@link RefType}, this instance is
+ * a primitive type.<p>
+ * Note: Every primitive only have one instance in runtime!<br>
+ * Note: Developers should cache the return values of some methods
+ *       to avoid frequent string concatenation and computation.
  *
  * @author Eric Bruneton
  * @author Chris Nokleberg
@@ -60,7 +62,7 @@ import java.lang.reflect.Method;
  * @implNote Users shouldn't extend this.<br>
  *           Instead, this is implemented in internal.
  *
- * @see CommonType
+ * @see RefType
  */
 public class Type {
     /** The sort of the {@code void} type. See {@link #getSort}. */
@@ -112,7 +114,8 @@ public class Type {
             "byte", "short", "int", "float", "long", "double"};
 
     /**
-     * A Java field or method type.This class can be used to make it easier to manipulate type and
+     * A Java field or method type, also is a reference type.
+     * This class can be used to make it easier to manipulate type and
      * method descriptors.
      * <p>
      * Field {@link #valueBuffer}'s additional details(specific to the class):<br>
@@ -120,7 +123,7 @@ public class Type {
      * [{@link #valueBegin},{@link #valueEnd}) contain the internal name, and those in [{@link
      * #valueBegin} - 1, {@link #valueEnd} + 1) contain the descriptor.
      */
-    public static final class CommonType extends Type {
+    public static final class RefType extends Type {
         /**
          * The beginning index, inclusive, of the value of this Java field or method type in {@link
          * #valueBuffer}. This value is an internal name for {@link #OBJECT} and {@link #INTERNAL} types,
@@ -144,7 +147,7 @@ public class Type {
          * @param valueEnd    the end index, exclusive, of the value of this field or method type in
          *                    valueBuffer.
          */
-        CommonType(int sort, String valueBuffer, int valueBegin, int valueEnd) {
+        RefType(int sort, String valueBuffer, int valueBegin, int valueEnd) {
             super(sort, valueBuffer);
             this.valueBegin = valueBegin;
             this.valueEnd = valueEnd;
@@ -238,24 +241,24 @@ public class Type {
         }
 
         /**
-         * Tests if the given CommonType is equal to this type.
+         * Tests if the given RefType is equal to this type.
          * @param object the object to be compared to this type.
          * @return if equal
          *
-         * @see #equals(CommonType)
+         * @see #equals(RefType)
          */
         @Override
         public boolean equals(Object object) {
-            return object instanceof CommonType && equals((CommonType) object);
+            return object instanceof RefType && equals((RefType) object);
         }
 
         /**
-         * Tests if the given CommonType is equal to this type.
+         * Tests if the given RefType is equal to this type.
          *
-         * @param other the CommonType to be compared to this type.
+         * @param other the RefType to be compared to this type.
          * @return {@literal true} if equal
          */
-        public boolean equals(CommonType other) {
+        public boolean equals(RefType other) {
             if (this == other) {
                 return true;
             }
@@ -285,7 +288,7 @@ public class Type {
      * The sort of this type.<br>
      * Must be either {@link #VOID}, {@link #BOOLEAN}, {@link #CHAR}, {@link #BYTE},
      * {@link #SHORT}, {@link #INT}, {@link #FLOAT}, {@link #LONG} or {@link #DOUBLE} in {@link Type}.<br>
-     * Must be either {@link #ARRAY}, {@link #OBJECT}, {@link #METHOD} or {@link #INTERNAL} in {@link CommonType}.
+     * Must be either {@link #ARRAY}, {@link #OBJECT}, {@link #METHOD} or {@link #INTERNAL} in {@link RefType}.
      */
     public final int sort;
 
@@ -297,7 +300,9 @@ public class Type {
     public final String valueBuffer;
 
     /**
-     * Constructs a type.
+     * Constructs a type.<br>
+     * Not exposed to developers, as this may cause some problems,
+     * developers should use factory methods instead.
      *
      * @param sort the sort of this type, see {@link #sort}.
      * @param valueBuffer a buffer containing the value of this field or method type.
@@ -382,7 +387,7 @@ public class Type {
      * @return the {@link Type} corresponding to the given internal name.
      */
     public static Type getObjectType(final String internalName) {
-        return new CommonType(
+        return new RefType(
                 internalName.charAt(0) == '[' ? ARRAY : INTERNAL, internalName, 0, internalName.length());
     }
 
@@ -394,7 +399,7 @@ public class Type {
      * @return the {@link Type} corresponding to the given method descriptor.
      */
     public static Type getMethodType(final String methodDescriptor) {
-        return new CommonType(METHOD, methodDescriptor, 0, methodDescriptor.length());
+        return new RefType(METHOD, methodDescriptor, 0, methodDescriptor.length());
     }
 
     /**
@@ -505,15 +510,15 @@ public class Type {
      * Returns the {@link Type} corresponding to the given field or method descriptor.
      *
      * @param descriptorBuffer a buffer containing the field or method descriptor.
-     * @param descriptorBegin the beginning index, inclusive, of the field or method descriptor in
+     * @param start the beginning index, inclusive, of the field or method descriptor in
      *     descriptorBuffer.
-     * @param descriptorEnd the end index, exclusive, of the field or method descriptor in
+     * @param end the end index, exclusive, of the field or method descriptor in
      *     descriptorBuffer.
      * @return the {@link Type} corresponding to the given type descriptor.
      */
     private static Type getTypeInternal(
-            final String descriptorBuffer, final int descriptorBegin, final int descriptorEnd) {
-        switch (descriptorBuffer.charAt(descriptorBegin)) {
+            final String descriptorBuffer, final int start, final int end) {
+        switch (descriptorBuffer.charAt(start)) {
             case 'V':
                 return VOID_TYPE;
             case 'Z':
@@ -533,13 +538,13 @@ public class Type {
             case 'D':
                 return DOUBLE_TYPE;
             case '[':
-                return new CommonType(ARRAY, descriptorBuffer, descriptorBegin, descriptorEnd);
+                return new RefType(ARRAY, descriptorBuffer, start, end);
             case 'L':
-                return new CommonType(OBJECT, descriptorBuffer, descriptorBegin + 1, descriptorEnd - 1);
+                return new RefType(OBJECT, descriptorBuffer, start + 1, end - 1);
             case '(':
-                return new CommonType(METHOD, descriptorBuffer, descriptorBegin, descriptorEnd);
+                return new RefType(METHOD, descriptorBuffer, start, end);
             default:
-                throw new IllegalArgumentException("Invalid descriptor: " + descriptorBuffer);
+                throw new IllegalArgumentException("Invalid descriptor: " + descriptorBuffer + "\nstart=" + start + ";end=" + end);
         }
     }
 
@@ -731,7 +736,7 @@ public class Type {
     /**
      * Just keep this method only for the sake of keeping the original code logic.
      *
-     * @see CommonType#getElementType()
+     * @see RefType#getElementType()
      * @return this instance
      */
     public Type getElementType() {
@@ -778,7 +783,7 @@ public class Type {
 
     /**
      * Returns the internal name of the class corresponding to this object or array type. The internal
-     * name of a class is its fully qualified name (as returned by Class.getName(), where '.' are
+     * name of a class is its fully qualified name (as returned by {@link Class#getName()}, where '.' are
      * replaced by '/'). This method should only be used for an object or array type.
      *
      * @return the internal name of the class corresponding to this object type.
@@ -823,7 +828,7 @@ public class Type {
     /**
      * Just keep this method only for the sake of keeping the original code logic.
      *
-     * @see CommonType#getDimensions()
+     * @see RefType#getDimensions()
      * @return 1
      */
     public int getDimensions() {
@@ -962,7 +967,7 @@ public class Type {
      * @param object the object to be compared to this type.
      * @return {@literal true} if the given object is this.
      *
-     * @see CommonType#equals(Object)
+     * @see RefType#equals(Object)
      */
     @Override
     public boolean equals(final Object object) {

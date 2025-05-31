@@ -198,9 +198,9 @@ final class SymbolTable {
       int itemTag = inputBytes[itemOffset - 1];
       int nameAndTypeItemOffset;
       switch (itemTag) {
-        case Symbol.CONSTANT_FIELDREF_TAG:
-        case Symbol.CONSTANT_METHODREF_TAG:
-        case Symbol.CONSTANT_INTERFACE_METHODREF_TAG:
+        case Tag.Fieldref:
+        case Tag.Methodref:
+        case Tag.InterfaceMethodRef:
           nameAndTypeItemOffset =
               classReader.getItem(classReader.readUnsignedShort(itemOffset + 2));
           addConstantMemberReference(
@@ -210,24 +210,24 @@ final class SymbolTable {
               classReader.readUTF8(nameAndTypeItemOffset, charBuffer),
               classReader.readUTF8(nameAndTypeItemOffset + 2, charBuffer));
           break;
-        case Symbol.CONSTANT_INTEGER_TAG:
-        case Symbol.CONSTANT_FLOAT_TAG:
+        case Tag.Integer:
+        case Tag.Float:
           addConstantIntegerOrFloat(itemIndex, itemTag, classReader.readInt(itemOffset));
           break;
-        case Symbol.CONSTANT_NAME_AND_TYPE_TAG:
+        case Tag.NameAndType:
           addConstantNameAndType(
               itemIndex,
               classReader.readUTF8(itemOffset, charBuffer),
               classReader.readUTF8(itemOffset + 2, charBuffer));
           break;
-        case Symbol.CONSTANT_LONG_TAG:
-        case Symbol.CONSTANT_DOUBLE_TAG:
+        case Tag.Long:
+        case Tag.Double:
           addConstantLongOrDouble(itemIndex, itemTag, classReader.readLong(itemOffset));
           break;
-        case Symbol.CONSTANT_UTF8_TAG:
+        case Tag.Utf8:
           addConstantUtf8(itemIndex, classReader.readUtf(itemIndex, charBuffer));
           break;
-        case Symbol.CONSTANT_METHOD_HANDLE_TAG:
+        case Tag.MethodHandle:
           int memberRefItemOffset =
               classReader.getItem(classReader.readUnsignedShort(itemOffset + 1));
           nameAndTypeItemOffset =
@@ -239,10 +239,10 @@ final class SymbolTable {
               classReader.readUTF8(nameAndTypeItemOffset, charBuffer),
               classReader.readUTF8(nameAndTypeItemOffset + 2, charBuffer),
               classReader.readByte(memberRefItemOffset - 1)
-                  == Symbol.CONSTANT_INTERFACE_METHODREF_TAG);
+                  == Tag.InterfaceMethodRef);
           break;
-        case Symbol.CONSTANT_DYNAMIC_TAG:
-        case Symbol.CONSTANT_INVOKE_DYNAMIC_TAG:
+        case Tag.Dynamic:
+        case Tag.InvokeDynamic:
           hasBootstrapMethods = true;
           nameAndTypeItemOffset =
               classReader.getItem(classReader.readUnsignedShort(itemOffset + 2));
@@ -253,11 +253,11 @@ final class SymbolTable {
               classReader.readUTF8(nameAndTypeItemOffset + 2, charBuffer),
               classReader.readUnsignedShort(itemOffset));
           break;
-        case Symbol.CONSTANT_STRING_TAG:
-        case Symbol.CONSTANT_CLASS_TAG:
-        case Symbol.CONSTANT_METHOD_TYPE_TAG:
-        case Symbol.CONSTANT_MODULE_TAG:
-        case Symbol.CONSTANT_PACKAGE_TAG:
+        case Tag.String:
+        case Tag.Class:
+        case Tag.MethodType:
+        case Tag.Module:
+        case Tag.Package:
           addConstantUtf8Reference(
               itemIndex, itemTag, classReader.readUTF8(itemOffset, charBuffer));
           break;
@@ -265,7 +265,7 @@ final class SymbolTable {
           throw new IllegalArgumentException();
       }
       itemIndex +=
-          (itemTag == Symbol.CONSTANT_LONG_TAG || itemTag == Symbol.CONSTANT_DOUBLE_TAG) ? 2 : 1;
+          (itemTag == Tag.Long || itemTag == Tag.Double) ? 2 : 1;
     }
 
     // Copy the BootstrapMethods, if any.
@@ -552,7 +552,7 @@ final class SymbolTable {
    * @return a new or already existing Symbol with the given value.
    */
   Symbol addConstantClass(final String value) {
-    return addConstantUtf8Reference(Symbol.CONSTANT_CLASS_TAG, value);
+    return addConstantUtf8Reference(Tag.Class, value);
   }
 
   /**
@@ -565,7 +565,7 @@ final class SymbolTable {
    * @return a new or already existing Symbol with the given value.
    */
   Symbol addConstantFieldref(final String owner, final String name, final String descriptor) {
-    return addConstantMemberReference(Symbol.CONSTANT_FIELDREF_TAG, owner, name, descriptor);
+    return addConstantMemberReference(Tag.Fieldref, owner, name, descriptor);
   }
 
   /**
@@ -580,7 +580,7 @@ final class SymbolTable {
    */
   Symbol addConstantMethodref(
       final String owner, final String name, final String descriptor, final boolean isInterface) {
-    int tag = isInterface ? Symbol.CONSTANT_INTERFACE_METHODREF_TAG : Symbol.CONSTANT_METHODREF_TAG;
+    int tag = isInterface ? Tag.InterfaceMethodRef : Tag.Methodref;
     return addConstantMemberReference(tag, owner, name, descriptor);
   }
 
@@ -589,8 +589,8 @@ final class SymbolTable {
    * the constant pool of this symbol table. Does nothing if the constant pool already contains a
    * similar item.
    *
-   * @param tag one of {@link Symbol#CONSTANT_FIELDREF_TAG}, {@link Symbol#CONSTANT_METHODREF_TAG}
-   *     or {@link Symbol#CONSTANT_INTERFACE_METHODREF_TAG}.
+   * @param tag one of {@link Tag#Fieldref}, {@link Tag#Methodref}
+   *     or {@link Tag#InterfaceMethodRef}.
    * @param owner the internal name of a class.
    * @param name a field or method name.
    * @param descriptor a field or method descriptor.
@@ -620,8 +620,8 @@ final class SymbolTable {
    * to the constant pool of this symbol table.
    *
    * @param index the constant pool index of the new Symbol.
-   * @param tag one of {@link Symbol#CONSTANT_FIELDREF_TAG}, {@link Symbol#CONSTANT_METHODREF_TAG}
-   *     or {@link Symbol#CONSTANT_INTERFACE_METHODREF_TAG}.
+   * @param tag one of {@link Tag#Fieldref}, {@link Tag#Methodref}
+   *     or {@link Tag#InterfaceMethodRef}.
    * @param owner the internal name of a class.
    * @param name a field or method name.
    * @param descriptor a field or method descriptor.
@@ -643,7 +643,7 @@ final class SymbolTable {
    * @return a new or already existing Symbol with the given value.
    */
   Symbol addConstantString(final String value) {
-    return addConstantUtf8Reference(Symbol.CONSTANT_STRING_TAG, value);
+    return addConstantUtf8Reference(Tag.String, value);
   }
 
   /**
@@ -654,7 +654,7 @@ final class SymbolTable {
    * @return a new or already existing Symbol with the given value.
    */
   Symbol addConstantInteger(final int value) {
-    return addConstantIntegerOrFloat(Symbol.CONSTANT_INTEGER_TAG, value);
+    return addConstantIntegerOrFloat(Tag.Integer, value);
   }
 
   /**
@@ -665,14 +665,14 @@ final class SymbolTable {
    * @return a new or already existing Symbol with the given value.
    */
   Symbol addConstantFloat(final float value) {
-    return addConstantIntegerOrFloat(Symbol.CONSTANT_FLOAT_TAG, Float.floatToRawIntBits(value));
+    return addConstantIntegerOrFloat(Tag.Float, Float.floatToRawIntBits(value));
   }
 
   /**
    * Adds a CONSTANT_Integer_info or CONSTANT_Float_info to the constant pool of this symbol table.
    * Does nothing if the constant pool already contains a similar item.
    *
-   * @param tag one of {@link Symbol#CONSTANT_INTEGER_TAG} or {@link Symbol#CONSTANT_FLOAT_TAG}.
+   * @param tag one of {@link Tag#Integer} or {@link Tag#Float}.
    * @param value an int or float.
    * @return a constant pool constant with the given tag and primitive values.
    */
@@ -694,7 +694,7 @@ final class SymbolTable {
    * table.
    *
    * @param index the constant pool index of the new Symbol.
-   * @param tag one of {@link Symbol#CONSTANT_INTEGER_TAG} or {@link Symbol#CONSTANT_FLOAT_TAG}.
+   * @param tag one of {@link Tag#Integer} or {@link Tag#Float}.
    * @param value an int or float.
    */
   private void addConstantIntegerOrFloat(final int index, final int tag, final int value) {
@@ -709,7 +709,7 @@ final class SymbolTable {
    * @return a new or already existing Symbol with the given value.
    */
   Symbol addConstantLong(final long value) {
-    return addConstantLongOrDouble(Symbol.CONSTANT_LONG_TAG, value);
+    return addConstantLongOrDouble(Tag.Long, value);
   }
 
   /**
@@ -720,14 +720,14 @@ final class SymbolTable {
    * @return a new or already existing Symbol with the given value.
    */
   Symbol addConstantDouble(final double value) {
-    return addConstantLongOrDouble(Symbol.CONSTANT_DOUBLE_TAG, Double.doubleToRawLongBits(value));
+    return addConstantLongOrDouble(Tag.Double, Double.doubleToRawLongBits(value));
   }
 
   /**
    * Adds a CONSTANT_Long_info or CONSTANT_Double_info to the constant pool of this symbol table.
    * Does nothing if the constant pool already contains a similar item.
    *
-   * @param tag one of {@link Symbol#CONSTANT_LONG_TAG} or {@link Symbol#CONSTANT_DOUBLE_TAG}.
+   * @param tag one of {@link Tag#Long} or {@link Tag#Double}.
    * @param value a long or double.
    * @return a constant pool constant with the given tag and primitive values.
    */
@@ -751,7 +751,7 @@ final class SymbolTable {
    * table.
    *
    * @param index the constant pool index of the new Symbol.
-   * @param tag one of {@link Symbol#CONSTANT_LONG_TAG} or {@link Symbol#CONSTANT_DOUBLE_TAG}.
+   * @param tag one of {@link Tag#Long} or {@link Tag#Double}.
    * @param value a long or double.
    */
   private void addConstantLongOrDouble(final int index, final int tag, final long value) {
@@ -767,7 +767,7 @@ final class SymbolTable {
    * @return a new or already existing Symbol with the given value.
    */
   int addConstantNameAndType(final String name, final String descriptor) {
-    final int tag = Symbol.CONSTANT_NAME_AND_TYPE_TAG;
+    final int tag = Tag.NameAndType;
     int hashCode = hash(tag, name, descriptor);
     Entry entry = get(hashCode);
     while (entry != null) {
@@ -791,7 +791,7 @@ final class SymbolTable {
    * @param descriptor a field or method descriptor.
    */
   private void addConstantNameAndType(final int index, final String name, final String descriptor) {
-    final int tag = Symbol.CONSTANT_NAME_AND_TYPE_TAG;
+    final int tag = Tag.NameAndType;
     add(new Entry(index, tag, name, descriptor, hash(tag, name, descriptor)));
   }
 
@@ -803,18 +803,18 @@ final class SymbolTable {
    * @return a new or already existing Symbol with the given value.
    */
   int addConstantUtf8(final String value) {
-    int hashCode = hash(Symbol.CONSTANT_UTF8_TAG, value);
+    int hashCode = hash(Tag.Utf8, value);
     Entry entry = get(hashCode);
     while (entry != null) {
-      if (entry.tag == Symbol.CONSTANT_UTF8_TAG
+      if (entry.tag == Tag.Utf8
           && entry.hashCode == hashCode
           && entry.value.equals(value)) {
         return entry.index;
       }
       entry = entry.next;
     }
-    constantPool.putByte(Symbol.CONSTANT_UTF8_TAG).putUTF8(value);
-    return put(new Entry(constantPoolCount++, Symbol.CONSTANT_UTF8_TAG, value, hashCode)).index;
+    constantPool.putByte(Tag.Utf8).putUTF8(value);
+    return put(new Entry(constantPoolCount++, Tag.Utf8, value, hashCode)).index;
   }
 
   /**
@@ -824,17 +824,17 @@ final class SymbolTable {
    * @param value a string.
    */
   private void addConstantUtf8(final int index, final String value) {
-    add(new Entry(index, Symbol.CONSTANT_UTF8_TAG, value, hash(Symbol.CONSTANT_UTF8_TAG, value)));
+    add(new Entry(index, Tag.Utf8, value, hash(Tag.Utf8, value)));
   }
 
   /**
    * Adds a CONSTANT_MethodHandle_info to the constant pool of this symbol table. Does nothing if
    * the constant pool already contains a similar item.
    *
-   * @param referenceKind one of {@link Opcodes#H_GETFIELD}, {@link Opcodes#H_GETSTATIC}, {@link
-   *     Opcodes#H_PUTFIELD}, {@link Opcodes#H_PUTSTATIC}, {@link Opcodes#H_INVOKEVIRTUAL}, {@link
-   *     Opcodes#H_INVOKESTATIC}, {@link Opcodes#H_INVOKESPECIAL}, {@link
-   *     Opcodes#H_NEWINVOKESPECIAL} or {@link Opcodes#H_INVOKEINTERFACE}.
+   * @param referenceKind one of {@link Tag#REF_getField}, {@link Tag#REF_getStatic}, {@link
+   *     Tag#REF_putField}, {@link Tag#REF_putStatic}, {@link Tag#REF_invokeVirtual}, {@link
+   *     Tag#REF_invokeStatic}, {@link Tag#REF_invokeSpecial}, {@link
+   *     Tag#REF_newInvokeSpecial} or {@link Tag#REF_invokeInterface}.
    * @param owner the internal name of a class of interface.
    * @param name a field or method name.
    * @param descriptor a field or method descriptor.
@@ -847,7 +847,7 @@ final class SymbolTable {
       final String name,
       final String descriptor,
       final boolean isInterface) {
-    final int tag = Symbol.CONSTANT_METHOD_HANDLE_TAG;
+    final int tag = Tag.MethodHandle;
     final int data = getConstantMethodHandleSymbolData(referenceKind, isInterface);
     // Note that we don't need to include isInterface in the hash computation, because it is
     // redundant with owner (we can't have the same owner with different isInterface values).
@@ -864,7 +864,7 @@ final class SymbolTable {
       }
       entry = entry.next;
     }
-    if (referenceKind <= Opcodes.H_PUTSTATIC) {
+    if (referenceKind <= Tag.REF_putStatic) {
       constantPool.put112(tag, referenceKind, addConstantFieldref(owner, name, descriptor).index);
     } else {
       constantPool.put112(
@@ -877,10 +877,10 @@ final class SymbolTable {
    * Adds a new CONSTANT_MethodHandle_info to the constant pool of this symbol table.
    *
    * @param index the constant pool index of the new Symbol.
-   * @param referenceKind one of {@link Opcodes#H_GETFIELD}, {@link Opcodes#H_GETSTATIC}, {@link
-   *     Opcodes#H_PUTFIELD}, {@link Opcodes#H_PUTSTATIC}, {@link Opcodes#H_INVOKEVIRTUAL}, {@link
-   *     Opcodes#H_INVOKESTATIC}, {@link Opcodes#H_INVOKESPECIAL}, {@link
-   *     Opcodes#H_NEWINVOKESPECIAL} or {@link Opcodes#H_INVOKEINTERFACE}.
+   * @param referenceKind one of {@link Tag#REF_getField}, {@link Tag#REF_getStatic}, {@link
+   *     Tag#REF_putField}, {@link Tag#REF_putStatic}, {@link Tag#REF_invokeVirtual}, {@link
+   *     Tag#REF_invokeStatic}, {@link Tag#REF_invokeSpecial}, {@link
+   *     Tag#REF_newInvokeSpecial} or {@link Tag#REF_invokeInterface}.
    * @param owner the internal name of a class of interface.
    * @param name a field or method name.
    * @param descriptor a field or method descriptor.
@@ -893,7 +893,7 @@ final class SymbolTable {
       final String name,
       final String descriptor,
       final boolean isInterface) {
-    final int tag = Symbol.CONSTANT_METHOD_HANDLE_TAG;
+    final int tag = Tag.MethodHandle;
     final int data = getConstantMethodHandleSymbolData(referenceKind, isInterface);
     int hashCode = hash(tag, owner, name, descriptor, data);
     add(new Entry(index, tag, owner, name, descriptor, data, hashCode));
@@ -902,15 +902,15 @@ final class SymbolTable {
   /**
    * Returns the {@link Symbol#data} field for a CONSTANT_MethodHandle_info Symbol.
    *
-   * @param referenceKind one of {@link Opcodes#H_GETFIELD}, {@link Opcodes#H_GETSTATIC}, {@link
-   *     Opcodes#H_PUTFIELD}, {@link Opcodes#H_PUTSTATIC}, {@link Opcodes#H_INVOKEVIRTUAL}, {@link
-   *     Opcodes#H_INVOKESTATIC}, {@link Opcodes#H_INVOKESPECIAL}, {@link
-   *     Opcodes#H_NEWINVOKESPECIAL} or {@link Opcodes#H_INVOKEINTERFACE}.
+   * @param referenceKind one of {@link Tag#REF_getField}, {@link Tag#REF_getStatic}, {@link
+   *     Tag#REF_putField}, {@link Tag#REF_putStatic}, {@link Tag#REF_invokeVirtual}, {@link
+   *     Tag#REF_invokeStatic}, {@link Tag#REF_invokeSpecial}, {@link
+   *     Tag#REF_newInvokeSpecial} or {@link Tag#REF_invokeInterface}.
    * @param isInterface whether owner is an interface or not.
    */
   private static int getConstantMethodHandleSymbolData(
       final int referenceKind, final boolean isInterface) {
-    if (referenceKind > Opcodes.H_PUTSTATIC && isInterface) {
+    if (referenceKind > Tag.REF_putStatic && isInterface) {
       return referenceKind << 8;
     }
     return referenceKind;
@@ -924,7 +924,7 @@ final class SymbolTable {
    * @return a new or already existing Symbol with the given value.
    */
   Symbol addConstantMethodType(final String methodDescriptor) {
-    return addConstantUtf8Reference(Symbol.CONSTANT_METHOD_TYPE_TAG, methodDescriptor);
+    return addConstantUtf8Reference(Tag.MethodType, methodDescriptor);
   }
 
   /**
@@ -945,7 +945,7 @@ final class SymbolTable {
       final Object... bootstrapMethodArguments) {
     Symbol bootstrapMethod = addBootstrapMethod(bootstrapMethodHandle, bootstrapMethodArguments);
     return addConstantDynamicOrInvokeDynamicReference(
-        Symbol.CONSTANT_DYNAMIC_TAG, name, descriptor, bootstrapMethod.index);
+        Tag.Dynamic, name, descriptor, bootstrapMethod.index);
   }
 
   /**
@@ -966,15 +966,15 @@ final class SymbolTable {
       final Object... bootstrapMethodArguments) {
     Symbol bootstrapMethod = addBootstrapMethod(bootstrapMethodHandle, bootstrapMethodArguments);
     return addConstantDynamicOrInvokeDynamicReference(
-        Symbol.CONSTANT_INVOKE_DYNAMIC_TAG, name, descriptor, bootstrapMethod.index);
+        Tag.InvokeDynamic, name, descriptor, bootstrapMethod.index);
   }
 
   /**
    * Adds a CONSTANT_Dynamic or a CONSTANT_InvokeDynamic_info to the constant pool of this symbol
    * table. Does nothing if the constant pool already contains a similar item.
    *
-   * @param tag one of {@link Symbol#CONSTANT_DYNAMIC_TAG} or {@link
-   *     Symbol#CONSTANT_INVOKE_DYNAMIC_TAG}.
+   * @param tag one of {@link Tag#Dynamic} or {@link
+   *     Tag#InvokeDynamic}.
    * @param name a method name.
    * @param descriptor a field descriptor for CONSTANT_DYNAMIC_TAG) or a method descriptor for
    *     CONSTANT_INVOKE_DYNAMIC_TAG.
@@ -1005,8 +1005,8 @@ final class SymbolTable {
    * Adds a new CONSTANT_Dynamic_info or CONSTANT_InvokeDynamic_info to the constant pool of this
    * symbol table.
    *
-   * @param tag one of {@link Symbol#CONSTANT_DYNAMIC_TAG} or {@link
-   *     Symbol#CONSTANT_INVOKE_DYNAMIC_TAG}.
+   * @param tag one of {@link Tag#Dynamic} or {@link
+   *     Tag#InvokeDynamic}.
    * @param index the constant pool index of the new Symbol.
    * @param name a method name.
    * @param descriptor a field descriptor for CONSTANT_DYNAMIC_TAG or a method descriptor for
@@ -1031,7 +1031,7 @@ final class SymbolTable {
    * @return a new or already existing Symbol with the given value.
    */
   Symbol addConstantModule(final String moduleName) {
-    return addConstantUtf8Reference(Symbol.CONSTANT_MODULE_TAG, moduleName);
+    return addConstantUtf8Reference(Tag.Module, moduleName);
   }
 
   /**
@@ -1042,7 +1042,7 @@ final class SymbolTable {
    * @return a new or already existing Symbol with the given value.
    */
   Symbol addConstantPackage(final String packageName) {
-    return addConstantUtf8Reference(Symbol.CONSTANT_PACKAGE_TAG, packageName);
+    return addConstantUtf8Reference(Tag.Package, packageName);
   }
 
   /**
@@ -1050,9 +1050,9 @@ final class SymbolTable {
    * CONSTANT_Module_info or CONSTANT_Package_info to the constant pool of this symbol table. Does
    * nothing if the constant pool already contains a similar item.
    *
-   * @param tag one of {@link Symbol#CONSTANT_CLASS_TAG}, {@link Symbol#CONSTANT_STRING_TAG}, {@link
-   *     Symbol#CONSTANT_METHOD_TYPE_TAG}, {@link Symbol#CONSTANT_MODULE_TAG} or {@link
-   *     Symbol#CONSTANT_PACKAGE_TAG}.
+   * @param tag one of {@link Tag#Class}, {@link Tag#String}, {@link
+   *     Tag#MethodType}, {@link Tag#Module} or {@link
+   *     Tag#Package}.
    * @param value an internal class name, an arbitrary string, a method descriptor, a module or a
    *     package name, depending on tag.
    * @return a new or already existing Symbol with the given value.
@@ -1075,9 +1075,9 @@ final class SymbolTable {
    * CONSTANT_Module_info or CONSTANT_Package_info to the constant pool of this symbol table.
    *
    * @param index the constant pool index of the new Symbol.
-   * @param tag one of {@link Symbol#CONSTANT_CLASS_TAG}, {@link Symbol#CONSTANT_STRING_TAG}, {@link
-   *     Symbol#CONSTANT_METHOD_TYPE_TAG}, {@link Symbol#CONSTANT_MODULE_TAG} or {@link
-   *     Symbol#CONSTANT_PACKAGE_TAG}.
+   * @param tag one of {@link Tag#Class}, {@link Tag#String}, {@link
+   *     Tag#MethodType}, {@link Tag#Module} or {@link
+   *     Tag#Package}.
    * @param value an internal class name, an arbitrary string, a method descriptor, a module or a
    *     package name, depending on tag.
    */

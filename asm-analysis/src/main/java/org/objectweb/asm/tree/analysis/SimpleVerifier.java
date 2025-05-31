@@ -44,7 +44,7 @@ package org.objectweb.asm.tree.analysis;
 
 import java.util.List;
 
-import dev.oblivruin.asm.UtilX;
+import dev.oblivruin.asm.JavaShadow;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
@@ -180,7 +180,7 @@ public class SimpleVerifier extends BasicVerifier {
       if (isArray) {
         value = newValue(type.getElementType());
         value = new BasicValue(Type.getType(
-                  UtilX.repeat("[", Math.max(0, type.getDimensions())) + value.getType().getDescriptor()));
+                  JavaShadow.repeat("[", Math.max(0, type.getDimensions())) + value.getType().getDescriptor()));
       } else {
         value = new BasicValue(type);
       }

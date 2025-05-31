@@ -742,33 +742,33 @@ class Frame {
         break;
       case Opcodes.LDC:
         switch (argSymbol.tag) {
-          case Symbol.CONSTANT_INTEGER_TAG:
+          case Tag.Integer:
             push(INTEGER);
             break;
-          case Symbol.CONSTANT_LONG_TAG:
+          case Tag.Long:
             push(LONG);
             push(TOP);
             break;
-          case Symbol.CONSTANT_FLOAT_TAG:
+          case Tag.Float:
             push(FLOAT);
             break;
-          case Symbol.CONSTANT_DOUBLE_TAG:
+          case Tag.Double:
             push(DOUBLE);
             push(TOP);
             break;
-          case Symbol.CONSTANT_CLASS_TAG:
+          case Tag.Class:
             push(REFERENCE_KIND | symbolTable.addType("java/lang/Class"));
             break;
-          case Symbol.CONSTANT_STRING_TAG:
+          case Tag.String:
             push(REFERENCE_KIND | symbolTable.addType("java/lang/String"));
             break;
-          case Symbol.CONSTANT_METHOD_TYPE_TAG:
+          case Tag.MethodType:
             push(REFERENCE_KIND | symbolTable.addType("java/lang/invoke/MethodType"));
             break;
-          case Symbol.CONSTANT_METHOD_HANDLE_TAG:
+          case Tag.MethodHandle:
             push(REFERENCE_KIND | symbolTable.addType("java/lang/invoke/MethodHandle"));
             break;
-          case Symbol.CONSTANT_DYNAMIC_TAG:
+          case Tag.Dynamic:
             push(symbolTable, argSymbol.value);
             break;
           default:

@@ -762,8 +762,8 @@ public class CheckMethodAdapter extends MethodVisitor {
     checkVisitMaxsNotCalled();
     checkMethodIdentifier(version, name, "name");
     checkMethodDescriptor(version, descriptor);
-    if (bootstrapMethodHandle.tag != Opcodes.H_INVOKESTATIC) {
-        if (bootstrapMethodHandle.tag != Opcodes.H_NEWINVOKESPECIAL) {
+    if (bootstrapMethodHandle.tag != Tag.REF_invokeStatic) {
+        if (bootstrapMethodHandle.tag != Tag.REF_newInvokeSpecial) {
             throw new IllegalArgumentException("invalid handle tag " + bootstrapMethodHandle.tag);
         }
     }
@@ -1182,17 +1182,17 @@ public class CheckMethodAdapter extends MethodVisitor {
       }
       Handle handle = (Handle) value;
         int tag = handle.tag;
-      if (tag < Opcodes.H_GETFIELD || tag > Opcodes.H_INVOKEINTERFACE) {
+      if (tag < Tag.REF_getField || tag > Tag.REF_invokeInterface) {
         throw new IllegalArgumentException("invalid handle tag " + tag);
       }
       checkInternalName(this.version, handle.owner, "handle owner");
-      if (tag <= Opcodes.H_PUTSTATIC) {
+      if (tag <= Tag.REF_putStatic) {
         checkDescriptor(this.version, handle.descriptor, false);
       } else {
         checkMethodDescriptor(this.version, handle.descriptor);
       }
       String handleName = handle.name;
-      if (!("<init>".equals(handleName) && tag == Opcodes.H_NEWINVOKESPECIAL)) {
+      if (!("<init>".equals(handleName) && tag == Tag.REF_newInvokeSpecial)) {
         checkMethodIdentifier(this.version, handleName, "handle name");
       }
     } else if (value instanceof ConstantDynamic) {

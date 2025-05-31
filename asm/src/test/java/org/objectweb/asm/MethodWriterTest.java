@@ -119,7 +119,7 @@ class MethodWriterTest {
   void testRecursiveCondyFastEnough() {
     Handle bsm =
         new Handle(
-            Opcodes.H_INVOKESTATIC,
+                Tag.REF_invokeStatic,
             "RT",
             "bsm",
             "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/Class;I)Ljava/lang/invoke/CallSite;",
