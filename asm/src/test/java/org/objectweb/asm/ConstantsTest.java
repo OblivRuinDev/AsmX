@@ -76,7 +76,7 @@ class ConstantsTest {
     OTHER
   }
 
-    @Test
+  @Test
   void testAsmVersions() {
     List<Field> asmVersions = getConstants(ConstantType.ASM_VERSION);
 
@@ -267,6 +267,7 @@ class ConstantsTest {
       case "V23":
       case "V24":
       case "V25":
+      case "V26":
       case "V_DYNA":
       case "V_BYPASS":
         return ConstantType.CLASS_VERSION;

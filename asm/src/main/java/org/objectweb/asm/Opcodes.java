@@ -90,6 +90,7 @@ public interface Opcodes {
     int V23  =/*0 << 16 |*/67;
     int V24  =/*0 << 16 |*/68;
     int V25  =/*0 << 16 |*/69;
+    int V26  =/*0 << 16 |*/70;
     /** Current JVM's ClassFile version. */
     int V_DYNA = UtilX.getClassVer();
     /** Indicates that don't check Java ClassFile version while visit. */
