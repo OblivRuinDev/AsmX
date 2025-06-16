@@ -42,9 +42,13 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
+import dev.oblivruin.asm.constant.AttributeNames;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import static dev.oblivruin.asm.constant.AttributeNames.*;
 
 /**
  * A parser to make a {@link ClassVisitor} visit a ClassFile structure, as defined in the Java
@@ -527,48 +531,48 @@ public class ClassReader {
       currentAttributeOffset += 6;
       // The tests are sorted in decreasing frequency order (based on frequencies observed on
       // typical classes).
-      if (Constants.SOURCE_FILE.equals(attributeName)) {
+      if (SourceFile.equals(attributeName)) {
         sourceFile = readUTF8(currentAttributeOffset, charBuffer);
-      } else if (Constants.INNER_CLASSES.equals(attributeName)) {
+      } else if (InnerClasses.equals(attributeName)) {
         innerClassesOffset = currentAttributeOffset;
-      } else if (Constants.ENCLOSING_METHOD.equals(attributeName)) {
+      } else if (EnclosingMethod.equals(attributeName)) {
         enclosingMethodOffset = currentAttributeOffset;
-      } else if (Constants.NEST_HOST.equals(attributeName)) {
+      } else if (NestHost.equals(attributeName)) {
         nestHostClass = readClass(currentAttributeOffset, charBuffer);
-      } else if (Constants.NEST_MEMBERS.equals(attributeName)) {
+      } else if (NestMembers.equals(attributeName)) {
         nestMembersOffset = currentAttributeOffset;
-      } else if (Constants.PERMITTED_SUBCLASSES.equals(attributeName)) {
+      } else if (PermittedSubclasses.equals(attributeName)) {
         permittedSubclassesOffset = currentAttributeOffset;
-      } else if (Constants.SIGNATURE.equals(attributeName)) {
+      } else if (Signature.equals(attributeName)) {
         signature = readUTF8(currentAttributeOffset, charBuffer);
-      } else if (Constants.RUNTIME_VISIBLE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeVisibleAnnotations.equals(attributeName)) {
         runtimeVisibleAnnotationsOffset = currentAttributeOffset;
-      } else if (Constants.RUNTIME_VISIBLE_TYPE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeVisibleTypeAnnotations.equals(attributeName)) {
         runtimeVisibleTypeAnnotationsOffset = currentAttributeOffset;
-      } else if (Constants.DEPRECATED.equals(attributeName)) {
+      } else if (Deprecated.equals(attributeName)) {
         accessFlags |= Opcodes.ACC_DEPRECATED;
-      } else if (Constants.SYNTHETIC.equals(attributeName)) {
+      } else if (Synthetic.equals(attributeName)) {
         accessFlags |= Opcodes.ACC_SYNTHETIC;
-      } else if (Constants.SOURCE_DEBUG_EXTENSION.equals(attributeName)) {
+      } else if (SourceDebugExtension.equals(attributeName)) {
         if (attributeLength > classFileBuffer.length - currentAttributeOffset) {
           throw new IllegalArgumentException();
         }
         sourceDebugExtension =
             readUtf(currentAttributeOffset, attributeLength, new char[attributeLength]);
-      } else if (Constants.RUNTIME_INVISIBLE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeInvisibleAnnotations.equals(attributeName)) {
         runtimeInvisibleAnnotationsOffset = currentAttributeOffset;
-      } else if (Constants.RUNTIME_INVISIBLE_TYPE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeInvisibleTypeAnnotations.equals(attributeName)) {
         runtimeInvisibleTypeAnnotationsOffset = currentAttributeOffset;
-      } else if (Constants.RECORD.equals(attributeName)) {
+      } else if (Record.equals(attributeName)) {
         recordOffset = currentAttributeOffset;
         accessFlags |= Opcodes.ACC_RECORD;
-      } else if (Constants.MODULE.equals(attributeName)) {
+      } else if (Module.equals(attributeName)) {
         moduleOffset = currentAttributeOffset;
-      } else if (Constants.MODULE_MAIN_CLASS.equals(attributeName)) {
+      } else if (ModuleMainClass.equals(attributeName)) {
         moduleMainClass = readClass(currentAttributeOffset, charBuffer);
-      } else if (Constants.MODULE_PACKAGES.equals(attributeName)) {
+      } else if (ModulePackages.equals(attributeName)) {
         modulePackagesOffset = currentAttributeOffset;
-      } else if (!Constants.BOOTSTRAP_METHODS.equals(attributeName)) {
+      } else if (!BootstrapMethods.equals(attributeName)) {
         // The BootstrapMethods attribute is read in the constructor.
         Attribute attribute =
             readAttribute(
@@ -944,15 +948,15 @@ public class ClassReader {
       currentOffset += 6;
       // The tests are sorted in decreasing frequency order (based on frequencies observed on
       // typical classes).
-      if (Constants.SIGNATURE.equals(attributeName)) {
+      if (Signature.equals(attributeName)) {
         signature = readUTF8(currentOffset, charBuffer);
-      } else if (Constants.RUNTIME_VISIBLE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeVisibleAnnotations.equals(attributeName)) {
         runtimeVisibleAnnotationsOffset = currentOffset;
-      } else if (Constants.RUNTIME_VISIBLE_TYPE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeVisibleTypeAnnotations.equals(attributeName)) {
         runtimeVisibleTypeAnnotationsOffset = currentOffset;
-      } else if (Constants.RUNTIME_INVISIBLE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeInvisibleAnnotations.equals(attributeName)) {
         runtimeInvisibleAnnotationsOffset = currentOffset;
-      } else if (Constants.RUNTIME_INVISIBLE_TYPE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeInvisibleTypeAnnotations.equals(attributeName)) {
         runtimeInvisibleTypeAnnotationsOffset = currentOffset;
       } else {
         Attribute attribute =
@@ -1120,22 +1124,22 @@ public class ClassReader {
       currentOffset += 6;
       // The tests are sorted in decreasing frequency order (based on frequencies observed on
       // typical classes).
-      if (Constants.CONSTANT_VALUE.equals(attributeName)) {
+      if (AttributeNames.ConstantValue.equals(attributeName)) {
         int constantvalueIndex = readUnsignedShort(currentOffset);
         constantValue = constantvalueIndex == 0 ? null : readConst(constantvalueIndex, charBuffer);
-      } else if (Constants.SIGNATURE.equals(attributeName)) {
+      } else if (Signature.equals(attributeName)) {
         signature = readUTF8(currentOffset, charBuffer);
-      } else if (Constants.DEPRECATED.equals(attributeName)) {
+      } else if (Deprecated.equals(attributeName)) {
         accessFlags |= Opcodes.ACC_DEPRECATED;
-      } else if (Constants.SYNTHETIC.equals(attributeName)) {
+      } else if (Synthetic.equals(attributeName)) {
         accessFlags |= Opcodes.ACC_SYNTHETIC;
-      } else if (Constants.RUNTIME_VISIBLE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeVisibleAnnotations.equals(attributeName)) {
         runtimeVisibleAnnotationsOffset = currentOffset;
-      } else if (Constants.RUNTIME_VISIBLE_TYPE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeVisibleTypeAnnotations.equals(attributeName)) {
         runtimeVisibleTypeAnnotationsOffset = currentOffset;
-      } else if (Constants.RUNTIME_INVISIBLE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeInvisibleAnnotations.equals(attributeName)) {
         runtimeInvisibleAnnotationsOffset = currentOffset;
-      } else if (Constants.RUNTIME_INVISIBLE_TYPE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeInvisibleTypeAnnotations.equals(attributeName)) {
         runtimeInvisibleTypeAnnotationsOffset = currentOffset;
       } else {
         Attribute attribute =
@@ -1318,11 +1322,11 @@ public class ClassReader {
       currentOffset += 6;
       // The tests are sorted in decreasing frequency order (based on frequencies observed on
       // typical classes).
-      if (Constants.CODE.equals(attributeName)) {
+      if (AttributeNames.Code.equals(attributeName)) {
         if ((context.parsingOptions & SKIP_CODE) == 0) {
           codeOffset = currentOffset;
         }
-      } else if (Constants.EXCEPTIONS.equals(attributeName)) {
+      } else if (Exceptions.equals(attributeName)) {
         exceptionsOffset = currentOffset;
         exceptions = new String[readUnsignedShort(exceptionsOffset)];
         int currentExceptionOffset = exceptionsOffset + 2;
@@ -1330,28 +1334,28 @@ public class ClassReader {
           exceptions[i] = readClass(currentExceptionOffset, charBuffer);
           currentExceptionOffset += 2;
         }
-      } else if (Constants.SIGNATURE.equals(attributeName)) {
+      } else if (Signature.equals(attributeName)) {
         signatureIndex = readUnsignedShort(currentOffset);
-      } else if (Constants.DEPRECATED.equals(attributeName)) {
+      } else if (Deprecated.equals(attributeName)) {
         context.currentMethodAccessFlags |= Opcodes.ACC_DEPRECATED;
-      } else if (Constants.RUNTIME_VISIBLE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeVisibleAnnotations.equals(attributeName)) {
         runtimeVisibleAnnotationsOffset = currentOffset;
-      } else if (Constants.RUNTIME_VISIBLE_TYPE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeVisibleTypeAnnotations.equals(attributeName)) {
         runtimeVisibleTypeAnnotationsOffset = currentOffset;
-      } else if (Constants.ANNOTATION_DEFAULT.equals(attributeName)) {
+      } else if (AnnotationDefault.equals(attributeName)) {
         annotationDefaultOffset = currentOffset;
-      } else if (Constants.SYNTHETIC.equals(attributeName)) {
+      } else if (Synthetic.equals(attributeName)) {
         synthetic = true;
         context.currentMethodAccessFlags |= Opcodes.ACC_SYNTHETIC;
-      } else if (Constants.RUNTIME_INVISIBLE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeInvisibleAnnotations.equals(attributeName)) {
         runtimeInvisibleAnnotationsOffset = currentOffset;
-      } else if (Constants.RUNTIME_INVISIBLE_TYPE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeInvisibleTypeAnnotations.equals(attributeName)) {
         runtimeInvisibleTypeAnnotationsOffset = currentOffset;
-      } else if (Constants.RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeVisibleParameterAnnotations.equals(attributeName)) {
         runtimeVisibleParameterAnnotationsOffset = currentOffset;
-      } else if (Constants.RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeInvisibleParameterAnnotations.equals(attributeName)) {
         runtimeInvisibleParameterAnnotationsOffset = currentOffset;
-      } else if (Constants.METHOD_PARAMETERS.equals(attributeName)) {
+      } else if (MethodParameters.equals(attributeName)) {
         methodParametersOffset = currentOffset;
       } else {
         Attribute attribute =
@@ -1907,7 +1911,7 @@ public class ClassReader {
       String attributeName = readUTF8(currentOffset, charBuffer);
       int attributeLength = readInt(currentOffset + 2);
       currentOffset += 6;
-      if (Constants.LOCAL_VARIABLE_TABLE.equals(attributeName)) {
+      if (LocalVariableTable.equals(attributeName)) {
         if ((context.parsingOptions & SKIP_DEBUG) == 0) {
           localVariableTableOffset = currentOffset;
           // Parse the attribute to find the corresponding (debug only) labels.
@@ -1923,11 +1927,11 @@ public class ClassReader {
             currentLocalVariableTableOffset += 10;
           }
         }
-      } else if (Constants.LOCAL_VARIABLE_TYPE_TABLE.equals(attributeName)) {
+      } else if (LocalVariableTypeTable.equals(attributeName)) {
         localVariableTypeTableOffset = currentOffset;
         // Here we do not extract the labels corresponding to the attribute content. We assume they
         // are the same or a subset of those of the LocalVariableTable attribute.
-      } else if (Constants.LINE_NUMBER_TABLE.equals(attributeName)) {
+      } else if (LineNumberTable.equals(attributeName)) {
         if ((context.parsingOptions & SKIP_DEBUG) == 0) {
           // Parse the attribute to find the corresponding (debug only) labels.
           int currentLineNumberTableOffset = currentOffset;
@@ -1941,7 +1945,7 @@ public class ClassReader {
             labels[startPc].addLineNumber(lineNumber);
           }
         }
-      } else if (Constants.RUNTIME_VISIBLE_TYPE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeVisibleTypeAnnotations.equals(attributeName)) {
         visibleTypeAnnotationOffsets =
             readTypeAnnotations(methodVisitor, context, currentOffset, /* visible= */ true);
         // Here we do not extract the labels corresponding to the attribute content. This would
@@ -1950,11 +1954,11 @@ public class ClassReader {
         // type annotation at a time (i.e. after a type annotation has been visited, the next type
         // annotation is read), and the labels it contains are also extracted one annotation at a
         // time. This assumes that type annotations are ordered by increasing bytecode offset.
-      } else if (Constants.RUNTIME_INVISIBLE_TYPE_ANNOTATIONS.equals(attributeName)) {
+      } else if (RuntimeInvisibleTypeAnnotations.equals(attributeName)) {
         invisibleTypeAnnotationOffsets =
             readTypeAnnotations(methodVisitor, context, currentOffset, /* visible= */ false);
         // Same comment as above for the RuntimeVisibleTypeAnnotations attribute.
-      } else if (Constants.STACK_MAP_TABLE.equals(attributeName)) {
+      } else if (StackMapTable.equals(attributeName)) {
         if ((context.parsingOptions & SKIP_FRAMES) == 0) {
           stackMapFrameOffset = currentOffset + 2;
           stackMapTableEndOffset = currentOffset + attributeLength;
@@ -3511,7 +3515,7 @@ public class ClassReader {
       String attributeName = readUTF8(currentAttributeOffset, charBuffer);
       int attributeLength = readInt(currentAttributeOffset + 2);
       currentAttributeOffset += 6;
-      if (Constants.BOOTSTRAP_METHODS.equals(attributeName)) {
+      if (BootstrapMethods.equals(attributeName)) {
         // Read the num_bootstrap_methods field and create an array of this size.
         int[] result = new int[readUnsignedShort(currentAttributeOffset)];
         // Compute and store the offset of each 'bootstrap_methods' array field entry.

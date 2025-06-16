@@ -24,8 +24,48 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
-/**
- * This package offers an extremely efficient array and collection,
- * but all of these are unsafe.
- */
 package dev.oblivruin.asm.collection;
+
+public abstract class ObjArray<T> extends Array {
+    public T[] data;
+
+    public ObjArray(T[] data) {
+        this.data = data;
+    }
+
+    public ObjArray(int size) {
+        this.data = newArray(size);
+    }
+
+    public ObjArray() {
+        this.data = newArray(20);
+    }
+
+    public final void add(T value) {
+        ensureFree(1);
+        data[length++] = value;
+    }
+
+    @Override
+    public final void ensureFree(int size) {
+        int i = length + size;
+        if (i >= data.length) {
+            System.arraycopy(data, 0,
+                    (data = newArray(Math.max(i, data.length * 2))), 0, length);
+        }
+    }
+
+    @Override
+    public final boolean tryExpand(int size) {
+        int i = length + size;
+        if (i >= data.length) {
+            System.arraycopy(data, 0,
+                    (data = newArray(Math.max(i, data.length * 2))), 0,
+                    length);
+            return true;
+        }
+        return false;
+    }
+
+    public abstract T[] newArray(int length);
+}

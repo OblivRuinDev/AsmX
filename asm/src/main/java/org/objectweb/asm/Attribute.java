@@ -27,6 +27,8 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
+import static dev.oblivruin.asm.constant.AttributeNames.*;
+
 /**
  * A non standard class, field, method or Code attribute, as defined in the Java Virtual Machine
  * Specification (JVMS).
@@ -365,18 +367,18 @@ public class Attribute {
     if ((accessFlags & Opcodes.ACC_SYNTHETIC) != 0
         && symbolTable.getMajorVersion() < Opcodes.V1_5) {
       // Synthetic attributes always use 6 bytes.
-      symbolTable.addConstantUtf8(Constants.SYNTHETIC);
+      symbolTable.addConstantUtf8(Synthetic);
       size += 6;
     }
     if (signatureIndex != 0) {
       // Signature attributes always use 8 bytes.
-      symbolTable.addConstantUtf8(Constants.SIGNATURE);
+      symbolTable.addConstantUtf8(Signature);
       size += 8;
     }
     // ACC_DEPRECATED is ASM specific, the ClassFile format uses a Deprecated attribute instead.
     if ((accessFlags & Opcodes.ACC_DEPRECATED) != 0) {
       // Deprecated attributes always use 6 bytes.
-      symbolTable.addConstantUtf8(Constants.DEPRECATED);
+      symbolTable.addConstantUtf8(Deprecated);
       size += 6;
     }
     return size;
@@ -391,11 +393,7 @@ public class Attribute {
    * @param output where the attributes must be written.
    */
   final void putAttributes(final SymbolTable symbolTable, final ByteVector output) {
-    final byte[] code = null;
-    final int codeLength = 0;
-    final int maxStack = -1;
-    final int maxLocals = -1;
-    putAttributes(symbolTable, code, codeLength, maxStack, maxLocals, output);
+      putAttributes(symbolTable, null, 0, -1, -1, output);
   }
 
   /**
@@ -453,16 +451,16 @@ public class Attribute {
     // Before Java 1.5, synthetic fields are represented with a Synthetic attribute.
     if ((accessFlags & Opcodes.ACC_SYNTHETIC) != 0
         && symbolTable.getMajorVersion() < Opcodes.V1_5) {
-      output.putShort(symbolTable.addConstantUtf8(Constants.SYNTHETIC)).putInt(0);
+      output.putShort(symbolTable.addConstantUtf8(Synthetic)).putInt(0);
     }
     if (signatureIndex != 0) {
       output
-          .putShort(symbolTable.addConstantUtf8(Constants.SIGNATURE))
+          .putShort(symbolTable.addConstantUtf8(Signature))
           .putInt(2)
           .putShort(signatureIndex);
     }
     if ((accessFlags & Opcodes.ACC_DEPRECATED) != 0) {
-      output.putShort(symbolTable.addConstantUtf8(Constants.DEPRECATED)).putInt(0);
+      output.putShort(symbolTable.addConstantUtf8(Deprecated)).putInt(0);
     }
   }
 

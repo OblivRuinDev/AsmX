@@ -44,6 +44,8 @@ package org.objectweb.asm;
 
 import dev.oblivruin.asm.ClassVersionException;
 
+import static dev.oblivruin.asm.constant.AttributeNames.*;
+
 /**
  * A {@link ClassVisitor} that generates a corresponding ClassFile structure, as defined in the Java
  * Virtual Machine Specification (JVMS). It can be used alone, to generate a Java class "from
@@ -546,61 +548,61 @@ public class ClassWriter implements IClassVisitor {
     if (innerClasses != null) {
       ++attributesCount;
       size += 8 + innerClasses.length;
-      symbolTable.addConstantUtf8(Constants.INNER_CLASSES);
+      symbolTable.addConstantUtf8(InnerClasses);
     }
     if (enclosingClassIndex != 0) {
       ++attributesCount;
       size += 10;
-      symbolTable.addConstantUtf8(Constants.ENCLOSING_METHOD);
+      symbolTable.addConstantUtf8(EnclosingMethod);
     }
     if ((accessFlags & Opcodes.ACC_SYNTHETIC) != 0 && (version & 0xFFFF) < Opcodes.V1_5) {
       ++attributesCount;
       size += 6;
-      symbolTable.addConstantUtf8(Constants.SYNTHETIC);
+      symbolTable.addConstantUtf8(Synthetic);
     }
     if (signatureIndex != 0) {
       ++attributesCount;
       size += 8;
-      symbolTable.addConstantUtf8(Constants.SIGNATURE);
+      symbolTable.addConstantUtf8(Signature);
     }
     if (sourceFileIndex != 0) {
       ++attributesCount;
       size += 8;
-      symbolTable.addConstantUtf8(Constants.SOURCE_FILE);
+      symbolTable.addConstantUtf8(SourceFile);
     }
     if (debugExtension != null) {
       ++attributesCount;
       size += 6 + debugExtension.length;
-      symbolTable.addConstantUtf8(Constants.SOURCE_DEBUG_EXTENSION);
+      symbolTable.addConstantUtf8(SourceDebugExtension);
     }
     if ((accessFlags & Opcodes.ACC_DEPRECATED) != 0) {
       ++attributesCount;
       size += 6;
-      symbolTable.addConstantUtf8(Constants.DEPRECATED);
+      symbolTable.addConstantUtf8(Deprecated);
     }
     if (lastRuntimeVisibleAnnotation != null) {
       ++attributesCount;
       size +=
           lastRuntimeVisibleAnnotation.computeAnnotationsSize(
-              Constants.RUNTIME_VISIBLE_ANNOTATIONS);
+                  RuntimeVisibleAnnotations);
     }
     if (lastRuntimeInvisibleAnnotation != null) {
       ++attributesCount;
       size +=
           lastRuntimeInvisibleAnnotation.computeAnnotationsSize(
-              Constants.RUNTIME_INVISIBLE_ANNOTATIONS);
+                  RuntimeInvisibleAnnotations);
     }
     if (lastRuntimeVisibleTypeAnnotation != null) {
       ++attributesCount;
       size +=
           lastRuntimeVisibleTypeAnnotation.computeAnnotationsSize(
-              Constants.RUNTIME_VISIBLE_TYPE_ANNOTATIONS);
+                  RuntimeVisibleTypeAnnotations);
     }
     if (lastRuntimeInvisibleTypeAnnotation != null) {
       ++attributesCount;
       size +=
           lastRuntimeInvisibleTypeAnnotation.computeAnnotationsSize(
-              Constants.RUNTIME_INVISIBLE_TYPE_ANNOTATIONS);
+                  RuntimeInvisibleTypeAnnotations);
     }
     if (symbolTable.computeBootstrapMethodsSize() > 0) {
       ++attributesCount;
@@ -613,17 +615,17 @@ public class ClassWriter implements IClassVisitor {
     if (nestHostClassIndex != 0) {
       ++attributesCount;
       size += 8;
-      symbolTable.addConstantUtf8(Constants.NEST_HOST);
+      symbolTable.addConstantUtf8(NestHost);
     }
     if (nestMemberClasses != null) {
       ++attributesCount;
       size += 8 + nestMemberClasses.length;
-      symbolTable.addConstantUtf8(Constants.NEST_MEMBERS);
+      symbolTable.addConstantUtf8(NestMembers);
     }
     if (permittedSubclasses != null) {
       ++attributesCount;
       size += 8 + permittedSubclasses.length;
-      symbolTable.addConstantUtf8(Constants.PERMITTED_SUBCLASSES);
+      symbolTable.addConstantUtf8(PermittedSubclasses);
     }
     int recordComponentCount = 0;
     int recordSize = 0;
@@ -636,7 +638,7 @@ public class ClassWriter implements IClassVisitor {
       }
       ++attributesCount;
       size += 8 + recordSize;
-      symbolTable.addConstantUtf8(Constants.RECORD);
+      symbolTable.addConstantUtf8(Record);
     }
     if (firstAttribute != null) {
       attributesCount += firstAttribute.getAttributeCount();
@@ -681,42 +683,42 @@ public class ClassWriter implements IClassVisitor {
     result.putShort(attributesCount);
     if (innerClasses != null) {
       result
-          .putShort(symbolTable.addConstantUtf8(Constants.INNER_CLASSES))
+          .putShort(symbolTable.addConstantUtf8(InnerClasses))
           .putInt(innerClasses.length + 2)
           .putShort(numberOfInnerClasses)
           .putByteArray(innerClasses.data, 0, innerClasses.length);
     }
     if (enclosingClassIndex != 0) {
       result
-          .putShort(symbolTable.addConstantUtf8(Constants.ENCLOSING_METHOD))
+          .putShort(symbolTable.addConstantUtf8(EnclosingMethod))
           .putInt(4)
           .putShort(enclosingClassIndex)
           .putShort(enclosingMethodIndex);
     }
     if ((accessFlags & Opcodes.ACC_SYNTHETIC) != 0 && (version & 0xFFFF) < Opcodes.V1_5) {
-      result.putShort(symbolTable.addConstantUtf8(Constants.SYNTHETIC)).putInt(0);
+      result.putShort(symbolTable.addConstantUtf8(Synthetic)).putInt(0);
     }
     if (signatureIndex != 0) {
       result
-          .putShort(symbolTable.addConstantUtf8(Constants.SIGNATURE))
+          .putShort(symbolTable.addConstantUtf8(Signature))
           .putInt(2)
           .putShort(signatureIndex);
     }
     if (sourceFileIndex != 0) {
       result
-          .putShort(symbolTable.addConstantUtf8(Constants.SOURCE_FILE))
+          .putShort(symbolTable.addConstantUtf8(SourceFile))
           .putInt(2)
           .putShort(sourceFileIndex);
     }
     if (debugExtension != null) {
       int length = debugExtension.length;
       result
-          .putShort(symbolTable.addConstantUtf8(Constants.SOURCE_DEBUG_EXTENSION))
+          .putShort(symbolTable.addConstantUtf8(SourceDebugExtension))
           .putInt(length)
           .putByteArray(debugExtension.data, 0, length);
     }
     if ((accessFlags & Opcodes.ACC_DEPRECATED) != 0) {
-      result.putShort(symbolTable.addConstantUtf8(Constants.DEPRECATED)).putInt(0);
+      result.putShort(symbolTable.addConstantUtf8(Deprecated)).putInt(0);
     }
     AnnotationWriter.putAnnotations(
         symbolTable,
@@ -731,27 +733,27 @@ public class ClassWriter implements IClassVisitor {
     }
     if (nestHostClassIndex != 0) {
       result
-          .putShort(symbolTable.addConstantUtf8(Constants.NEST_HOST))
+          .putShort(symbolTable.addConstantUtf8(NestHost))
           .putInt(2)
           .putShort(nestHostClassIndex);
     }
     if (nestMemberClasses != null) {
       result
-          .putShort(symbolTable.addConstantUtf8(Constants.NEST_MEMBERS))
+          .putShort(symbolTable.addConstantUtf8(NestMembers))
           .putInt(nestMemberClasses.length + 2)
           .putShort(numberOfNestMemberClasses)
           .putByteArray(nestMemberClasses.data, 0, nestMemberClasses.length);
     }
     if (permittedSubclasses != null) {
       result
-          .putShort(symbolTable.addConstantUtf8(Constants.PERMITTED_SUBCLASSES))
+          .putShort(symbolTable.addConstantUtf8(PermittedSubclasses))
           .putInt(permittedSubclasses.length + 2)
           .putShort(numberOfPermittedSubclasses)
           .putByteArray(permittedSubclasses.data, 0, permittedSubclasses.length);
     }
     if ((accessFlags & Opcodes.ACC_RECORD) != 0 || firstRecordComponent != null) {
       result
-          .putShort(symbolTable.addConstantUtf8(Constants.RECORD))
+          .putShort(symbolTable.addConstantUtf8(Record))
           .putInt(recordSize + 2)
           .putShort(recordComponentCount);
       RecordComponentWriter recordComponentWriter = firstRecordComponent;

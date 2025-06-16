@@ -42,6 +42,10 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
+import dev.oblivruin.asm.constant.AttributeNames;
+
+import static dev.oblivruin.asm.constant.AttributeNames.*;
+
 /**
  * A {@link MethodVisitor} that generates a corresponding 'method_info' structure, as defined in the
  * Java Virtual Machine Specification (JVMS).
@@ -2102,40 +2106,40 @@ final class MethodWriter implements IMethodVisitor {
         throw new MethodTooLargeException(
             symbolTable.getClassName(), name, descriptor, code.length);
       }
-      symbolTable.addConstantUtf8(Constants.CODE);
+      symbolTable.addConstantUtf8(AttributeNames.Code);
       // The Code attribute has 6 header bytes, plus 2, 2, 4 and 2 bytes respectively for max_stack,
       // max_locals, code_length and attributes_count, plus the bytecode and the exception table.
       size += 16 + code.length + Handler.getExceptionTableSize(firstHandler);
       if (stackMapTableEntries != null) {
         boolean useStackMapTable = symbolTable.getMajorVersion() >= Opcodes.V1_6;
-        symbolTable.addConstantUtf8(useStackMapTable ? Constants.STACK_MAP_TABLE : "StackMap");
+        symbolTable.addConstantUtf8(useStackMapTable ? StackMapTable : "StackMap");
         // 6 header bytes and 2 bytes for number_of_entries.
         size += 8 + stackMapTableEntries.length;
       }
       if (lineNumberTable != null) {
-        symbolTable.addConstantUtf8(Constants.LINE_NUMBER_TABLE);
+        symbolTable.addConstantUtf8(LineNumberTable);
         // 6 header bytes and 2 bytes for line_number_table_length.
         size += 8 + lineNumberTable.length;
       }
       if (localVariableTable != null) {
-        symbolTable.addConstantUtf8(Constants.LOCAL_VARIABLE_TABLE);
+        symbolTable.addConstantUtf8(LocalVariableTable);
         // 6 header bytes and 2 bytes for local_variable_table_length.
         size += 8 + localVariableTable.length;
       }
       if (localVariableTypeTable != null) {
-        symbolTable.addConstantUtf8(Constants.LOCAL_VARIABLE_TYPE_TABLE);
+        symbolTable.addConstantUtf8(LocalVariableTypeTable);
         // 6 header bytes and 2 bytes for local_variable_type_table_length.
         size += 8 + localVariableTypeTable.length;
       }
       if (lastCodeRuntimeVisibleTypeAnnotation != null) {
         size +=
             lastCodeRuntimeVisibleTypeAnnotation.computeAnnotationsSize(
-                Constants.RUNTIME_VISIBLE_TYPE_ANNOTATIONS);
+                    RuntimeVisibleTypeAnnotations);
       }
       if (lastCodeRuntimeInvisibleTypeAnnotation != null) {
         size +=
             lastCodeRuntimeInvisibleTypeAnnotation.computeAnnotationsSize(
-                Constants.RUNTIME_INVISIBLE_TYPE_ANNOTATIONS);
+                    RuntimeInvisibleTypeAnnotations);
       }
       if (firstCodeAttribute != null) {
         size +=
@@ -2144,7 +2148,7 @@ final class MethodWriter implements IMethodVisitor {
       }
     }
     if (numberOfExceptions > 0) {
-      symbolTable.addConstantUtf8(Constants.EXCEPTIONS);
+      symbolTable.addConstantUtf8(Exceptions);
       size += 8 + 2 * numberOfExceptions;
     }
     size += Attribute.computeAttributesSize(symbolTable, accessFlags, signatureIndex);
@@ -2157,7 +2161,7 @@ final class MethodWriter implements IMethodVisitor {
     if (lastRuntimeVisibleParameterAnnotations != null) {
       size +=
           AnnotationWriter.computeParameterAnnotationsSize(
-              Constants.RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS,
+                  RuntimeVisibleParameterAnnotations,
               lastRuntimeVisibleParameterAnnotations,
               visibleAnnotableParameterCount == 0
                   ? lastRuntimeVisibleParameterAnnotations.length
@@ -2166,18 +2170,18 @@ final class MethodWriter implements IMethodVisitor {
     if (lastRuntimeInvisibleParameterAnnotations != null) {
       size +=
           AnnotationWriter.computeParameterAnnotationsSize(
-              Constants.RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS,
+                  RuntimeInvisibleParameterAnnotations,
               lastRuntimeInvisibleParameterAnnotations,
               invisibleAnnotableParameterCount == 0
                   ? lastRuntimeInvisibleParameterAnnotations.length
                   : invisibleAnnotableParameterCount);
     }
     if (defaultValue != null) {
-      symbolTable.addConstantUtf8(Constants.ANNOTATION_DEFAULT);
+      symbolTable.addConstantUtf8(AnnotationDefault);
       size += 6 + defaultValue.length;
     }
     if (parameters != null) {
-      symbolTable.addConstantUtf8(Constants.METHOD_PARAMETERS);
+      symbolTable.addConstantUtf8(MethodParameters);
       // 6 header bytes and 1 byte for parameters_count.
       size += 7 + parameters.length;
     }
@@ -2276,13 +2280,13 @@ final class MethodWriter implements IMethodVisitor {
       if (lastCodeRuntimeVisibleTypeAnnotation != null) {
         size +=
             lastCodeRuntimeVisibleTypeAnnotation.computeAnnotationsSize(
-                Constants.RUNTIME_VISIBLE_TYPE_ANNOTATIONS);
+                    RuntimeVisibleTypeAnnotations);
         ++codeAttributeCount;
       }
       if (lastCodeRuntimeInvisibleTypeAnnotation != null) {
         size +=
             lastCodeRuntimeInvisibleTypeAnnotation.computeAnnotationsSize(
-                Constants.RUNTIME_INVISIBLE_TYPE_ANNOTATIONS);
+                    RuntimeInvisibleTypeAnnotations);
         ++codeAttributeCount;
       }
       if (firstCodeAttribute != null) {
@@ -2292,7 +2296,7 @@ final class MethodWriter implements IMethodVisitor {
         codeAttributeCount += firstCodeAttribute.getAttributeCount();
       }
       output
-          .putShort(symbolTable.addConstantUtf8(Constants.CODE))
+          .putShort(symbolTable.addConstantUtf8(AttributeNames.Code))
           .putInt(size)
           .putShort(maxStack)
           .putShort(maxLocals)
@@ -2305,39 +2309,39 @@ final class MethodWriter implements IMethodVisitor {
         output
             .putShort(
                 symbolTable.addConstantUtf8(
-                    useStackMapTable ? Constants.STACK_MAP_TABLE : "StackMap"))
+                    useStackMapTable ? StackMapTable : "StackMap"))
             .putInt(2 + stackMapTableEntries.length)
             .putShort(stackMapTableNumberOfEntries)
             .putByteArray(stackMapTableEntries.data, 0, stackMapTableEntries.length);
       }
       if (lineNumberTable != null) {
         output
-            .putShort(symbolTable.addConstantUtf8(Constants.LINE_NUMBER_TABLE))
+            .putShort(symbolTable.addConstantUtf8(LineNumberTable))
             .putInt(2 + lineNumberTable.length)
             .putShort(lineNumberTableLength)
             .putByteArray(lineNumberTable.data, 0, lineNumberTable.length);
       }
       if (localVariableTable != null) {
         output
-            .putShort(symbolTable.addConstantUtf8(Constants.LOCAL_VARIABLE_TABLE))
+            .putShort(symbolTable.addConstantUtf8(LocalVariableTable))
             .putInt(2 + localVariableTable.length)
             .putShort(localVariableTableLength)
             .putByteArray(localVariableTable.data, 0, localVariableTable.length);
       }
       if (localVariableTypeTable != null) {
         output
-            .putShort(symbolTable.addConstantUtf8(Constants.LOCAL_VARIABLE_TYPE_TABLE))
+            .putShort(symbolTable.addConstantUtf8(LocalVariableTypeTable))
             .putInt(2 + localVariableTypeTable.length)
             .putShort(localVariableTypeTableLength)
             .putByteArray(localVariableTypeTable.data, 0, localVariableTypeTable.length);
       }
       if (lastCodeRuntimeVisibleTypeAnnotation != null) {
         lastCodeRuntimeVisibleTypeAnnotation.putAnnotations(
-            symbolTable.addConstantUtf8(Constants.RUNTIME_VISIBLE_TYPE_ANNOTATIONS), output);
+            symbolTable.addConstantUtf8(RuntimeVisibleTypeAnnotations), output);
       }
       if (lastCodeRuntimeInvisibleTypeAnnotation != null) {
         lastCodeRuntimeInvisibleTypeAnnotation.putAnnotations(
-            symbolTable.addConstantUtf8(Constants.RUNTIME_INVISIBLE_TYPE_ANNOTATIONS), output);
+            symbolTable.addConstantUtf8(RuntimeInvisibleTypeAnnotations), output);
       }
       if (firstCodeAttribute != null) {
         firstCodeAttribute.putAttributes(
@@ -2346,7 +2350,7 @@ final class MethodWriter implements IMethodVisitor {
     }
     if (numberOfExceptions > 0) {
       output
-          .putShort(symbolTable.addConstantUtf8(Constants.EXCEPTIONS))
+          .putShort(symbolTable.addConstantUtf8(Exceptions))
           .putInt(2 + 2 * numberOfExceptions)
           .putShort(numberOfExceptions);
       for (int exceptionIndex : exceptionIndexTable) {
@@ -2363,7 +2367,7 @@ final class MethodWriter implements IMethodVisitor {
         output);
     if (lastRuntimeVisibleParameterAnnotations != null) {
       AnnotationWriter.putParameterAnnotations(
-          symbolTable.addConstantUtf8(Constants.RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS),
+          symbolTable.addConstantUtf8(RuntimeVisibleParameterAnnotations),
           lastRuntimeVisibleParameterAnnotations,
           visibleAnnotableParameterCount == 0
               ? lastRuntimeVisibleParameterAnnotations.length
@@ -2372,7 +2376,7 @@ final class MethodWriter implements IMethodVisitor {
     }
     if (lastRuntimeInvisibleParameterAnnotations != null) {
       AnnotationWriter.putParameterAnnotations(
-          symbolTable.addConstantUtf8(Constants.RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS),
+          symbolTable.addConstantUtf8(RuntimeInvisibleParameterAnnotations),
           lastRuntimeInvisibleParameterAnnotations,
           invisibleAnnotableParameterCount == 0
               ? lastRuntimeInvisibleParameterAnnotations.length
@@ -2381,13 +2385,13 @@ final class MethodWriter implements IMethodVisitor {
     }
     if (defaultValue != null) {
       output
-          .putShort(symbolTable.addConstantUtf8(Constants.ANNOTATION_DEFAULT))
+          .putShort(symbolTable.addConstantUtf8(AnnotationDefault))
           .putInt(defaultValue.length)
           .putByteArray(defaultValue.data, 0, defaultValue.length);
     }
     if (parameters != null) {
       output
-          .putShort(symbolTable.addConstantUtf8(Constants.METHOD_PARAMETERS))
+          .putShort(symbolTable.addConstantUtf8(MethodParameters))
           .putInt(1 + parameters.length)
           .putByte(parametersCount)
           .putByteArray(parameters.data, 0, parameters.length);

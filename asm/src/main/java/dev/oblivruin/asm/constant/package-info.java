@@ -25,7 +25,23 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
 /**
- * This package offers an extremely efficient array and collection,
- * but all of these are unsafe.
+ * Contains classes that declare compile-time constants for javac inlining optimization.
+ * And classes which provide
+ *
+ * <p>Under normal conditions, classes in this package <b>will not be loaded at runtime</b>,
+ * because their constant values are inlined directly into bytecode during compilation.
+ * This design prevents unnecessary class loading and reduces runtime memory footprint.
+ *
+ * <h3>Technical Rationale</h3>
+ * When javac processes {@code static final} primitive/String constants, it performs:
+ * <ol>
+ *   <li><b>Constant folding</b> - Computations resolved at compile time</li>
+ *   <li><b>Bytecode inlining</b> - Direct embedding of constant values</li>
+ *   <li><b>Class elimination</b> - Removal of constant-holder classes from runtime loading</li>
+ * </ol>
+ *
+ * <h3>Exception Case</h3>
+ * The {@link dev.oblivruin.asm.constant.RuntimeConstant} class and <i>Xxx</i>Helper
+ * <b>deviate from this pattern</b>.
  */
-package dev.oblivruin.asm.collection;
+package dev.oblivruin.asm.constant;

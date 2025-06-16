@@ -53,6 +53,10 @@ public final class ByteArray extends Array {
         data[length++] = b;
     }
 
+    public void put1_(byte b) {
+        data[length++] = b;
+    }
+
     /**
      * Copy the source ByteArray.
      * @param byteArray source ByteArray
@@ -116,6 +120,94 @@ public final class ByteArray extends Array {
             return true;
         }
         return false;
+    }
+
+    public void put2(short value) {
+        ensureFree(2);
+        data[length++] = (byte) (value >>> 8);
+        data[length++] = (byte) value;
+    }
+
+    public void put2(int value) {
+        ensureFree(2);
+        put2_(value);
+    }
+
+    public void put2_(int value) {
+        data[length++] = (byte) (value >>> 8);
+        data[length++] = (byte) value;
+    }
+
+    public void put2On(int index, int value) {
+        data[index] = (byte) (value >>> 8);
+        data[index + 1] = (byte) value;
+    }
+
+    public void put4(int value) {
+        ensureFree(4);
+        int pointer = this.length;
+        byte[] array = this.data;
+        array[pointer++] = (byte) (value >>> 24);
+        array[pointer++] = (byte) (value >>> 16);
+        array[pointer++] = (byte) (value >>> 8 );
+        array[pointer  ] = (byte)  value        ;
+        this.length = ++pointer;
+    }
+
+    public void put8(long value) {
+        ensureFree(8);
+        int pointer = this.length;
+        byte[] array = this.data;
+        array[pointer++] = (byte) (value >>> 56);
+        array[pointer++] = (byte) (value >>> 48);
+        array[pointer++] = (byte) (value >>> 40);
+        array[pointer++] = (byte) (value >>> 32);
+        array[pointer++] = (byte) (value >>> 24);
+        array[pointer++] = (byte) (value >>> 16);
+        array[pointer++] = (byte) (value >>> 8 );
+        array[pointer  ] = (byte)  value        ;
+        this.length = ++pointer;
+    }
+
+    public void put4(float value) {
+        put4(Float.floatToIntBits(value));
+    }
+
+    public void put8(double value) {
+        put8(Double.doubleToLongBits(value));
+    }
+
+    public void put222(int shortV1, int shortV2, int shortV3) {
+        ensureFree(6);
+        int pointer = this.length;
+        byte[] array = this.data;
+        array[pointer++] = (byte) (shortV1 >>> 8);
+        array[pointer++] = (byte) shortV1;
+        array[pointer++] = (byte) (shortV2 >>> 8);
+        array[pointer++] = (byte) shortV2;
+        array[pointer++] = (byte) (shortV3 >>> 8);
+        array[pointer  ] = (byte) shortV3;
+        this.length = ++pointer;
+    }
+
+    public void put122_(int byteV, int shortV1, int shortV2) {
+        int pointer = this.length;
+        byte[] array = this.data;
+        array[pointer++] = (byte) byteV;
+        array[pointer++] = (byte) (shortV1 >>> 8);
+        array[pointer++] = (byte) shortV1;
+        array[pointer++] = (byte) (shortV2 >>> 8);
+        array[pointer  ] = (byte) shortV2;
+        this.length = ++pointer;//faster than x++
+    }
+
+    public void put12_(int byteV, int shortV) {
+        int pointer = this.length;
+        byte[] array = this.data;
+        array[pointer++] = (byte) byteV;
+        array[pointer++] = (byte) (shortV >>> 8);
+        array[pointer  ] = (byte) shortV;
+        this.length = ++pointer;
     }
 
     public byte[] toArray() {

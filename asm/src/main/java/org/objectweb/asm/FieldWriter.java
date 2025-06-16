@@ -42,6 +42,8 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
+import dev.oblivruin.asm.constant.AttributeNames;
+
 /**
  * A {@link FieldVisitor} that generates a corresponding 'field_info' structure, as defined in the
  * Java Virtual Machine Specification (JVMS).
@@ -211,7 +213,7 @@ final class FieldWriter implements IFieldVisitor {
     // For ease of reference, we use here the same attribute order as in Section 4.7 of the JVMS.
     if (constantValueIndex != 0) {
       // ConstantValue attributes always use 8 bytes.
-      symbolTable.addConstantUtf8(Constants.CONSTANT_VALUE);
+      symbolTable.addConstantUtf8(AttributeNames.ConstantValue);
       size += 8;
     }
     size += Attribute.computeAttributesSize(symbolTable, accessFlags, signatureIndex);
@@ -273,7 +275,7 @@ final class FieldWriter implements IFieldVisitor {
     // For ease of reference, we use here the same attribute order as in Section 4.7 of the JVMS.
     if (constantValueIndex != 0) {
       output
-          .putShort(symbolTable.addConstantUtf8(Constants.CONSTANT_VALUE))
+          .putShort(symbolTable.addConstantUtf8(AttributeNames.ConstantValue))
           .putInt(2)
           .putShort(constantValueIndex);
     }

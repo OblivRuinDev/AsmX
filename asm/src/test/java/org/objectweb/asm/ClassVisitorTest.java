@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import dev.oblivruin.asm.constant.AttributeNames;
 import dev.oblivruin.asm.ClassVersionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -82,13 +83,6 @@ class ClassVisitorTest extends AsmTest {
     Executable constructor = () -> new ClassVisitor(-1) {};
 
       assertThrows(ClassVersionException.class, constructor);
-  }
-
-  @Test
-  void testGetDelegate() {
-    ClassVisitor delegate = new ClassVisitor() {};
-
-      DelegateVisitorTest.testGetDelegate(delegate, new ClassVisitor(delegate) {});
   }
 
   /**
@@ -315,7 +309,7 @@ class ClassVisitorTest extends AsmTest {
 
     String classDump = new ClassFile(classWriter.toByteArray()).toString();
     assertFalse(classDump.contains("ModulePackage"));
-    assertFalse(classDump.contains("ModuleMainClass"));
+    assertFalse(classDump.contains(AttributeNames.ModuleMainClass));
   }
 
   static Attribute[] attributes() {

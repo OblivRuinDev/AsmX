@@ -42,6 +42,8 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
+import static dev.oblivruin.asm.constant.AttributeNames.*;
+
 /**
  * An {@link AnnotationVisitor} that generates a corresponding 'annotation' or 'type_annotation'
  * structure, as defined in the Java Virtual Machine Specification (JVMS). AnnotationWriter
@@ -388,22 +390,22 @@ final class AnnotationWriter implements IAnnotationVisitor {
     if (lastRuntimeVisibleAnnotation != null) {
       size +=
           lastRuntimeVisibleAnnotation.computeAnnotationsSize(
-              Constants.RUNTIME_VISIBLE_ANNOTATIONS);
+                  RuntimeVisibleAnnotations);
     }
     if (lastRuntimeInvisibleAnnotation != null) {
       size +=
           lastRuntimeInvisibleAnnotation.computeAnnotationsSize(
-              Constants.RUNTIME_INVISIBLE_ANNOTATIONS);
+                  RuntimeInvisibleAnnotations);
     }
     if (lastRuntimeVisibleTypeAnnotation != null) {
       size +=
           lastRuntimeVisibleTypeAnnotation.computeAnnotationsSize(
-              Constants.RUNTIME_VISIBLE_TYPE_ANNOTATIONS);
+                  RuntimeVisibleTypeAnnotations);
     }
     if (lastRuntimeInvisibleTypeAnnotation != null) {
       size +=
           lastRuntimeInvisibleTypeAnnotation.computeAnnotationsSize(
-              Constants.RUNTIME_INVISIBLE_TYPE_ANNOTATIONS);
+                  RuntimeInvisibleTypeAnnotations);
     }
     return size;
   }
@@ -469,19 +471,19 @@ final class AnnotationWriter implements IAnnotationVisitor {
       final ByteVector output) {
     if (lastRuntimeVisibleAnnotation != null) {
       lastRuntimeVisibleAnnotation.putAnnotations(
-          symbolTable.addConstantUtf8(Constants.RUNTIME_VISIBLE_ANNOTATIONS), output);
+          symbolTable.addConstantUtf8(RuntimeVisibleAnnotations), output);
     }
     if (lastRuntimeInvisibleAnnotation != null) {
       lastRuntimeInvisibleAnnotation.putAnnotations(
-          symbolTable.addConstantUtf8(Constants.RUNTIME_INVISIBLE_ANNOTATIONS), output);
+          symbolTable.addConstantUtf8(RuntimeInvisibleAnnotations), output);
     }
     if (lastRuntimeVisibleTypeAnnotation != null) {
       lastRuntimeVisibleTypeAnnotation.putAnnotations(
-          symbolTable.addConstantUtf8(Constants.RUNTIME_VISIBLE_TYPE_ANNOTATIONS), output);
+          symbolTable.addConstantUtf8(RuntimeVisibleTypeAnnotations), output);
     }
     if (lastRuntimeInvisibleTypeAnnotation != null) {
       lastRuntimeInvisibleTypeAnnotation.putAnnotations(
-          symbolTable.addConstantUtf8(Constants.RUNTIME_INVISIBLE_TYPE_ANNOTATIONS), output);
+          symbolTable.addConstantUtf8(RuntimeInvisibleTypeAnnotations), output);
     }
   }
 

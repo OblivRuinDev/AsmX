@@ -42,6 +42,8 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
+import static dev.oblivruin.asm.constant.AttributeNames.*;
+
 /**
  * A {@link ModuleVisitor} that generates the corresponding Module, ModulePackages and
  * ModuleMainClass attributes, as defined in the Java Virtual Machine Specification (JVMS).
@@ -208,17 +210,17 @@ final class ModuleWriter implements IModuleVisitor {
    * @return the size in bytes of the Module, ModulePackages and ModuleMainClass attributes.
    */
   int computeAttributesSize() {
-    symbolTable.addConstantUtf8(Constants.MODULE);
+    symbolTable.addConstantUtf8(Module);
     // 6 attribute header bytes, 6 bytes for name, flags and version, and 5 * 2 bytes for counts.
     int size =
         22 + requires.length + exports.length + opens.length + usesIndex.length + provides.length;
     if (packageCount > 0) {
-      symbolTable.addConstantUtf8(Constants.MODULE_PACKAGES);
+      symbolTable.addConstantUtf8(ModulePackages);
       // 6 attribute header bytes, and 2 bytes for package_count.
       size += 8 + packageIndex.length;
     }
     if (mainClassIndex > 0) {
-      symbolTable.addConstantUtf8(Constants.MODULE_MAIN_CLASS);
+      symbolTable.addConstantUtf8(ModuleMainClass);
       // 6 attribute header bytes, and 2 bytes for main_class_index.
       size += 8;
     }
@@ -236,7 +238,7 @@ final class ModuleWriter implements IModuleVisitor {
     int moduleAttributeLength =
         16 + requires.length + exports.length + opens.length + usesIndex.length + provides.length;
     output
-        .putShort(symbolTable.addConstantUtf8(Constants.MODULE))
+        .putShort(symbolTable.addConstantUtf8(Module))
         .putInt(moduleAttributeLength)
         .putShort(moduleNameIndex)
         .putShort(moduleFlags)
@@ -253,14 +255,14 @@ final class ModuleWriter implements IModuleVisitor {
         .putByteArray(provides.data, 0, provides.length);
     if (packageCount > 0) {
       output
-          .putShort(symbolTable.addConstantUtf8(Constants.MODULE_PACKAGES))
+          .putShort(symbolTable.addConstantUtf8(ModulePackages))
           .putInt(2 + packageIndex.length)
           .putShort(packageCount)
           .putByteArray(packageIndex.data, 0, packageIndex.length);
     }
     if (mainClassIndex > 0) {
       output
-          .putShort(symbolTable.addConstantUtf8(Constants.MODULE_MAIN_CLASS))
+          .putShort(symbolTable.addConstantUtf8(ModuleMainClass))
           .putInt(2)
           .putShort(mainClassIndex);
     }

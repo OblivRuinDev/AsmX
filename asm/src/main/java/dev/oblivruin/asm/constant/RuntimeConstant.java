@@ -24,8 +24,10 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
-/**
- * This package offers an extremely efficient array and collection,
- * but all of these are unsafe.
- */
-package dev.oblivruin.asm.collection;
+package dev.oblivruin.asm.constant;
+
+public final class RuntimeConstant {
+
+    static {}
+    private RuntimeConstant() {}
+}

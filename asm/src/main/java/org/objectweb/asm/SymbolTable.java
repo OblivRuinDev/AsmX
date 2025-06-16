@@ -42,6 +42,8 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm;
 
+import static dev.oblivruin.asm.constant.AttributeNames.BootstrapMethods;
+
 /**
  * The constant pool entries, the BootstrapMethods attribute entries and the (ASM specific) type
  * table entries of a class.
@@ -288,7 +290,7 @@ final class SymbolTable {
     int currentAttributeOffset = classReader.getFirstAttributeOffset();
     for (int i = classReader.readUnsignedShort(currentAttributeOffset - 2); i > 0; --i) {
       String attributeName = classReader.readUTF8(currentAttributeOffset, charBuffer);
-      if (Constants.BOOTSTRAP_METHODS.equals(attributeName)) {
+      if (BootstrapMethods.equals(attributeName)) {
         bootstrapMethodCount = classReader.readUnsignedShort(currentAttributeOffset + 6);
         break;
       }
@@ -398,7 +400,7 @@ final class SymbolTable {
    */
   int computeBootstrapMethodsSize() {
     if (bootstrapMethods != null) {
-      addConstantUtf8(Constants.BOOTSTRAP_METHODS);
+      addConstantUtf8(BootstrapMethods);
       return 8 + bootstrapMethods.length;
     } else {
       return 0;
@@ -414,7 +416,7 @@ final class SymbolTable {
   void putBootstrapMethods(final ByteVector output) {
     if (bootstrapMethods != null) {
       output
-          .putShort(addConstantUtf8(Constants.BOOTSTRAP_METHODS))
+          .putShort(addConstantUtf8(BootstrapMethods))
           .putInt(bootstrapMethods.length + 2)
           .putShort(bootstrapMethodCount)
           .putByteArray(bootstrapMethods.data, 0, bootstrapMethods.length);
