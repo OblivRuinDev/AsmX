@@ -49,7 +49,7 @@ package org.objectweb.asm;
  *
  * @author OblivRuinDev
  */
-public interface IRecordComponentVisitor extends IVisitor, ISpecialVisitor {
+public interface IRecordComponentVisitor extends ISpecialVisitor {
 
     /** {@inheritDoc} */
     @Override

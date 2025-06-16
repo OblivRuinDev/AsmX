@@ -50,6 +50,7 @@ package org.objectweb.asm.signature;
  *     4.7.9.1</a>
  * @author Thomas Hallgren
  * @author Eric Bruneton
+ * @author OblivRuinDev
  */
 public class SignatureReader {
 

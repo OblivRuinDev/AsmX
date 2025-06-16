@@ -50,7 +50,7 @@ package org.objectweb.asm;
  *
  * @author OblivRuinDev
  */
-public interface ISpecialVisitor extends IVisitor {
+public interface ISpecialVisitor {
     /**
      * Visits an annotation.
      *
@@ -81,4 +81,9 @@ public interface ISpecialVisitor extends IVisitor {
      * @param attribute an attribute.
      */
     void visitAttribute(Attribute attribute);
+
+    /**
+     * Visits the end of this.
+     */
+    void visitEnd();
 }

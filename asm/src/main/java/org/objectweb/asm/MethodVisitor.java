@@ -78,12 +78,12 @@ public abstract class MethodVisitor extends DelegateVisitor<IMethodVisitor> impl
     super(ver);
   }
 
-  /** @see DelegateVisitor#DelegateVisitor(int, IVisitor) */
+  /** @see DelegateVisitor#DelegateVisitor(int, Object) */
   protected MethodVisitor(final int ver, final IMethodVisitor methodVisitor) {
     super(ver, methodVisitor);
   }
 
-  /** @see DelegateVisitor#DelegateVisitor(IVisitor) */
+  /** @see DelegateVisitor#DelegateVisitor(Object) */
   protected MethodVisitor(IMethodVisitor visitor) {
     super(visitor);
   }

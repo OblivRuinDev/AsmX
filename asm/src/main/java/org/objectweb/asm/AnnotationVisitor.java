@@ -63,12 +63,12 @@ public abstract class AnnotationVisitor extends DelegateVisitor<IAnnotationVisit
     super(ver);
   }
 
-  /** @see DelegateVisitor#DelegateVisitor(int, IVisitor) */
+  /** @see DelegateVisitor#DelegateVisitor(int, Object) */
   protected AnnotationVisitor(final int ver, final IAnnotationVisitor annotationVisitor) {
     super(ver, annotationVisitor);
   }
 
-  /** @see DelegateVisitor#DelegateVisitor(IVisitor) */
+  /** @see DelegateVisitor#DelegateVisitor(Object) */
   protected AnnotationVisitor(IAnnotationVisitor visitor) {
     super(visitor);
   }

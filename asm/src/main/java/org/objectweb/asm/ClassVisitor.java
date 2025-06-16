@@ -68,12 +68,12 @@ public abstract class ClassVisitor extends DelegateVisitor<IClassVisitor> implem
     super(ver);
   }
 
-  /** @see DelegateVisitor#DelegateVisitor(int, IVisitor) */
+  /** @see DelegateVisitor#DelegateVisitor(int, Object) */
   protected ClassVisitor(final int ver, final IClassVisitor classVisitor) {
     super(ver, classVisitor);
   }
 
-  /** @see DelegateVisitor#DelegateVisitor(IVisitor) */
+  /** @see DelegateVisitor#DelegateVisitor(Object) */
   protected ClassVisitor(IClassVisitor visitor) {
     super(visitor);
   }

@@ -42,7 +42,6 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.signature;
 
-import org.objectweb.asm.IVisitor;
 import org.objectweb.asm.VerObj;
 
 /**
@@ -65,7 +64,7 @@ import org.objectweb.asm.VerObj;
  * @author Eric Bruneton
  * @author OblivRuinDev
  */
-public abstract class SignatureVisitor extends VerObj implements IVisitor {
+public abstract class SignatureVisitor extends VerObj {
 
   /** Wildcard for an "extends" type argument. */
   public static final char EXTENDS = '+';

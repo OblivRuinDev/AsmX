@@ -72,7 +72,7 @@ package org.objectweb.asm;
  *
  * @author OblivRuinDev
  */
-public interface IModuleVisitor extends IVisitor {
+public interface IModuleVisitor {
     /**
      * Visit the main class of the current module.
      *

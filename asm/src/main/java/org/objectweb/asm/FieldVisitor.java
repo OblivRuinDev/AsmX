@@ -63,12 +63,12 @@ public abstract class FieldVisitor extends DelegateVisitor<IFieldVisitor> implem
     super(ver);
   }
 
-  /** @see DelegateVisitor#DelegateVisitor(int, IVisitor) */
+  /** @see DelegateVisitor#DelegateVisitor(int, Object) */
   protected FieldVisitor(final int ver, final IFieldVisitor fieldVisitor) {
     super(ver, fieldVisitor);
   }
 
-  /** @see DelegateVisitor#DelegateVisitor(IVisitor) */
+  /** @see DelegateVisitor#DelegateVisitor(Object) */
   protected FieldVisitor(IFieldVisitor visitor) {
     super(visitor);
   }

@@ -86,7 +86,7 @@ package org.objectweb.asm;
  *
  * @author OblivRuinDev
  */
-public interface IClassVisitor extends IVisitor, ISpecialVisitor {
+public interface IClassVisitor extends ISpecialVisitor {
     /**
      * Visits the header of the class.
      *

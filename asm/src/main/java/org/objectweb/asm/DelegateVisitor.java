@@ -51,7 +51,7 @@ package org.objectweb.asm;
  *
  * @see VerObj
  */
-public abstract class DelegateVisitor<T extends IVisitor> extends VerObj {
+public abstract class DelegateVisitor<T> extends VerObj {
     /**
      * The parent visitor for delegation.<br>
      * May be {@code null}
@@ -61,7 +61,7 @@ public abstract class DelegateVisitor<T extends IVisitor> extends VerObj {
     /**
      * Construct this without any ClassFile Version checking on later visits
      *
-     * @see #DelegateVisitor(int, IVisitor)
+     * @see #DelegateVisitor(int, T)
      * @see VerObj#VerObj()
      */
     protected DelegateVisitor(T parent) {
@@ -72,7 +72,7 @@ public abstract class DelegateVisitor<T extends IVisitor> extends VerObj {
     /**
      * Construct this without any ClassFile Version checking on later visits
      *
-     * @see #DelegateVisitor(int, IVisitor)
+     * @see #DelegateVisitor(int, T)
      * @see VerObj#VerObj()
      */
     protected DelegateVisitor() {
@@ -93,7 +93,7 @@ public abstract class DelegateVisitor<T extends IVisitor> extends VerObj {
     }
 
     /**
-     * @see #DelegateVisitor(int, IVisitor)
+     * @see #DelegateVisitor(int, T)
      */
     protected DelegateVisitor(int ver) {
         super(ver);

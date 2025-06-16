@@ -63,12 +63,12 @@ public abstract class RecordComponentVisitor extends DelegateVisitor<IRecordComp
     super(ver);
   }
 
-  /** @see DelegateVisitor#DelegateVisitor(int, IVisitor) */
+  /** @see DelegateVisitor#DelegateVisitor(int, Object) */
   protected RecordComponentVisitor(final int ver, final IRecordComponentVisitor recordComponentVisitor) {
     super(ver, recordComponentVisitor);
   }
 
-  /** @see DelegateVisitor#DelegateVisitor(IVisitor) */
+  /** @see DelegateVisitor#DelegateVisitor(Object) */
   protected RecordComponentVisitor(IRecordComponentVisitor visitor) {
     super(visitor);
   }

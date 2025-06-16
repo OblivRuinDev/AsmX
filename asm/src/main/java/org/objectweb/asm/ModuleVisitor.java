@@ -63,12 +63,12 @@ public abstract class ModuleVisitor extends DelegateVisitor<IModuleVisitor> impl
     super(ver);
   }
 
-  /** @see DelegateVisitor#DelegateVisitor(int, IVisitor) */
+  /** @see DelegateVisitor#DelegateVisitor(int, Object) */
   protected ModuleVisitor(final int ver, final IModuleVisitor moduleVisitor) {
     super(ver, moduleVisitor);
   }
 
-  /** @see DelegateVisitor#DelegateVisitor(IVisitor) */
+  /** @see DelegateVisitor#DelegateVisitor(Object) */
   protected ModuleVisitor(IModuleVisitor visitor) {
     super(visitor);
   }

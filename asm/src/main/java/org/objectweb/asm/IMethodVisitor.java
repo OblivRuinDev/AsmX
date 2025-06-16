@@ -121,7 +121,7 @@ package org.objectweb.asm;
  *
  * @author OblivRuinDev
  */
-public interface IMethodVisitor extends IVisitor, ISpecialVisitor {
+public interface IMethodVisitor extends ISpecialVisitor {
     // -----------------------------------------------------------------------------------------------
     // Parameters, annotations and non standard attributes
     // -----------------------------------------------------------------------------------------------

@@ -49,7 +49,7 @@ package org.objectweb.asm;
  *
  * @author OblivRuinDev
  */
-public interface IFieldVisitor extends IVisitor, ISpecialVisitor {
+public interface IFieldVisitor extends ISpecialVisitor {
 
     /** {@inheritDoc} */
     @Override
